@@ -8,6 +8,7 @@ import datetime
 
 Base = declarative_base()
 
+
 class Transaction(Base):
     __tablename__ = 'transaction'
 
@@ -16,3 +17,11 @@ class Transaction(Base):
     price = Column(Float())
     comment = Column(String(500))
     type = Column(String(50))
+
+    def __str__(self):
+        return "(date: %s, price: %f, type: %s, comment: %s)" % (
+            "test",
+            self.price,
+            self.type,
+            self.comment,
+        )

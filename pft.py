@@ -6,5 +6,7 @@ class PersonalFinanceTool():
         dt = convert_to_datetime("30", "06", "1994")
         add_new_transaction(price=10.99, comment="more beer", date=dt)
 
+
+
 if __name__ == '__main__':
     ptf = PersonalFinanceTool()

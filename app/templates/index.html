@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% block app_content %}
 <h1>Hi, {{ current_user.username }}!</h1>
 {% for post in posts %}
 <div>
@@ -8,27 +8,42 @@
 </div>
 {% endfor %}
 
-<div class="flight-container" style="overflow: auto; max-height: 80vh">
-  <div class="table-responsive">
-    <table class="table" id="flights">
-      <thead>
-        <tr>
-          <th scope="col">Date</th>
-          <th scope="col">Price</th>
-          <th scope="col">Comment</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for transaction in current_user.transactions %}
-        <tr id={{ transaction.id }}>
-          <th scope="row">{{ transaction.date }}</th>
-          <td> {{transaction.price }} </td>
-          <td> {{ transaction.comment }} </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
+<table class="table table-hover" id="incoming">
+  <thead>
+    <tr>
+      <th scope="col">Date</th>
+      <th scope="col">Price</th>
+      <th scope="col">Comment</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for transaction in incoming_transactions %}
+    <tr id={{ transaction.id }}>
+      <th scope="row">{{ transaction.date }}</th>
+      <td> {{transaction.price }} </td>
+      <td> {{ transaction.comment }} </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<table class="table table-hover" id="outgoing">
+  <thead>
+    <tr>
+      <th scope="col">Date</th>
+      <th scope="col">Price</th>
+      <th scope="col">Comment</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for transaction in outgoing_transactions %}
+    <tr id={{ transaction.id }}>
+      <th scope="row">{{ transaction.date }}</th>
+      <td> {{transaction.price }} </td>
+      <td> {{ transaction.comment }} </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 
 {% endblock %}

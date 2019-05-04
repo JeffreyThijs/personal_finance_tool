@@ -1,9 +1,10 @@
-from app import db
+from app import db, login
 import datetime
 import enum
+from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -11,6 +12,10 @@ class User(db.Model):
     email = db.Column(db.String(120), index=True, unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
     transactions = db.relationship('Transaction', backref='user', lazy='dynamic')
+
+    @login.user_loader
+    def load_user(id):
+        return User.query.get(int(id))
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -27,25 +32,24 @@ class User(db.Model):
             self.email
         )
 
-class Transaction(db.Model):
+class Transaction(UserMixin, db.Model):
 
     class TransactionType(enum.Enum):
-        GENERAL = 1
-        RECREATIONAL = 2
-        UNKOWN = 3
+        UNKNOWN = 1
+        GENERAL = 2
+        RECREATIONAL = 3
 
     __tablename__ = 'transaction'
 
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
-    price = db.Column(db.Float())
-    type = db.Column(db.Enum(TransactionType))
-    currency = db.Column(db.String(50))
-    incoming = db.column(db.Boolean)
-    comment = db.Column(db.String(500))
+    price = db.Column(db.Float(), default=0.0, nullable=False)
+    type = db.Column(db.Enum(TransactionType), default=TransactionType.UNKNOWN, nullable=False)
+    currency = db.Column(db.String(50), default="euro", nullable=False)
+    incoming = db.Column(db.Boolean, default=False, nullable=False)
+    comment = db.Column(db.String(500), default="placeholder", nullable=False)
 
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    user = db.relationship("User", back_populates="transactions")
 
     def __repr__(self):
         return '<Transaction {}>'.format(self.id)

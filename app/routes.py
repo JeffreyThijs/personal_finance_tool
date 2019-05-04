@@ -5,13 +5,20 @@ from app import app, db
 from app.forms import LoginForm, RegistrationForm, TransactionForm
 from app.models import User
 from app.dbutils import add_new_transaction
+from sqlalchemy import and_
+
 
 
 @app.route('/')
 @app.route('/index')
 @login_required
 def index():
-    return render_template('index.html', title='Home')
+    incoming_transactions = list(filter(lambda t: t.incoming, current_user.transactions))
+    outgoing_transactions = list(filter(lambda t: not t.incoming, current_user.transactions))
+    return render_template('index.html',
+                           title='Home',
+                           incoming_transactions=incoming_transactions,
+                           outgoing_transactions=outgoing_transactions)
 
 @app.route('/entry', methods=['GET', 'POST'])
 @login_required

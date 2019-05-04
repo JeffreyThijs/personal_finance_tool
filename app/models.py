@@ -12,6 +12,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), index=True, unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
     transactions = db.relationship('Transaction', backref='user', lazy='dynamic')
+    last_date_viewed = db.Column(db.DateTime(), default=datetime.date.today())
 
     @login.user_loader
     def load_user(id):

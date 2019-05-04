@@ -5,20 +5,53 @@ from app import app, db
 from app.forms import LoginForm, RegistrationForm, TransactionForm
 from app.models import User
 from app.dbutils import add_new_transaction
+from app.tools.dateutils import filter_on_MonthYear, _next_month, _previous_month, dt_parse
 from sqlalchemy import and_
 
-
-
-@app.route('/')
-@app.route('/index')
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
-    incoming_transactions = list(filter(lambda t: t.incoming, current_user.transactions))
-    outgoing_transactions = list(filter(lambda t: not t.incoming, current_user.transactions))
+    transactions = list(current_user.transactions)
+    transactions.sort(key=lambda x: x.date, reverse=True)
+
+    current_date_view = dt_parse(current_user.last_date_viewed)
+
+
+    current_month_view, current_year_view = str(current_user.last_date_viewed.month), str(current_user.last_date_viewed.year)
+    transactions = filter_on_MonthYear(transactions, "date", current_month_view, current_year_view)
+
     return render_template('index.html',
                            title='Home',
-                           incoming_transactions=incoming_transactions,
-                           outgoing_transactions=outgoing_transactions)
+                           transactions=transactions,
+                           current_date_view=current_date_view)
+
+
+@app.route('/next_month', methods=['GET', 'POST'])
+@login_required
+def next_month():
+    current_month = current_user.last_date_viewed.month
+    new_month = _next_month(str(current_month))
+    current_user.last_date_viewed = current_user.last_date_viewed.replace(month=new_month)
+    if current_month == 12:
+        current_year = current_user.last_date_viewed.year
+        current_user.last_date_viewed = current_user.last_date_viewed.replace(year=current_year+1)
+    db.session.add(current_user)
+    db.session.commit()
+    return redirect(url_for('index'))
+
+@app.route('/previous_month', methods=['GET', 'POST'])
+@login_required
+def previous_month():
+    current_month = current_user.last_date_viewed.month
+    new_month = _previous_month(str(current_month))
+    current_user.last_date_viewed = current_user.last_date_viewed.replace(month=new_month)
+    if current_month == 1:
+        current_year = current_user.last_date_viewed.year
+        current_user.last_date_viewed = current_user.last_date_viewed.replace(year=current_year-1)
+    db.session.add(current_user)
+    db.session.commit()
+    return redirect(url_for('index'))
 
 @app.route('/entry', methods=['GET', 'POST'])
 @login_required

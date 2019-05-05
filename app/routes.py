@@ -13,7 +13,7 @@ from sqlalchemy import and_
 @login_required
 def index():
     transactions = list(current_user.transactions)
-    transactions.sort(key=lambda x: x.date, reverse=True)
+    transactions.sort(key=lambda x: x.date, reverse=False)
 
     current_date_view = dt_parse(current_user.last_date_viewed)
 
@@ -21,9 +21,12 @@ def index():
     current_month_view, current_year_view = str(current_user.last_date_viewed.month), str(current_user.last_date_viewed.year)
     transactions = filter_on_MonthYear(transactions, "date", current_month_view, current_year_view)
 
+    balance = round(sum(t.price for t in transactions if t.incoming) - sum(t.price for t in transactions if not t.incoming), 2)
+
     return render_template('index.html',
                            title='Home',
                            transactions=transactions,
+                           balance=balance,
                            current_date_view=current_date_view)
 
 

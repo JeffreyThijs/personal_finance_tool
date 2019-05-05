@@ -56,8 +56,11 @@ class Transaction(UserMixin, db.Model):
         return '<Transaction {}>'.format(self.id)
 
     def __str__(self):
-        return "(price: {}, type: {}, comment: {}".format(
+        return "(price: {}, type: {}, comment: {}, currency: {}, incoming: {}, user_id: {})".format(
             self.price,
-            "null",
-            self.comment
+            self.type,
+            self.comment,
+            self.currency,
+            self.incoming,
+            self.user_id
         )

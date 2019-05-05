@@ -1,24 +1,7 @@
-a {
-  text-decoration: none;
-  display: inline-block;
-  padding: 8px 16px;
+.table td, .table th {
+    border: none;
 }
 
-a:hover {
-  background-color: #ddd;
-  color: black;
-}
-
-.previous {
-  background-color: #ddd;
-  color: black;
-}
-
-.next {
-  background-color: #ddd;
-  color: blue;
-}
-
-.round {
-  border-radius: 50%;
+table.table.table-condensed {
+    border: 5px solid black;
 }

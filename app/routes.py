@@ -1,17 +1,23 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, send_file
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
 from app import app, db
-from app.forms import LoginForm, RegistrationForm, TransactionForm
+from app.forms import LoginForm, RegistrationForm, TransactionForm, TranactionButton
 from app.models import User
 from app.dbutils import add_new_transaction
 from app.tools.dateutils import filter_on_MonthYear, _next_month, _previous_month, dt_parse
+from app.tools.plotutils import _plot
 from sqlalchemy import and_
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
+
+    new_transaction = TranactionButton()
+    if new_transaction.validate_on_submit():
+        return redirect(url_for('entry'))
+
     transactions = list(current_user.transactions)
     transactions.sort(key=lambda x: x.date, reverse=False)
 
@@ -24,11 +30,19 @@ def index():
     balance = round(sum(t.price for t in transactions if t.incoming) - sum(t.price for t in transactions if not t.incoming), 2)
 
     return render_template('index.html',
+                           new_transaction=new_transaction,
                            title='Home',
                            transactions=transactions,
                            balance=balance,
                            current_date_view=current_date_view)
 
+
+@app.route('/plots', methods=['GET'])
+@login_required
+def plots():
+    bytes_obj = _plot()
+
+    return send_file(bytes_obj, attachment_filename='plot.png', mimetype='image/png')
 
 @app.route('/next_month', methods=['GET', 'POST'])
 @login_required

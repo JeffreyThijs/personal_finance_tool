@@ -11,14 +11,15 @@ def _plot(*args, **kwargs):
     ylabel = kwargs['ylabel'] if kwargs['ylabel'] else None
     figure_number = kwargs['figure_number'] if kwargs['figure_number'] else 0
     filetype = kwargs['filetype'] if kwargs['filetype'] else "png"
+    figsize = kwargs['figsize'] if kwargs['figsize'] else [12.8, 9.6]
+    dpi = kwargs['dpi'] if kwargs['dpi'] else 400
 
-    plt.figure(figure_number)
+    plt.figure(figure_number, figsize=figsize, dpi=dpi)
 
     if len(args) == 0:
         raise ValueError("no input")
 
     for y in args:
-        print(y)
         if x is not None:
             plt.plot(x, y)
         else:

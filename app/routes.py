@@ -6,7 +6,7 @@ from app.forms import LoginForm, RegistrationForm, TransactionForm, TranactionBu
 from app.models import User
 from app.dbutils import add_new_transaction
 from app.tools.dateutils import filter_on_MonthYear, _next_month, _previous_month, dt_parse
-from app.tools.plotutils import _plot
+from app.tools.plotutils import test_plot, _plot
 from sqlalchemy import and_
 
 @app.route('/', methods=['GET', 'POST'])
@@ -23,7 +23,6 @@ def index():
 
     current_date_view = dt_parse(current_user.last_date_viewed)
 
-
     current_month_view, current_year_view = str(current_user.last_date_viewed.month), str(current_user.last_date_viewed.year)
     transactions = filter_on_MonthYear(transactions, "date", current_month_view, current_year_view)
 
@@ -37,12 +36,45 @@ def index():
                            current_date_view=current_date_view)
 
 
-@app.route('/plots', methods=['GET'])
+@app.route('/makeplots', methods=['GET'])
 @login_required
-def plots():
-    bytes_obj = _plot()
+def make_plots():
+    dates = []
+    current_date = None
+    current_balance = 0.0
+    balance_history = []
 
-    return send_file(bytes_obj, attachment_filename='plot.png', mimetype='image/png')
+    transactions = list(current_user.transactions)
+    transactions.sort(key=lambda x: x.date, reverse=False)
+    for t in transactions:
+
+        if t.incoming:
+            current_balance += t.price
+        else:
+            current_balance -= t.price
+
+        current_date = t.date
+
+        if len(dates) == 0 or current_date != dates[-1:]:
+            print(current_date)
+            dates.append(current_date)
+            balance_history.append(current_balance)
+
+    bytes_obj = _plot(balance_history,
+         x=dates,
+         title='Balance History',
+         xlabel='Date',
+         ylabel='Balance',
+         figure_number=0,
+         filetype='png')
+
+
+    return send_file(bytes_obj, attachment_filename='plot.png', mimetype='image/png', cache_timeout=5)
+
+@app.route('/plots')
+@login_required
+def get_plots():
+    return render_template('plots.html', title='Plots')
 
 @app.route('/next_month', methods=['GET', 'POST'])
 @login_required

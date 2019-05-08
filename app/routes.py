@@ -1,13 +1,13 @@
 from flask import render_template, flash, redirect, url_for, request, send_file
 from flask_login import login_user, logout_user, current_user, login_required
-from werkzeug.urls import url_parse
-from app import app, db
 from app.forms import LoginForm, RegistrationForm, TransactionForm, TranactionButton
-from app.models import User
-from app.dbutils import add_new_transaction
 from app.tools.dateutils import filter_on_MonthYear, _next_month, _previous_month, dt_parse
 from app.tools.plotutils import test_plot, _plot
+from app.dbutils import add_new_transaction
+from werkzeug.urls import url_parse
+from app.models import User
 from sqlalchemy import and_
+from app import app, db
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -47,7 +47,6 @@ def make_plots():
     transactions = list(current_user.transactions)
     transactions.sort(key=lambda x: x.date, reverse=False)
     for t in transactions:
-
         if t.incoming:
             current_balance += t.price
         else:
@@ -56,20 +55,18 @@ def make_plots():
         current_date = t.date
 
         if len(dates) == 0 or current_date != dates[-1:]:
-            print(current_date)
             dates.append(current_date)
             balance_history.append(current_balance)
 
     bytes_obj = _plot(balance_history,
-         x=dates,
-         title='Balance History',
-         xlabel='Date',
-         ylabel='Balance',
-         figure_number=0,
-         filetype='png')
+                      x=dates,
+                      title='Balance History',
+                      xlabel='Date',
+                      ylabel='Balance',
+                      figure_number=0,
+                      filetype='png')
 
-
-    return send_file(bytes_obj, attachment_filename='plot.png', mimetype='image/png', cache_timeout=5)
+    return send_file(bytes_obj, attachment_filename='plot.png', mimetype='image/png')
 
 @app.route('/plots')
 @login_required

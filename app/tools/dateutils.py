@@ -39,10 +39,8 @@ def filter_on_datetime(objects,
 
     start_dt = convert_to_datetime(start_day, start_month, start_year,
                                    "00", "00", "00")
-    print(start_dt)
     end_dt = convert_to_datetime(end_day, end_month, end_year,
                                  "23", "59", "59")
-    print(end_dt)
 
     return list(filter(lambda o: (getattr(o, datetime_attr) <= end_dt) and
                        (getattr(o, datetime_attr) >= start_dt), objects))

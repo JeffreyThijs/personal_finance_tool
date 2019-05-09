@@ -7,6 +7,10 @@ from app.models import User
 class TranactionButton(FlaskForm):
     submit = SubmitField('New Transaction')
 
+class TaxForm(FlaskForm):
+    gross_wage = FloatField('Price', validators=[DataRequired()])
+    submit = SubmitField('Calculate')
+
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])

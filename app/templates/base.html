@@ -25,6 +25,7 @@
                     <li><a href="{{ url_for('login') }}">Login</a></li>
                     {% else %}
                     <li><a href="{{ url_for('get_plots') }}">Plots</a></li>
+                    <li><a href="{{ url_for('tax') }}">Calculate Net Wage</a></li>
                     <li><a href="{{ url_for('logout') }}">Logout</a></li>
                     {% endif %}
                 </ul>

@@ -5,14 +5,14 @@ import io
 
 def _plot(*args, **kwargs):
 
-    x = kwargs['x'] if kwargs['x'] else None
-    title = kwargs['title'] if kwargs['title'] else None
-    xlabel = kwargs['xlabel'] if kwargs['xlabel'] else None
-    ylabel = kwargs['ylabel'] if kwargs['ylabel'] else None
-    figure_number = kwargs['figure_number'] if kwargs['figure_number'] else 0
-    filetype = kwargs['filetype'] if kwargs['filetype'] else "png"
-    figsize = kwargs['figsize'] if kwargs['figsize'] else [12.8, 9.6]
-    dpi = kwargs['dpi'] if kwargs['dpi'] else 400
+    x = kwargs['x'] if 'x' in kwargs else None
+    title = kwargs['title'] if 'title' in kwargs else None
+    xlabel = kwargs['xlabel'] if 'xlabel' in kwargs else None
+    ylabel = kwargs['ylabel'] if 'ylabel' in kwargs else None
+    figure_number = kwargs['figure_number'] if 'figure_number' in kwargs else 0
+    filetype = kwargs['filetype'] if 'filetype' in kwargs else "png"
+    figsize = kwargs['figsize'] if 'figsize' in kwargs else [12.8, 9.6]
+    dpi = kwargs['dpi'] if 'dpi' in kwargs else 400
 
     plt.figure(figure_number, figsize=figsize, dpi=dpi)
 

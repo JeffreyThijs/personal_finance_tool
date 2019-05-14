@@ -1,0 +1,13 @@
+# more generic tax calculation
+# holiday money calculation
+# end of the year bous calculation
+# switch balance to home/index and monthly view to other tab - DONE
+# expand monthly view by drop down category
+# more advanced plots such as overview per categoy, incoming/outgoing, ...
+# add transaction editing support on client side
+# enhance layout
+# add email support
+# add error support
+# look into flask-blueprints / refactoring to split more general parts
+# look into containered deployement ==> docker, uwsgi, ansible, ...
+# maybe try to make an API?

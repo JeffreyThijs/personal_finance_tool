@@ -24,7 +24,7 @@
                     {% if current_user.is_anonymous %}
                     <li><a href="{{ url_for('login') }}">Login</a></li>
                     {% else %}
-                    <li><a href="{{ url_for('get_plots') }}">Plots</a></li>
+                    <li><a href="{{ url_for('monthly_overview') }}">Monthly Overview</a></li>
                     <li><a href="{{ url_for('tax') }}">Calculate Net Wage</a></li>
                     <li><a href="{{ url_for('logout') }}">Logout</a></li>
                     {% endif %}

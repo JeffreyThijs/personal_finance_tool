@@ -14,7 +14,12 @@ from app import app, db
 @app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
+    return render_template('index.html', title='Plots')
 
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/monthly_overview', methods=['GET', 'POST'])
+@login_required
+def monthly_overview():
     new_transaction = TranactionButton()
     if new_transaction.validate_on_submit():
         return redirect(url_for('entry'))
@@ -29,7 +34,7 @@ def index():
 
     balance = round(sum(t.price for t in transactions if t.incoming) - sum(t.price for t in transactions if not t.incoming), 2)
 
-    return render_template('index.html',
+    return render_template('monthly_overview.html',
                            new_transaction=new_transaction,
                            title='Home',
                            transactions=transactions,
@@ -69,10 +74,10 @@ def make_plots():
 
     return send_file(bytes_obj, attachment_filename='plot.png', mimetype='image/png')
 
-@app.route('/plots')
-@login_required
-def get_plots():
-    return render_template('plots.html', title='Plots')
+# @app.route('/plots')
+# @login_required
+# def get_plots():
+#     return render_template('plots.html', title='Plots')
 
 @app.route('/next_month', methods=['GET', 'POST'])
 @login_required
@@ -85,7 +90,7 @@ def next_month():
         current_user.last_date_viewed = current_user.last_date_viewed.replace(year=current_year+1)
     db.session.add(current_user)
     db.session.commit()
-    return redirect(url_for('index'))
+    return redirect(url_for('monthly_overview'))
 
 @app.route('/previous_month', methods=['GET', 'POST'])
 @login_required
@@ -98,7 +103,7 @@ def previous_month():
         current_user.last_date_viewed = current_user.last_date_viewed.replace(year=current_year-1)
     db.session.add(current_user)
     db.session.commit()
-    return redirect(url_for('index'))
+    return redirect(url_for('monthly_overview'))
 
 @app.route('/entry', methods=['GET', 'POST'])
 @login_required
@@ -110,7 +115,7 @@ def entry():
                             comment=form.comment.data,
                             user_id=current_user.id,
                             incoming=form.incoming.data)
-        return redirect(url_for('index'))
+        return redirect(url_for('monthly_overview'))
     return render_template('entry.html', title='Entry', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -129,7 +134,6 @@ def login():
             next_page = url_for('index')
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
-
 
 @app.route('/logout')
 def logout():

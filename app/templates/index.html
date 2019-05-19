@@ -6,11 +6,100 @@
 <link rel="stylesheet" href="{{url_for('.static', filename='styles.css')}}">
 {% endblock %}
 
+{% block scripts %}
+
+{{super()}}
+{% endblock %}
+
 
 {% block app_content %}
   <h1>Hi, {{ current_user.username }}!</h1>
 
-  <div class="imgbox">
+  <!-- <div class="imgbox">
     <img src="http://localhost:5000/makeplots" class="center-fit">
-  </div>
+  </div> -->
+
+  <canvas id="myChart"></canvas>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+  <script>
+  var ctx = document.getElementById('myChart').getContext('2d');
+  var myChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: {{ labels | safe}},
+        datasets: 
+        [
+          { 
+            data: {{ incoming_data }},
+            label: "Incoming",
+            borderColor: "#3e95cd",
+            fill: true,
+          }
+          // }, 
+          // { 
+          //   data: {{ outgoing_data }},
+          //   label: "Outgoing",
+          //   borderColor: "#8e5ea2",
+          //   fill: true
+          // }
+        ]
+      },
+      options: {
+        scales: {
+          xAxes: [{
+              gridLines: {
+                  display:false
+              }
+          }],
+          yAxes: [{
+              gridLines: {
+                  display:false
+              }   
+          }]
+        }
+    }
+  });
+  </script>
+
+<canvas id="myChart2"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+<script>
+var ctx = document.getElementById('myChart2').getContext('2d');
+var myChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: {{ labels | safe}},
+      datasets: 
+      [
+        { 
+          data: {{ incoming_data }},
+          label: "Incoming",
+          borderColor: "#3e95cd",
+          fill: true,
+        }
+        // }, 
+        // { 
+        //   data: {{ outgoing_data }},
+        //   label: "Outgoing",
+        //   borderColor: "#8e5ea2",
+        //   fill: true
+        // }
+      ]
+    },
+    options: {
+      scales: {
+        xAxes: [{
+            gridLines: {
+                display:false
+            }
+        }],
+        yAxes: [{
+            gridLines: {
+                display:false
+            }   
+        }]
+      }
+  }
+});
+</script>
 {% endblock %}

@@ -73,5 +73,3 @@ def calc_net_wage(gross_wage):
     net_wage = round(taxable_wage - payroll_tax - bbsz, 2)
 
     return net_wage
-
-print(calc_net_wage(2809.40))

@@ -9,12 +9,37 @@ from werkzeug.urls import url_parse
 from app.models import User
 from sqlalchemy import and_
 from app import app, db
+import json
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
-    return render_template('index.html', title='Plots')
+
+    dates = []
+    current_date = None
+    current_balance = 0.0
+    balance_history = []
+    
+    transactions = list(current_user.transactions)
+    transactions.sort(key=lambda x: x.date, reverse=False)
+    for t in transactions:
+        if t.incoming:
+            current_balance += t.price
+        else:
+            current_balance -= t.price
+
+        current_date = t.date
+
+        if len(dates) == 0 or current_date != dates[-1:]:
+            dates.append(current_date)
+            balance_history.append(round(current_balance, 2))
+
+    sdates = [dt.strftime("%d/%m/%Y") for dt in dates]
+    labels = sdates
+    incoming_data = balance_history
+    # outgoing_data = balance_history
+    return render_template('index.html', title='Plots', labels=labels, incoming_data=incoming_data) #, outgoing_data=outgoing_data)
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/monthly_overview', methods=['GET', 'POST'])
@@ -41,38 +66,6 @@ def monthly_overview():
                            balance=balance,
                            current_date_view=current_date_view)
 
-
-@app.route('/makeplots', methods=['GET'])
-@login_required
-def make_plots():
-    dates = []
-    current_date = None
-    current_balance = 0.0
-    balance_history = []
-
-    transactions = list(current_user.transactions)
-    transactions.sort(key=lambda x: x.date, reverse=False)
-    for t in transactions:
-        if t.incoming:
-            current_balance += t.price
-        else:
-            current_balance -= t.price
-
-        current_date = t.date
-
-        if len(dates) == 0 or current_date != dates[-1:]:
-            dates.append(current_date)
-            balance_history.append(current_balance)
-
-    bytes_obj = _plot(balance_history,
-                      x=dates,
-                      title='Balance History',
-                      xlabel='Date',
-                      ylabel='Balance',
-                      figure_number=0,
-                      filetype='png')
-
-    return send_file(bytes_obj, attachment_filename='plot.png', mimetype='image/png')
 
 # @app.route('/plots')
 # @login_required

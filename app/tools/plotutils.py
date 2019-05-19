@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import io
+import bokeh.plotting as bplt
 
 
 def _plot(*args, **kwargs):
@@ -37,6 +38,10 @@ def _plot(*args, **kwargs):
     bytes_image.seek(0)
 
     return bytes_image
+
+def _bplot(ref, title, x, y):
+    bplt.output_file(ref, title=title)
+    bplt.line(x, y)
 
 
 def test_plot():

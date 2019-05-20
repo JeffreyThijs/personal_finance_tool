@@ -51,9 +51,10 @@ def filter_on_MonthYear(objects,
                         month : str,
                         year : str):
 
-    end_day = str(get_days_in_month(int(month), int(year)))
+    
 
     if month.lower() in MONTHS: month = convert_month(month)
+    end_day = str(get_days_in_month(int(month), int(year)))
     begin_date = "01-"+month+"-"+year
     end_date = end_day+"-"+month+"-"+year
 

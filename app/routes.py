@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for, request, send_file
 from flask_login import login_user, logout_user, current_user, login_required
 from app.forms import LoginForm, RegistrationForm, TransactionForm, TranactionButton, TaxForm
-from app.tools.dateutils import filter_on_MonthYear, _next_month, _previous_month, dt_parse
+from app.tools.dateutils import filter_on_MonthYear, _next_month, _previous_month, dt_parse, MONTHS
 from app.tools.taxutils import calc_net_wage
 from app.tools.plotutils import test_plot, _plot
 from app.dbutils import add_new_transaction
@@ -20,9 +20,11 @@ def index():
     current_date = None
     current_balance = 0.0
     balance_history = []
+    incoming_data, outgoing_data = [], []
     
     transactions = list(current_user.transactions)
     transactions.sort(key=lambda x: x.date, reverse=False)
+
     for t in transactions:
         if t.incoming:
             current_balance += t.price
@@ -37,9 +39,26 @@ def index():
 
     sdates = [dt.strftime("%d/%m/%Y") for dt in dates]
     labels = sdates
-    incoming_data = balance_history
-    # outgoing_data = balance_history
-    return render_template('index.html', title='Plots', labels=labels, incoming_data=incoming_data) #, outgoing_data=outgoing_data)
+
+    for month in MONTHS:
+        sum_incoming, sum_outgoing = 0, 0
+        ts = filter_on_MonthYear(transactions, "date", month, "2019")
+        for t in ts:
+            if t.incoming:
+                sum_incoming += t.price
+            else:
+                sum_outgoing += t.price
+        incoming_data.append(sum_incoming)
+        outgoing_data.append(sum_outgoing)
+
+    overall_data = balance_history
+    return render_template('index.html', 
+                            title='Plots', 
+                            labels=labels, 
+                            overall_data=overall_data, 
+                            labels_bar=MONTHS,
+                            incoming_data=incoming_data,
+                            outgoing_data=outgoing_data)
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/monthly_overview', methods=['GET', 'POST'])
@@ -66,11 +85,6 @@ def monthly_overview():
                            balance=balance,
                            current_date_view=current_date_view)
 
-
-# @app.route('/plots')
-# @login_required
-# def get_plots():
-#     return render_template('plots.html', title='Plots')
 
 @app.route('/next_month', methods=['GET', 'POST'])
 @login_required

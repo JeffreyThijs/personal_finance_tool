@@ -30,18 +30,12 @@
         datasets: 
         [
           { 
-            data: {{ incoming_data }},
+            data: {{ overall_data }},
             label: "Incoming",
-            borderColor: "#3e95cd",
+            backgroundColor: "rgba(0, 150, 255, 0.5)",
+            borderColor: "rgba(0, 150, 255, 1)",
             fill: true,
           }
-          // }, 
-          // { 
-          //   data: {{ outgoing_data }},
-          //   label: "Outgoing",
-          //   borderColor: "#8e5ea2",
-          //   fill: true
-          // }
         ]
       },
       options: {
@@ -66,24 +60,27 @@
 <script>
 var ctx = document.getElementById('myChart2').getContext('2d');
 var myChart = new Chart(ctx, {
-    type: 'line',
+    type: 'bar',
     data: {
-      labels: {{ labels | safe}},
+      labels: {{ labels_bar | safe}},
       datasets: 
       [
         { 
           data: {{ incoming_data }},
           label: "Incoming",
-          borderColor: "#3e95cd",
+          backgroundColor: "rgba(0, 255, 0, 1)",
+          borderColor: "#000000",
+          borderWidth: 1,
           fill: true,
+        },
+        { 
+          data: {{ outgoing_data }},
+          label: "Outgoing",
+          backgroundColor: "rgba(255, 0, 10, 1)",
+          borderColor: "#000000",
+          borderWidth: 1,
+          fill: true
         }
-        // }, 
-        // { 
-        //   data: {{ outgoing_data }},
-        //   label: "Outgoing",
-        //   borderColor: "#8e5ea2",
-        //   fill: true
-        // }
       ]
     },
     options: {

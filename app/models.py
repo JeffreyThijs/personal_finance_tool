@@ -4,6 +4,18 @@ import enum
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
+class FormEnum(enum.Enum):
+    @classmethod
+    def choices(cls):
+        return [(choice, choice.name.title()) for choice in cls]
+
+    @classmethod
+    def coerce(cls, item):
+        return cls(int(item)) if not isinstance(item, cls) else item
+
+    def __str__(self):
+        return str(self.value)
+
 class User(UserMixin, db.Model):
     __tablename__ = 'user'
 
@@ -35,7 +47,7 @@ class User(UserMixin, db.Model):
 
 class Transaction(UserMixin, db.Model):
 
-    class TransactionType(enum.Enum):
+    class TransactionType(FormEnum):
         UNKNOWN = 1
         GENERAL = 2
         RECREATIONAL = 3

@@ -1,8 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, FloatField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, FloatField, SelectField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
-from app.models import User
-
+from app.models import User, Transaction
 
 class TranactionButton(FlaskForm):
     submit = SubmitField('New Transaction')
@@ -40,6 +39,8 @@ class TransactionForm(FlaskForm):
     date = StringField('Date', validators=[DataRequired()])
     price = FloatField('Price', validators=[DataRequired()])
     comment = StringField('Comment', validators=[DataRequired()])
+    category = SelectField("Category",  choices = Transaction.TransactionType.choices(),
+                                        coerce = Transaction.TransactionType.coerce)
     incoming = BooleanField('Incoming transaction')
 
     submit = SubmitField('Add Transaction')

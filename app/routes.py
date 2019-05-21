@@ -120,6 +120,7 @@ def entry():
         add_new_transaction(price=form.price.data,
                             date=form.date.data,
                             comment=form.comment.data,
+                            category=form.category.data,
                             user_id=current_user.id,
                             incoming=form.incoming.data)
         return redirect(url_for('monthly_overview'))

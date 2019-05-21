@@ -15,88 +15,25 @@
 {% block app_content %}
   <h1>Hi, {{ current_user.username }}!</h1>
 
-  <!-- <div class="imgbox">
-    <img src="http://localhost:5000/makeplots" class="center-fit">
-  </div> -->
+  <div>
+    <canvas id="line_plot"></canvas>
+    <canvas id="bar_plot"></canvas>
+    <div class="row">
+      <div class="column">
+        <canvas id="doughnut_plot_incoming"></canvas>
+      </div>
+      <div class="column">
+          <canvas id="doughnut_plot_outgoing"></canvas>
+      </div>
+    </div>
+  </div>
 
-  <canvas id="myChart"></canvas>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
-  <script>
-  var ctx = document.getElementById('myChart').getContext('2d');
-  var myChart = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: {{ labels | safe}},
-        datasets: 
-        [
-          { 
-            data: {{ overall_data }},
-            label: "Incoming",
-            backgroundColor: "rgba(0, 150, 255, 0.5)",
-            borderColor: "rgba(0, 150, 255, 1)",
-            fill: true,
-          }
-        ]
-      },
-      options: {
-        scales: {
-          xAxes: [{
-              gridLines: {
-                  display:false
-              }
-          }],
-          yAxes: [{
-              gridLines: {
-                  display:false
-              }   
-          }]
-        }
-    }
-  });
+  <script src="{{ url_for('static', filename='plots.js') }}"></script>
+  <script type="text/javascript">
+    make_line_plot("line_plot", {{ overall_data}}, {{labels | safe}});
+    make_bar_plot("bar_plot",  {{ incoming_data }}, {{ outgoing_data }}, {{ labels_bar | safe}});
+    make_doughnut_plot("doughnut_plot_incoming", {{incoming_data}});
+    make_doughnut_plot("doughnut_plot_outgoing", {{outgoing_data}});
   </script>
-
-<canvas id="myChart2"></canvas>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
-<script>
-var ctx = document.getElementById('myChart2').getContext('2d');
-var myChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: {{ labels_bar | safe}},
-      datasets: 
-      [
-        { 
-          data: {{ incoming_data }},
-          label: "Incoming",
-          backgroundColor: "rgba(0, 255, 0, 1)",
-          borderColor: "#000000",
-          borderWidth: 1,
-          fill: true,
-        },
-        { 
-          data: {{ outgoing_data }},
-          label: "Outgoing",
-          backgroundColor: "rgba(255, 0, 10, 1)",
-          borderColor: "#000000",
-          borderWidth: 1,
-          fill: true
-        }
-      ]
-    },
-    options: {
-      scales: {
-        xAxes: [{
-            gridLines: {
-                display:false
-            }
-        }],
-        yAxes: [{
-            gridLines: {
-                display:false
-            }   
-        }]
-      }
-  }
-});
-</script>
 {% endblock %}

@@ -7,6 +7,7 @@ def add_new_transaction(price : float,
                         date : str = None,
                         comment : str = "placeholder",
                         user_id : int = None,
+                        category : Transaction.TransactionType = Transaction.TransactionType.UNKNOWN,
                         incoming : bool = False):
     if date:
         day, month, year = date_parse(date)
@@ -18,16 +19,19 @@ def add_new_transaction(price : float,
                          comment=comment,
                          date=dt,
                          user_id=user_id,
+                         category=category,
                          incoming=incoming)
 
 def _add_new_transaction(price : float,
                          comment : str,
                          date : datetime = None,
                          user_id : int = None,
+                         category : Transaction.TransactionType = Transaction.TransactionType.UNKNOWN,
                          incoming : bool = False):
 
     transaction = Transaction(price=price,
                               comment=comment,
+                              type=category,
                               incoming=incoming)
 
     if date: transaction.date = date

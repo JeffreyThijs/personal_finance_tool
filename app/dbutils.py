@@ -40,3 +40,24 @@ def _add_new_transaction(price : float,
     print("Adding new transaction: {}".format(transaction))
     db.session.add(transaction)
     db.session.commit()
+
+def edit_transaction(id : int,
+                    price : float = None,
+                    comment : str = None,
+                    date : datetime = None,
+                    user_id : int = None,
+                    category : Transaction.TransactionType = None,
+                    incoming : bool = None):
+
+    transaction = db.session.query(Transaction).get(id)
+
+    if isinstance(price, float): transaction.price = price
+    if isinstance(comment, str): transaction.comment = comment
+    if isinstance(date, datetime): transaction.date = date
+    if isinstance(user_id, int): transaction.user_id = user_id
+    if isinstance(category, Transaction.TransactionType): transaction.category = category
+    if isinstance(incoming, bool): transaction.incoming = incoming
+
+    print("Edited transaction: {}".format(transaction))
+    db.session.add(transaction)
+    db.session.commit()

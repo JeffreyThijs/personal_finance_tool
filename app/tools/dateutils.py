@@ -19,6 +19,19 @@ def convert_to_datetime(day: str,
 def dt_parse(dt : datetime) -> str:
     return dt.strftime('%B %Y')
 
+def date_time_parse(date_time : str, datetime_seperator=" ", date_seperator="-", time_separator=":") -> tuple:
+    if (datetime_seperator not in date_time or 
+        date_seperator not in date_time or 
+        time_separator not in date_time):
+        raise ValueError("date_time string {} does not contain the right seperators")
+
+    date, time = date_time.split(date_time, 1)
+    day, month, year = date.split(date_seperator, 2)
+    hour, minute, second = time.split(time_separator, 2)
+    
+    return tuple((day, month, year, hour, minute, second))
+
+
 def date_parse(date: str, seperator="-") -> tuple:
     if seperator not in date:
         raise ValueError(

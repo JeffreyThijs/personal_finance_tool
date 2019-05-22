@@ -4,7 +4,7 @@ from app.forms import LoginForm, RegistrationForm, TransactionForm, TranactionBu
 from app.tools.dateutils import filter_on_MonthYear, _next_month, _previous_month, dt_parse, MONTHS
 from app.tools.taxutils import calc_net_wage
 from app.tools.plotutils import test_plot, _plot
-from app.dbutils import add_new_transaction
+from app.dbutils import add_new_transaction, edit_transaction
 from werkzeug.urls import url_parse
 from app.models import User
 from sqlalchemy import and_
@@ -78,12 +78,18 @@ def monthly_overview():
 
     balance = round(sum(t.price for t in transactions if t.incoming) - sum(t.price for t in transactions if not t.incoming), 2)
 
+    edit_transaction_form = TransactionForm()
+    if edit_transaction_form.validate_on_submit():
+        edit_transaction(id=None, price=edit_transaction_form.price.data)
+        return redirect(url_for('monthly_overview'))
+
     return render_template('monthly_overview.html',
                            new_transaction=new_transaction,
                            title='Home',
                            transactions=transactions,
                            balance=balance,
-                           current_date_view=current_date_view)
+                           current_date_view=current_date_view,
+                           edit_transaction_form=edit_transaction_form)
 
 
 @app.route('/next_month', methods=['GET', 'POST'])

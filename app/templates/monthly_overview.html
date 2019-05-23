@@ -35,30 +35,32 @@
   <tbody>
     {% for transaction in transactions %}
     {% if transaction.incoming %}
-    <tr class="bg-success" id={{ transaction.id }}>
+    <tr class="bg-success">
       <th scope="row">{{ loop.index }}</th>
-      <td id={{ 'date_' + loop.index | string }}> {{ transaction.date }} </td>
-      <td id={{ 'comment_' + loop.index | string }}> {{ transaction.comment }} </td>
+      <td> {{ transaction.date }} </td>
+      <td> {{ transaction.comment }} </td>
       <td> &#8592; </td>
-      <td id={{ 'price_' + loop.index | string }}> {{ transaction.price }} </td>
+      <td> {{ transaction.price }} </td>
       <td> 
-        <button type="button" id={{ 'button_' + loop.index | string }} class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" onclick="obtain_transaction_info(this.id);">
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal"
+         onclick='obtain_transaction_info("{{transaction.id}}", "{{transaction}}" , "{{transaction.date}}");'>
           edit
         </button>
-      </td>>
+      </td>
     </tr>
     {% else %}
-    <tr class="bg-danger" id={{ transaction.id }}>
+    <tr class="bg-danger" >
       <th scope="row">{{ loop.index }}</th>
-      <td id={{ 'date_' + loop.index | string }}> {{ transaction.date }} </td>
-      <td id={{ 'comment_' + loop.index | string }}> {{ transaction.comment }} </td>
+      <td > {{ transaction.date }} </td>
+      <td > {{ transaction.comment }} </td>
       <td> &#8594; </td>
-      <td id={{ 'price_' + loop.index | string }}> {{ transaction.price }} </td>
+      <td > {{ transaction.price }} </td>
       <td> 
-        <button type="button" id={{ 'button_' + loop.index | string }} class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" onclick="obtain_transaction_info(this.id);">
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" 
+        onclick='obtain_transaction_info("{{transaction.id}}", "{{transaction}}" , "{{transaction.date}}");'>
           edit
         </button>
-      </td>>
+      </td>
     </tr>
     {% endif %}
     {% endfor %}
@@ -74,20 +76,19 @@
   </tbody>
 </table>
 
-
-
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Edit Transaction</h5>
+        <h3 class="modal-title" id="exampleModalLabel">Edit Transaction</h3>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
           <form class="form form-basic" method="post" role="form">
+            <input type="hidden" id="edit_transaction_id">
             {{ wtf.form_field(edit_transaction_form.date, id="edit_form_date")}}
             {{ wtf.form_field(edit_transaction_form.price, id="edit_form_price") }}
             {{ wtf.form_field(edit_transaction_form.comment, id="edit_form_comment") }}
@@ -104,40 +105,43 @@
 </div>
 
 <script>
-    var entities = {
-      'amp': '&',
-      'apos': '\'',
-      '#x27': '\'',
-      '#x2F': '/',
-      '#39': '\'',
-      '#47': '/',
-      'lt': '<',
-      'gt': '>',
-      'nbsp': ' ',
-      'quot': '"'
+  function parse_transaction(transaction) {
+    function to_object(kv_pairs) {
+      var obj = {};
+      for (var i = 0; i < kv_pairs.length; i++) {
+        obj[kv_pairs[i][0]] = kv_pairs[i][1];
+      }
+      return obj;
     }
 
-    function decodeHTMLEntities (text) {
-      return text.replace(/&([^;]+);/gm, function (match, entity) {
-        return entities[entity] || match
-      })
+    function get_key_value(value, index, array) {
+      var kv = value.split(":")
+      return [kv[0].trim(), kv[1].trim()];
     }
 
-    function obtain_transaction_info(button_id){
-      button_id_split = button_id.split("_");
-      var date_field_cell = "date_" + button_id_split[1];
-      var price_field_cell = "comment_" + button_id_split[1];
-      var comment_field_cell = "price_" + button_id_split[1];
-      var date_field_element = document.getElementById("edit_form_date");
-      var comment_field_element = document.getElementById("edit_form_comment");
-      var price_field_element = document.getElementById("edit_form_price");
-      var date_field_cell_value = document.getElementById(date_field_cell).innerHTML;
-      var comment_field_cell_value = document.getElementById(comment_field_cell).innerHTML;
-      var price_field_cell_value = document.getElementById(price_field_cell).innerHTML;
-      date_field_element.value = decodeHTMLEntities(date_field_cell_value);
-      comment_field_element.value = decodeHTMLEntities(comment_field_cell_value);
-      price_field_element.value = decodeHTMLEntities(price_field_cell_value);
-    }
+
+
+    transaction = transaction.slice(1, transaction.length - 1);
+    var objects = transaction.split(",");
+    var kv_pairs = objects.map(get_key_value);
+    return to_object(kv_pairs);
+  }
+
+
+  function obtain_transaction_info(id, transaction, date) {
+    console.log(transaction);
+    var tr = parse_transaction(transaction);
+    var date_field_element = document.getElementById("edit_form_date");
+    var comment_field_element = document.getElementById("edit_form_comment");
+    var price_field_element = document.getElementById("edit_form_price");
+    var category_field_element = document.getElementById("edit_form_category");
+    var incoming_field_element = document.getElementById("incoming");
+    date_field_element.value = date;
+    price_field_element.value = tr.price;
+    comment_field_element.value = tr.comment;
+    incoming_field_element.checked = true;
+    category_field_element.value = tr.category_field_element;
+  }
 </script>
 
 

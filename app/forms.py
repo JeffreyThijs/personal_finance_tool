@@ -42,5 +42,4 @@ class TransactionForm(FlaskForm):
     category = SelectField("Category",  choices = Transaction.TransactionType.choices(),
                                         coerce = Transaction.TransactionType.coerce)
     incoming = BooleanField('Incoming transaction')
-
     submit = SubmitField('Add Transaction')

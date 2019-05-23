@@ -77,7 +77,6 @@ def monthly_overview():
     transactions = filter_on_MonthYear(transactions, "date", current_month_view, current_year_view)
 
     balance = round(sum(t.price for t in transactions if t.incoming) - sum(t.price for t in transactions if not t.incoming), 2)
-
     edit_transaction_form = TransactionForm()
     if edit_transaction_form.validate_on_submit():
         edit_transaction(id=None, price=edit_transaction_form.price.data)

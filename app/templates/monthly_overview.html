@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block app_content %}
-{{ wtf.quick_form(new_transaction) }}
+
 
 <nav aria-label="Page navigation example">
   <ul class="pager justify-content-center">
@@ -43,7 +43,7 @@
       <td> {{ transaction.price }} </td>
       <td> 
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal"
-         onclick='obtain_transaction_info("{{transaction.id}}", "{{transaction}}" , "{{transaction.date}}");'>
+        onclick='obtain_transaction_info("{{transaction | safe}}");'>
           edit
         </button>
       </td>
@@ -57,7 +57,7 @@
       <td > {{ transaction.price }} </td>
       <td> 
         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" 
-        onclick='obtain_transaction_info("{{transaction.id}}", "{{transaction}}" , "{{transaction.date}}");'>
+        onclick='obtain_transaction_info("{{transaction | safe}}");'>
           edit
         </button>
       </td>
@@ -88,16 +88,18 @@
       </div>
       <div class="modal-body">
           <form class="form form-basic" method="post" role="form">
-            <input type="hidden" id="edit_transaction_id">
+            {{ edit_transaction_form.hidden_tag() }}
+            {{ wtf.form_field(edit_transaction_form.transaction_id, id="edit_form_transaction_id") }}
             {{ wtf.form_field(edit_transaction_form.date, id="edit_form_date")}}
             {{ wtf.form_field(edit_transaction_form.price, id="edit_form_price") }}
             {{ wtf.form_field(edit_transaction_form.comment, id="edit_form_comment") }}
             {{ wtf.form_field(edit_transaction_form.category, id="edit_form_category") }}
             {{ wtf.form_field(edit_transaction_form.incoming, id="edit_form_incoming") }}
+            {{ edit_transaction_form.submit() }}
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary" type="submit">Save changes</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
         <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
       </div>
     </div>
@@ -128,19 +130,25 @@
   }
 
 
-  function obtain_transaction_info(id, transaction, date) {
+  function obtain_transaction_info(transaction) {
     console.log(transaction);
     var tr = parse_transaction(transaction);
+    var transaction_id_field_element = document.getElementById("edit_form_transaction_id");
     var date_field_element = document.getElementById("edit_form_date");
     var comment_field_element = document.getElementById("edit_form_comment");
     var price_field_element = document.getElementById("edit_form_price");
     var category_field_element = document.getElementById("edit_form_category");
-    var incoming_field_element = document.getElementById("incoming");
-    date_field_element.value = date;
+    // var incoming_field_element = document.getElementById("edit_form_incoming");
+    console.log(tr.id);
+    transaction_id_field_element.value = parseInt(tr.id, 10);
+    date_field_element.value = tr.date;
     price_field_element.value = tr.price;
     comment_field_element.value = tr.comment;
-    incoming_field_element.checked = true;
-    category_field_element.value = tr.category_field_element;
+    // incoming_field_element.checked = true;
+    category_field_element.value = tr.type;
+
+    var transaction_id_field_element = document.getElementById("edit_form_transaction_id");
+    console.log(transaction_id_field_element.value);
   }
 </script>
 

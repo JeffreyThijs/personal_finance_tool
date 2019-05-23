@@ -1,7 +1,7 @@
 from app import db
 from app.models import Transaction
 from app.tools.dateutils import convert_to_datetime, date_parse
-import datetime
+from datetime import datetime
 
 def add_new_transaction(price : float,
                         date : str = None,
@@ -49,6 +49,8 @@ def edit_transaction(id : int,
                     category : Transaction.TransactionType = None,
                     incoming : bool = None):
 
+    print("called this beautful function @@@@@@@@@@@@@@@@@@")
+    print(id)
     transaction = db.session.query(Transaction).get(id)
 
     if isinstance(price, float): transaction.price = price

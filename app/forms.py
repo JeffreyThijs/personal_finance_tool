@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, FloatField, SelectField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, FloatField, SelectField, HiddenField, IntegerField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from app.models import User, Transaction
 
@@ -36,6 +36,7 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Please use a different email address.')
 
 class TransactionForm(FlaskForm):
+    transaction_id = IntegerField("")
     date = StringField('Date', validators=[DataRequired()])
     price = FloatField('Price', validators=[DataRequired()])
     comment = StringField('Comment', validators=[DataRequired()])

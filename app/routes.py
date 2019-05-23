@@ -64,9 +64,9 @@ def index():
 @app.route('/monthly_overview', methods=['GET', 'POST'])
 @login_required
 def monthly_overview():
-    new_transaction = TranactionButton()
-    if new_transaction.validate_on_submit():
-        return redirect(url_for('entry'))
+    # new_transaction = TranactionButton()
+    # if new_transaction.validate_on_submit():
+    #     return redirect(url_for('entry'))
 
     transactions = list(current_user.transactions)
     transactions.sort(key=lambda x: x.date, reverse=False)
@@ -77,13 +77,17 @@ def monthly_overview():
     transactions = filter_on_MonthYear(transactions, "date", current_month_view, current_year_view)
 
     balance = round(sum(t.price for t in transactions if t.incoming) - sum(t.price for t in transactions if not t.incoming), 2)
+
     edit_transaction_form = TransactionForm()
     if edit_transaction_form.validate_on_submit():
-        edit_transaction(id=None, price=edit_transaction_form.price.data)
+        print("called")
+        print("id: {}, price: {}".format(edit_transaction_form.transaction_id.data, edit_transaction_form.price.data))
+        edit_transaction(id=edit_transaction_form.transaction_id.data, 
+                         price=edit_transaction_form.price.data)
         return redirect(url_for('monthly_overview'))
 
+    #    new_transaction=new_transaction,
     return render_template('monthly_overview.html',
-                           new_transaction=new_transaction,
                            title='Home',
                            transactions=transactions,
                            balance=balance,

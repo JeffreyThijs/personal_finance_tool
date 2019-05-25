@@ -1,10 +1,10 @@
 from flask import render_template, flash, redirect, url_for, request, send_file
 from flask_login import current_user, login_required
 from app.forms.forms import TransactionForm, TranactionButton
-from app.tools.dateutils import filter_on_MonthYear, _next_month, _previous_month, dt_parse, MONTHS
+from app.tools.dateutils import filter_on_MonthYear, _next_month, _previous_month, generic_datetime_parse, MONTHS, date_time_parse
 from app.sqldb.dbutils import add_new_transaction, edit_transaction
 from werkzeug.urls import url_parse
-from app.sqldb.models import User
+from app.sqldb.models import User, Transaction
 from app import app, db
 import json
 
@@ -19,7 +19,7 @@ def monthly_overview():
     transactions = list(current_user.transactions)
     transactions.sort(key=lambda x: x.date, reverse=False)
 
-    current_date_view = dt_parse(current_user.last_date_viewed)
+    current_date_view = generic_datetime_parse(current_user.last_date_viewed, format='%B %Y')
 
     current_month_view, current_year_view = str(current_user.last_date_viewed.month), str(current_user.last_date_viewed.year)
     transactions = filter_on_MonthYear(transactions, "date", current_month_view, current_year_view)
@@ -28,10 +28,15 @@ def monthly_overview():
 
     edit_transaction_form = TransactionForm()
     if edit_transaction_form.validate_on_submit():
-        print("called")
-        print("id: {}, price: {}".format(edit_transaction_form.transaction_id.data, edit_transaction_form.price.data))
+        print(edit_transaction_form.transaction_id)
+
+        date = date_time_parse(edit_transaction_form.date.data, output_type="datetime", reverse_date=True)
+        category = Transaction.TransactionType.coerce(edit_transaction_form.category.data)
         edit_transaction(id=edit_transaction_form.transaction_id.data, 
-                         price=edit_transaction_form.price.data)
+                         price=edit_transaction_form.price.data,
+                         comment=edit_transaction_form.comment.data,
+                         category=category,
+                         date=date)
         return redirect(url_for('monthly_overview'))
 
     #    new_transaction=new_transaction,

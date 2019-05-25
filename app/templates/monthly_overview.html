@@ -6,6 +6,12 @@
 <link rel="stylesheet" href="{{url_for('.static', filename='styles.css')}}">
 {% endblock %}
 
+
+{% block scripts %}
+{{super()}}
+<script src="{{ url_for('static', filename='form_edit.js') }}"></script>
+{% endblock %}
+
 {% block app_content %}
 
 
@@ -87,70 +93,20 @@
         </button>
       </div>
       <div class="modal-body">
-          <form class="form form-basic" method="post" role="form">
+          <form class="form form-basic" method="post" role="form" id="edit_form">
             {{ edit_transaction_form.hidden_tag() }}
-            {{ wtf.form_field(edit_transaction_form.transaction_id, id="edit_form_transaction_id") }}
             {{ wtf.form_field(edit_transaction_form.date, id="edit_form_date")}}
             {{ wtf.form_field(edit_transaction_form.price, id="edit_form_price") }}
             {{ wtf.form_field(edit_transaction_form.comment, id="edit_form_comment") }}
             {{ wtf.form_field(edit_transaction_form.category, id="edit_form_category") }}
-            {{ wtf.form_field(edit_transaction_form.incoming, id="edit_form_incoming") }}
-            {{ edit_transaction_form.submit() }}
+            <!-- {{ wtf.form_field(edit_transaction_form.incoming, id="edit_form_incoming") }} -->
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="submit" form="edit_form" class="btn btn-primary">Save changes</button>
         <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
 </div>
-
-<script>
-  function parse_transaction(transaction) {
-    function to_object(kv_pairs) {
-      var obj = {};
-      for (var i = 0; i < kv_pairs.length; i++) {
-        obj[kv_pairs[i][0]] = kv_pairs[i][1];
-      }
-      return obj;
-    }
-
-    function get_key_value(value, index, array) {
-      var kv = value.split(":")
-      return [kv[0].trim(), kv[1].trim()];
-    }
-
-
-
-    transaction = transaction.slice(1, transaction.length - 1);
-    var objects = transaction.split(",");
-    var kv_pairs = objects.map(get_key_value);
-    return to_object(kv_pairs);
-  }
-
-
-  function obtain_transaction_info(transaction) {
-    console.log(transaction);
-    var tr = parse_transaction(transaction);
-    var transaction_id_field_element = document.getElementById("edit_form_transaction_id");
-    var date_field_element = document.getElementById("edit_form_date");
-    var comment_field_element = document.getElementById("edit_form_comment");
-    var price_field_element = document.getElementById("edit_form_price");
-    var category_field_element = document.getElementById("edit_form_category");
-    // var incoming_field_element = document.getElementById("edit_form_incoming");
-    console.log(tr.id);
-    transaction_id_field_element.value = parseInt(tr.id, 10);
-    date_field_element.value = tr.date;
-    price_field_element.value = tr.price;
-    comment_field_element.value = tr.comment;
-    // incoming_field_element.checked = true;
-    category_field_element.value = tr.type;
-
-    var transaction_id_field_element = document.getElementById("edit_form_transaction_id");
-    console.log(transaction_id_field_element.value);
-  }
-</script>
-
-
 {% endblock %}

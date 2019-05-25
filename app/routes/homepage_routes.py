@@ -30,7 +30,7 @@ def index():
 
         if len(dates) == 0 or current_date != dates[-1:]:
             dates.append(current_date)
-            balance_history.append(round(current_balance, 2))
+            balance_history.append(round(current_balance, 0))
 
     sdates = [dt.strftime("%d/%m/%Y") for dt in dates]
     labels = sdates
@@ -43,8 +43,8 @@ def index():
                 sum_incoming += t.price
             else:
                 sum_outgoing += t.price
-        incoming_data.append(sum_incoming)
-        outgoing_data.append(sum_outgoing)
+        incoming_data.append(round(sum_incoming, 2))
+        outgoing_data.append(round(sum_outgoing, 2))
 
     overall_data = balance_history
     return render_template('index.html', 

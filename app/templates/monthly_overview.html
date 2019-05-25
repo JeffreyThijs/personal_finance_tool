@@ -9,11 +9,10 @@
 
 {% block scripts %}
 {{super()}}
-<script src="{{ url_for('static', filename='form_edit.js') }}"></script>
+<script src="{{ url_for('static', filename='transaction_adaptation_functions.js') }}"></script>
 {% endblock %}
 
 {% block app_content %}
-
 
 <nav aria-label="Page navigation example">
   <ul class="pager justify-content-center">
@@ -27,7 +26,11 @@
   </ul>
 </nav>
 
-<table class="table table-hover table-condensed" id="incoming">
+<div>
+  {{ wtf.quick_form(new_transaction_button) }}
+</div>
+
+<table class="table table-hover table-condensed" id="table">
   <thead>
     <tr>
       <th scope="col">#</th>
@@ -35,40 +38,40 @@
       <th scope="col">Comment</th>
       <th scope="col"></th>
       <th scope="col">Price</th>
-      <th scope="col">test</th>
+      <th scope="col"></th>
     </tr>
   </thead>
   <tbody>
     {% for transaction in transactions %}
     {% if transaction.incoming %}
     <tr class="bg-success">
+    {% else %}
+    <tr class="bg-danger">
+    {% endif %}
+
       <th scope="row">{{ loop.index }}</th>
       <td> {{ transaction.date }} </td>
       <td> {{ transaction.comment }} </td>
-      <td> &#8592; </td>
+      <td>
+      {% if transaction.incoming %}
+        <span class="glyphicon glyphicon-arrow-left"></span>
+      {% else %}
+        <span class="glyphicon glyphicon-arrow-right"></span>
+      {% endif %}
+      </td>
       <td> {{ transaction.price }} </td>
-      <td> 
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal"
-        onclick='obtain_transaction_info("{{transaction | safe}}");'>
-          edit
+      <td>
+        <button type="button" class="btn button_invisibe" data-toggle="modal" data-target="#EditTransactionModal"
+          onclick='obtain_transaction_info("{{transaction | safe}}");'>
+          <span class="glyphicon glyphicon-edit"></span>
+        </button>
+        <button type="button" class="btn button_invisibe" data-toggle="modal" data-target="#RemoveTransactionModal"
+          onclick='remove_transaction("{{transaction.id | safe}}");'>
+          <span class="glyphicon glyphicon-remove"></span>
         </button>
       </td>
     </tr>
-    {% else %}
-    <tr class="bg-danger" >
-      <th scope="row">{{ loop.index }}</th>
-      <td > {{ transaction.date }} </td>
-      <td > {{ transaction.comment }} </td>
-      <td> &#8594; </td>
-      <td > {{ transaction.price }} </td>
-      <td> 
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal" 
-        onclick='obtain_transaction_info("{{transaction | safe}}");'>
-          edit
-        </button>
-      </td>
-    </tr>
-    {% endif %}
+
     {% endfor %}
     {% if transactions %}
     <tr id={{ total }}>
@@ -77,34 +80,60 @@
       <td></td>
       <td></td>
       <td> {{ balance }} </td>
+      <td></td>
     </tr>
     {% endif %}
   </tbody>
 </table>
 
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- Edit Tranaction Modal -->
+<div class="modal fade" id="EditTransactionModal" tabindex="-1" role="dialog"
+  aria-labelledby="EditTransactionModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title" id="exampleModalLabel">Edit Transaction</h3>
+        <h3 class="modal-title" id="EditTransactionModalTitle">Edit Transaction</h3>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
       <div class="modal-body">
-          <form class="form form-basic" method="post" role="form" id="edit_form">
-            {{ edit_transaction_form.hidden_tag() }}
-            {{ wtf.form_field(edit_transaction_form.date, id="edit_form_date")}}
-            {{ wtf.form_field(edit_transaction_form.price, id="edit_form_price") }}
-            {{ wtf.form_field(edit_transaction_form.comment, id="edit_form_comment") }}
-            {{ wtf.form_field(edit_transaction_form.category, id="edit_form_category") }}
-            <!-- {{ wtf.form_field(edit_transaction_form.incoming, id="edit_form_incoming") }} -->
+        <form class="form form-basic" method="post" role="form" id="edit_form">
+          {{ edit_transaction_form.hidden_tag() }}
+          {{ wtf.form_field(edit_transaction_form.date, id="edit_form_date")}}
+          {{ wtf.form_field(edit_transaction_form.price, id="edit_form_price") }}
+          {{ wtf.form_field(edit_transaction_form.comment, id="edit_form_comment") }}
+          {{ wtf.form_field(edit_transaction_form.category, id="edit_form_category") }}
+          <!-- {{ wtf.form_field(edit_transaction_form.incoming, id="edit_form_incoming") }} -->
         </form>
       </div>
       <div class="modal-footer">
         <button type="submit" form="edit_form" class="btn btn-primary">Save changes</button>
         <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Tranaction Modal -->
+<div class="modal fade" id="RemoveTransactionModal" tabindex="-1" role="dialog"
+  aria-labelledby="RemoveTransactionModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="RemoveTransactionModalTitle">Do you want to remove this transaction?</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="form form-basic" method="post" role="form" id="remove_form">
+          {{ remove_transaction_form.hidden_tag() }}
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" form="remove_form" class="btn btn-primary">Yes</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
       </div>
     </div>
   </div>

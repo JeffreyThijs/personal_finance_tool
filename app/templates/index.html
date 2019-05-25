@@ -12,17 +12,23 @@
 
 
 {% block app_content %}
-  <h1>Hi, {{ current_user.username }}!</h1>
-
   <div>
-    <canvas id="line_plot"></canvas>
-    <canvas id="bar_plot"></canvas>
     <div class="row">
-      <div class="column">
+      <div class="column_left">
+        <canvas id="line_plot"></canvas>
+      </div>
+      <div class="column_right">
         <canvas id="doughnut_plot_incoming"></canvas>
       </div>
-      <div class="column">
-          <canvas id="doughnut_plot_outgoing"></canvas>
+    </div>
+    <div class="row">
+
+      <div class="column_left">
+        <canvas id="bar_plot"></canvas>
+      </div>
+
+      <div class="column_right">
+        <canvas id="doughnut_plot_outgoing"></canvas>
       </div>
     </div>
   </div>

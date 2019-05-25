@@ -16,7 +16,6 @@ class LoginForm(FlaskForm):
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
 
-
 class RegistrationForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
@@ -36,7 +35,7 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Please use a different email address.')
 
 class TransactionForm(FlaskForm):
-    transaction_id = HiddenField("")
+    transaction_id = HiddenField()
     date = StringField('Date', validators=[DataRequired()])
     price = FloatField('Price', validators=[DataRequired()])
     comment = StringField('Comment', validators=[DataRequired()])
@@ -44,3 +43,6 @@ class TransactionForm(FlaskForm):
                                         coerce = Transaction.TransactionType.coerce)
     incoming = BooleanField('Incoming transaction')
     submit = SubmitField('Add Transaction')
+
+class TransactionRemovalForm(FlaskForm):
+    remove_transaction_id = HiddenField()

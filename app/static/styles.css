@@ -21,9 +21,15 @@ table.table.table-condensed {
 }
 
  /* Three image containers (use 25% for four, and 50% for two, etc) */
- .column {
+ .column_left {
     float: left;
-    width: 50.00%;
+    width: 66.00%;
+    padding: 5px;
+  }
+
+  .column_right {
+    float: left;
+    width: 34.00%;
     padding: 5px;
   }
   
@@ -33,3 +39,43 @@ table.table.table-condensed {
     clear: both;
     display: table;
   } 
+
+  .button_invisibe{
+    background-color: Transparent;
+    border-color: Transparent;
+    text-align:center;
+    /* vertical-align: middle; */
+    color: white;
+    font-size: 15px;
+    height: 15px;
+    width: 20px;
+    padding: 0;
+    align-content: center
+  }
+
+  td, th {
+    text-align: center;
+    vertical-align: middle;
+    font-weight: bold;
+    border: 1px solid black;
+  }
+
+  .bg-danger {
+    background-color: #dc3545;
+  }
+  
+  .bg-danger:hover, a.bg-danger:focus,
+  button.bg-danger:hover,
+  button.bg-danger:focus {
+    background-color: #bd2130 !important;
+  }
+
+  .bg-success {
+    background-color: #28a745;
+  }
+  
+  .bg-success:hover, a.bg-success:focus,
+  button.bg-success:hover,
+  button.bg-success:focus {
+    background-color: #1e7e34 !important;
+  }

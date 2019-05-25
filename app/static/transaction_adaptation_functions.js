@@ -35,3 +35,8 @@ function obtain_transaction_info(transaction) {
     // incoming_field_element.checked = true;
     category_field_element.value = tr.type;
 }
+
+function remove_transaction(transaction_id){
+    var transaction_id_field_element = document.getElementById("remove_transaction_id");
+    transaction_id_field_element.value = parseInt(transaction_id, 10);
+}

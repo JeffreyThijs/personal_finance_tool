@@ -13,13 +13,16 @@ def convert_to_datetime(day: str,
     date_string_format = "{} {} {} {} {} {}".format(day, month, year,
                                                     hour, minute, second)
 
+    # try normal formal
     try:
-        dt = datetime.datetime.strptime(date_string_format, '%d %m %Y %H %M %S')
+        return datetime.datetime.strptime(date_string_format, '%d %m %Y %H %M %S')
     except:
-        print("something went wrong!")
-        dt = None
-        
-    return dt
+        pass
+    # retry reversing day and year
+    try:
+        return datetime.datetime.strptime(date_string_format, '%Y %m %d %H %M %S')
+    except:
+        return None
 
 def generic_datetime_parse(dt : datetime, format : str) -> str:
     return dt.strftime(format)

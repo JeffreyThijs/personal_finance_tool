@@ -61,3 +61,9 @@ def edit_transaction(id : int,
     print("Edited transaction: {}".format(transaction))
     db.session.add(transaction)
     db.session.commit()
+
+def remove_transaction(id : int):
+    transaction = db.session.query(Transaction).get(id)
+    print("Removed transaction: {}".format(transaction))
+    db.session.delete(transaction)
+    db.session.commit()

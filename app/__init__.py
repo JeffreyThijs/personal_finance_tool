@@ -20,4 +20,6 @@ db = SQLAlchemy(app, metadata=MetaData(naming_convention=naming_convention))
 login = LoginManager(app)
 login.login_view = 'login'
 
-from app import models, routes
+from app.sqldb import models, dbutils
+from app.routes import *
+from app.forms import forms

@@ -1,5 +1,5 @@
 from app import db
-from app.models import Transaction
+from app.sqldb.models import Transaction
 from app.tools.dateutils import convert_to_datetime, date_parse
 from datetime import datetime
 
@@ -49,8 +49,6 @@ def edit_transaction(id : int,
                     category : Transaction.TransactionType = None,
                     incoming : bool = None):
 
-    print("called this beautful function @@@@@@@@@@@@@@@@@@")
-    print(id)
     transaction = db.session.query(Transaction).get(id)
 
     if isinstance(price, float): transaction.price = price

@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, FloatField, SelectField, HiddenField, IntegerField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
-from app.models import User, Transaction
+from app.sqldb.models import User, Transaction
 
 class TranactionButton(FlaskForm):
     submit = SubmitField('New Transaction')

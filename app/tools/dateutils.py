@@ -12,35 +12,65 @@ def convert_to_datetime(day: str,
 
     date_string_format = "{} {} {} {} {} {}".format(day, month, year,
                                                     hour, minute, second)
-    dt = datetime.datetime.strptime(date_string_format, '%d %m %Y %H %M %S')
 
+    try:
+        dt = datetime.datetime.strptime(date_string_format, '%d %m %Y %H %M %S')
+    except:
+        print("something went wrong!")
+        dt = None
+        
     return dt
 
-def dt_parse(dt : datetime) -> str:
-    return dt.strftime('%B %Y')
+def generic_datetime_parse(dt : datetime, format : str) -> str:
+    return dt.strftime(format)
 
-def date_time_parse(date_time : str, datetime_seperator=" ", date_seperator="-", time_separator=":") -> tuple:
-    if (datetime_seperator not in date_time or 
-        date_seperator not in date_time or 
-        time_separator not in date_time):
+def date_time_parse(date_time : str, 
+                   datetime_seperator : str = " ", 
+                   date_seperator : str = "-", 
+                   time_separator : str = ":",
+                   output_type = "tuple",
+                   reverse_date = False):
+
+    if (date_seperator not in date_time):
         raise ValueError("date_time string {} does not contain the right seperators")
-
-    date, time = date_time.split(date_time, 1)
-    day, month, year = date.split(date_seperator, 2)
-    hour, minute, second = time.split(time_separator, 2)
     
-    return tuple((day, month, year, hour, minute, second))
+    if time_separator not in date_time:
+        return date_parse(date_time, 
+                          output_type=output_type,
+                          reverse_date=reverse_date)
 
+    if datetime_seperator not in date_time:
+        raise ValueError("date_time string {} does not contain the right seperators")
+    else:
+        date, time = date_time.split(datetime_seperator, 1)
+        hour, minute, second = time.split(time_separator, 2)
+        if not reverse_date:
+            day, month, year = date.split(date_seperator, 2)
+        else:
+            year, month, day = date.split(date_seperator, 2)
+  
+    if output_type == "tuple":
+        return tuple((day, month, year, hour, minute, second))
+    elif output_type == "datetime":
+        return convert_to_datetime(day, month, year, hour, minute, second)
+    else:
+        raise ValueError("unknown output type: {}".format(output_type))
 
-def date_parse(date: str, seperator="-") -> tuple:
+def date_parse(date: str, seperator="-", output_type="tuple", reverse_date = False):
     if seperator not in date:
-        raise ValueError(
-            "date {} does not contain seperator {}".format(date, seperator))
+        raise ValueError( "date {} does not contain seperator {}".format(date, seperator))
 
-    day, month, year = date.split(seperator, 2)
+    if not reverse_date:
+        day, month, year = date.split(seperator, 2)
+    else:
+        year, month, day = date.split(seperator, 2)
 
-    return tuple((day, month, year))
-
+    if output_type == "tuple":
+        return tuple((day, month, year))
+    elif output_type == "datetime":
+        return convert_to_datetime(day, month, year)
+    else:
+        raise ValueError("unknown output type: {}".format(output_type))
 
 def filter_on_datetime(objects,
                        datetime_attr: str,

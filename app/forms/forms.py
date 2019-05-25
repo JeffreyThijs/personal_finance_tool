@@ -36,7 +36,7 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Please use a different email address.')
 
 class TransactionForm(FlaskForm):
-    transaction_id = IntegerField("")
+    transaction_id = HiddenField("")
     date = StringField('Date', validators=[DataRequired()])
     price = FloatField('Price', validators=[DataRequired()])
     comment = StringField('Comment', validators=[DataRequired()])

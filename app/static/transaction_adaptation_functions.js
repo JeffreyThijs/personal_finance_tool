@@ -27,12 +27,12 @@ function obtain_transaction_info(transaction) {
     var comment_field_element = document.getElementById("edit_form_comment");
     var price_field_element = document.getElementById("edit_form_price");
     var category_field_element = document.getElementById("edit_form_category");
-    // var incoming_field_element = document.getElementById("edit_form_incoming");
+    var incoming_field_element = document.getElementById("incoming");
     transaction_id_field_element.value = parseInt(tr.id, 10);
     date_field_element.value = tr.date;
     price_field_element.value = tr.price;
     comment_field_element.value = tr.comment;
-    // incoming_field_element.checked = true;
+    incoming_field_element.checked = (tr.incoming == "True");
     category_field_element.value = tr.type;
 }
 

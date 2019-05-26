@@ -35,6 +35,7 @@ def monthly_overview():
                          price=edit_transaction_form.price.data,
                          comment=edit_transaction_form.comment.data,
                          category=category,
+                         incoming=edit_transaction_form.incoming.data,
                          date=date)
         return redirect(url_for('monthly_overview'))  
 

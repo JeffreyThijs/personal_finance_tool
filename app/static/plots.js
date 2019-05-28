@@ -5,15 +5,16 @@ function make_doughnut_plot(canvas_name, data) {
         data: {
             datasets: [{
                 data: data,
-                backgroundColor: [
-                    "rgba(0, 255, 0, 1)",
-                    "rgba(0, 1, 10, 1)",
-                    "rgba(0, 100, 120, 1)",
-                    "rgba(200, 255, 30, 1)",
-                    "rgba(100, 255, 140, 1)"
-                ],
+                // backgroundColor: [
+                //     "rgba(0, 255, 0, 1)",
+                //     "rgba(0, 1, 10, 1)",
+                //     "rgba(0, 100, 120, 1)",
+                //     "rgba(200, 255, 30, 1)",
+                //     "rgba(100, 255, 140, 1)"
+                // ],
                 label: 'Dataset 1'
-            }],
+            }]
+            ,
             labels: [
                 'Red',
                 'Orange',
@@ -34,6 +35,11 @@ function make_doughnut_plot(canvas_name, data) {
             animation: {
                 animateScale: true,
                 animateRotate: true
+            },
+            plugins: {
+              colorschemes: {
+                scheme: 'office.VaporTrail6'
+              }
             }
         }
     });
@@ -93,8 +99,11 @@ function make_line_plot(canvas_name, data, labels){
             { 
               data: data,
               label: "Incoming",
-              backgroundColor: "rgba(0, 150, 255, 0.5)",
+              backgroundColor: "rgba(0, 150, 255, 0.375)",
               borderColor: "rgba(0, 150, 255, 1)",
+              pointBackgroundColor: "rgba(0, 150, 255, 1)",
+              pointBorderColor: "rgba(255, 255, 255, 1)",
+              pointBorderWidth: 0.5,
               fill: true,
             }
           ]
@@ -111,6 +120,21 @@ function make_line_plot(canvas_name, data, labels){
                     display:false
                 }   
             }]
+          },
+          pan: {
+            enabled: true,
+            mode: "x",
+            speed: 1000,
+            threshold: 1
+          },
+          zoom: {
+            enabled: true,
+            drag: false,
+            mode: "xy",
+            limits: {
+              max: 1000,
+              min: 0.5
+            }
           }
       }
     });

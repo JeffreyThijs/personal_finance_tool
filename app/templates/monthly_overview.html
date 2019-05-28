@@ -36,6 +36,7 @@
       <th scope="col">#</th>
       <th scope="col">Date</th>
       <th scope="col">Comment</th>
+      <th scope="col">Category</th>
       <th scope="col"></th>
       <th scope="col">Price</th>
       <th scope="col"></th>
@@ -52,6 +53,7 @@
       <th scope="row">{{ loop.index }}</th>
       <td> {{ transaction.date }} </td>
       <td> {{ transaction.comment }} </td>
+      <td> {{ transaction.category }} </td>
       <td>
       {% if transaction.incoming %}
         <span class="glyphicon glyphicon-arrow-left"></span>
@@ -76,6 +78,7 @@
     {% if transactions %}
     <tr id={{ total }}>
       <th scope="row"></th>
+      <td></td>
       <td></td>
       <td></td>
       <td></td>

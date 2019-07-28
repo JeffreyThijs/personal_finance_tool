@@ -1,50 +1,89 @@
-{% extends 'bootstrap/base.html' %}
+{% extends "material/base.html" %}
 
-{% block title %}
-    {% if title %}{{ title }} - Personal Finance Tool {% else %} Welcome to Personal Finance Tool {% endif %}
-{% endblock %}
+{% macro row() %}<div class="row">{% endmacro %}
 
-{% block navbar %}
-    <nav class="navbar navbar-dark">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="{{ url_for('index') }}">Personal Finance Tool</a>
+    {% macro container() %}<div class="container">{% endmacro %}
+    
+    {% macro col(cols=[]) %}<div class="col {{ cols|join(' ') }}">{% endmacro %}
+    
+    {% macro enddiv() %}</div>{% endmacro %}
+    
+    {% block doc -%}
+    <!DOCTYPE html>
+    <html{% block html_attribs %}{% endblock html_attribs %}>
+    {%- block html %}
+      <head>
+        {%- block head %}
+        <title>
+            {% block title %}
+                 Personal Finance Tool
+            {% endblock %}
+        </title>
+    
+        {%- block metas %}
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        {%- endblock metas %}
+    
+        {%- block styles %}
+        <!-- Materialize. Availible at https://github.com/Dogfalo/materialize -->
+        <!-- Flask-Materialize. Availible at https://github.com/HellerCommaA/flask-materialize -->
+        <link href="{{material_find_resource('css/materialize.css', cdn='material')}}" rel="stylesheet" media="screen">
+        {%- endblock styles %}
+        {%- endblock head %}
+      </head>
+      <body{% block body_attribs %}{% endblock body_attribs %}>
+        {% block body -%}
+
+
+        {% block navbar %}
+        <nav>
+            <div class="container">
+                <div>
+                    <ul class="nav navbar-nav">
+                        <li><a href="{{ url_for('index') }}">Home</a></li>
+                    </ul>
+                    <ul class="nav navbar-nav navbar-right">
+                        {% if current_user.is_anonymous %}
+                        <li><a href="{{ url_for('login') }}">Login</a></li>
+                        {% else %}
+                        <li><a href="{{ url_for('monthly_overview') }}">Monthly Overview</a></li>
+                        <li><a href="{{ url_for('tax') }}">Calculate Net Wage</a></li>
+                        <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
             </div>
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav">
-                    <li><a href="{{ url_for('index') }}">Home</a></li>
-                </ul>
-                <ul class="nav navbar-nav navbar-right">
-                    {% if current_user.is_anonymous %}
-                    <li><a href="{{ url_for('login') }}">Login</a></li>
-                    {% else %}
-                    <li><a href="{{ url_for('monthly_overview') }}">Monthly Overview</a></li>
-                    <li><a href="{{ url_for('tax') }}">Calculate Net Wage</a></li>
-                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
-                    {% endif %}
-                </ul>
+        </nav>
+        {%- endblock %}
+
+
+
+        {% block content %}
+            <div class="container">
+                {# application content needs to be provided in the app_content block #}
+                {% block app_content %}{% endblock %}
+            </div>
+        {%- endblock %}
+    
+        {% block scripts %}
+        <script src="{{material_find_resource('jquery.js', cdn='jquery')}}"></script>
+        <script src="{{material_find_resource('js/materialize.js', cdn='material')}}"></script>
+        {%- endblock scripts %}
+        {% block footer %}
+        <div class="container">
+            <br>
+            <div class="col s12 m6">
+                <p>
+                    <i>
+                        Made by
+                        <a href="https://github.com/JeffreyThijs">Jeffrey Thijs</a> 
+                    </i>
+                </p>
             </div>
         </div>
-    </nav>
-{% endblock %}
-
-{% block content %}
-    <div class="container">
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-info" role="alert">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-        {% endwith %}
-
-        {# application content needs to be provided in the app_content block #}
-        {% block app_content %}{% endblock %}
-    </div>
-{% endblock %}
+        {%- endblock footer %}
+        {%- endblock body %}
+      </body>
+    {%- endblock html %}
+    </html>
+    {% endblock doc -%}

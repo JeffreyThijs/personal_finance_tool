@@ -1,5 +1,6 @@
 {% extends "base.html" %}
-{% import 'bootstrap/wtf.html' as wtf %}
+{% import "material/utils.html" as util %}
+{% import "material/wtf.html" as wtf %}
 
 {% block styles %}
 {{super()}}
@@ -12,30 +13,45 @@
 
 
 {% block app_content %}
-  <div>
-    <div class="row">
-      <div class="column_left">
-        <canvas id="line_plot"></canvas>
-      </div>
-      <div class="column_right">
-        <canvas id="doughnut_plot_incoming"></canvas>
-      </div>
-    </div>
-    <div class="row">
 
-      <div class="column_left">
-        <canvas id="bar_plot"></canvas>
-      </div>
 
-      <div class="column_right">
-        <canvas id="doughnut_plot_outgoing"></canvas>
-      </div>
-    </div>
+
+  <div class="container">
+
+    <!-- <div class="col s12 m6"> -->
+      {{ util.card('Overview',
+
+      '<div class="row">
+          <div class="column_left">
+            <div class="graph">
+              <div class="graph-container">
+                  <canvas id="line_plot"></canvas>
+              </div>
+            </div>
+          </div>
+    
+          <div class="column_right">
+            <canvas id="doughnut_plot_incoming"></canvas>
+          </div>
+        </div>
+    
+      <div class="row">
+        <div class="column_left">
+          <canvas id="bar_plot"></canvas>
+        </div>
+        <div class="column_right">
+          <canvas id="doughnut_plot_outgoing"></canvas>
+        </div>
+      </div>'
+
+        )}}
+    <!-- </div> -->
+
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-colorschemes@latest/dist/chartjs-plugin-colorschemes.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@0.7.0"></script>
   <script src="{{ url_for('static', filename='plots.js') }}"></script>
   <script type="text/javascript">

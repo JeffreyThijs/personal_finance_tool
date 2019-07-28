@@ -1,8 +1,11 @@
 {% extends "base.html" %}
-{% import 'bootstrap/wtf.html' as wtf %}
+{% import "material/utils.html" as util %}
+{% import "material/wtf.html" as wtf %}
+{% import 'bootstrap/wtf.html' as wtfb %}
 
 {% block styles %}
 {{super()}}
+<link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
 <link rel="stylesheet" href="{{url_for('.static', filename='styles.css')}}">
 {% endblock %}
 
@@ -26,9 +29,11 @@
   </ul>
 </nav>
 
+<br>
 <div>
   {{ wtf.quick_form(new_transaction_button) }}
 </div>
+<br>
 
 <table class="table table-hover table-condensed" id="table">
   <thead>
@@ -65,11 +70,11 @@
       <td>
         <button type="button" class="btn button_invisibe" data-toggle="modal" data-target="#EditTransactionModal"
           onclick='obtain_transaction_info("{{transaction | safe}}");'>
-          <span class="glyphicon glyphicon-edit"></span>
+          b
         </button>
         <button type="button" class="btn button_invisibe" data-toggle="modal" data-target="#RemoveTransactionModal"
           onclick='remove_transaction("{{transaction.id | safe}}");'>
-          <span class="glyphicon glyphicon-remove"></span>
+          a
         </button>
       </td>
     </tr>

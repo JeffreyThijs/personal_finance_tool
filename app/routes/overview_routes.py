@@ -63,10 +63,10 @@ def monthly_overview():
 def next_month():
     current_month = current_user.last_date_viewed.month
     new_month = _next_month(str(current_month))
-    current_user.last_date_viewed = current_user.last_date_viewed.replace(month=new_month)
+    current_user.last_date_viewed = current_user.last_date_viewed.replace(day=1, month=new_month)
     if current_month == 12:
         current_year = current_user.last_date_viewed.year
-        current_user.last_date_viewed = current_user.last_date_viewed.replace(year=current_year+1)
+        current_user.last_date_viewed = current_user.last_date_viewed.replace(day=1, year=current_year+1)
     db.session.add(current_user)
     db.session.commit()
     return redirect(url_for('monthly_overview'))
@@ -76,10 +76,10 @@ def next_month():
 def previous_month():
     current_month = current_user.last_date_viewed.month
     new_month = _previous_month(str(current_month))
-    current_user.last_date_viewed = current_user.last_date_viewed.replace(month=new_month)
+    current_user.last_date_viewed = current_user.last_date_viewed.replace(day=1, month=new_month)
     if current_month == 1:
         current_year = current_user.last_date_viewed.year
-        current_user.last_date_viewed = current_user.last_date_viewed.replace(year=current_year-1)
+        current_user.last_date_viewed = current_user.last_date_viewed.replace(day=1, year=current_year-1)
     db.session.add(current_user)
     db.session.commit()
     return redirect(url_for('monthly_overview'))

@@ -92,12 +92,29 @@ def filter_on_datetime(objects,
                        (getattr(o, datetime_attr) >= start_dt), objects))
 
 
+def partition_in_MonthYear(objects, 
+                           datetime_attr : str):
+
+    object_dict = dict()
+
+    for o in objects:
+        dt = getattr(o, datetime_attr)
+        year_str = str(dt.year)
+        month_str = MONTHS[dt.month - 1]
+
+        if year_str not in object_dict:
+            object_dict[year_str] = dict()
+        
+        if month_str not in object_dict[year_str]:
+            object_dict[year_str][month_str] = []
+
+        object_dict[year_str][month_str].append(o)
+    return object_dict
+
 def filter_on_MonthYear(objects,
                         datetime_attr : str,
                         month : str,
                         year : str):
-
-    
 
     if month.lower() in MONTHS: month = convert_month(month)
     end_day = str(get_days_in_month(int(month), int(year)))

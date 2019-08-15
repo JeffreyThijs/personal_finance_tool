@@ -123,7 +123,7 @@ function make_line_plot(canvas_name, data, labels) {
             display: false
           },
           ticks: {
-            display: false //this will remove only the label
+            display: true //this will remove only the label
           }
         }],
         yAxes: [{

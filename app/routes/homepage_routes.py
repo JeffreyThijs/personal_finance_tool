@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_required
 from app.forms.forms import TransactionForm, TranactionButton, TaxForm
-from app.tools.dateutils import filter_on_MonthYear, MONTHS
+from app.tools.dateutils import filter_on_MonthYear, MONTHS, partition_in_MonthYear
 from werkzeug.urls import url_parse
 from app.sqldb.models import User
 from app import app, db
@@ -10,31 +10,21 @@ from app import app, db
 @app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
-
-    dates = []
-    current_date = None
-    current_balance = 0.0
-    balance_history = []
-    incoming_data, outgoing_data = [], []
-    
     transactions = list(current_user.transactions)
     transactions.sort(key=lambda x: x.date, reverse=False)
+    transactions_montly = partition_in_MonthYear(transactions, "date")
 
-    for t in transactions:
-        if t.incoming:
-            current_balance += t.price
-        else:
-            current_balance -= t.price
+    balance_montly = []
+    labels = []
+    _balance = 0
+    for year in transactions_montly:
+        for month in transactions_montly[year]:
+            _balance += (sum([t.price for t in transactions_montly[year][month] if t.incoming]) 
+                         - sum([t.price for t in transactions_montly[year][month] if not t.incoming]))
+            balance_montly.append(round(_balance, 2))
+            labels.append("{} {}".format(month, year))
 
-        current_date = t.date
-
-        if len(dates) == 0 or current_date != dates[-1:]:
-            dates.append(current_date)
-            balance_history.append(round(current_balance, 0))
-
-    sdates = [dt.strftime("%d/%m/%Y") for dt in dates]
-    labels = sdates
-
+    incoming_data, outgoing_data = [], []
     for month in MONTHS:
         sum_incoming, sum_outgoing = 0, 0
         ts = filter_on_MonthYear(transactions, "date", month, "2019")
@@ -43,14 +33,14 @@ def index():
                 sum_incoming += t.price
             else:
                 sum_outgoing += t.price
+
         incoming_data.append(round(sum_incoming, 2))
         outgoing_data.append(round(sum_outgoing, 2))
 
-    overall_data = balance_history
     return render_template('index.html', 
                             title='Plots', 
                             labels=labels, 
-                            overall_data=overall_data, 
+                            overall_data=balance_montly, 
                             labels_bar=MONTHS,
                             incoming_data=incoming_data,
                             outgoing_data=outgoing_data)

@@ -5,11 +5,14 @@ Revises: 21d9614ee9d5
 Create Date: 2019-05-04 20:18:20.745484
 
 """
+import sys, os
 from alembic import op
 import sqlalchemy as sa
 import datetime
+
 from app import db
-from app.models import User
+from app.sqldb.models import User
+
 
 # revision identifiers, used by Alembic.
 revision = '2675af6ce1bd'

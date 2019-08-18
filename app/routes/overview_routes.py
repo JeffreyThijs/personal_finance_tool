@@ -32,8 +32,6 @@ def monthly_overview():
     change_date_form = ChangeDateForm()
     add_new_transaction_form = TransactionForm()
 
-    print(change_date_form.change_date_id.data)
-
     # editing current transactions
     if edit_transaction_form.transaction_id.data and edit_transaction_form.validate_on_submit():
         date = date_time_parse(edit_transaction_form.date.data, output_type="datetime", reverse_date=True)
@@ -68,15 +66,6 @@ def monthly_overview():
                             user_id=current_user.id,
                             incoming=add_new_transaction_form.incoming.data)
         return redirect(url_for('monthly_overview'))
-
-    else:
-        print("is submitted: {}".format(add_new_transaction_form.is_submitted()))
-        print("is validated: {}".format(add_new_transaction_form.validate()))
-        print(add_new_transaction_form.price.data)
-        print(add_new_transaction_form.date.data)
-        print(add_new_transaction_form.comment.data)
-        print(add_new_transaction_form.category.data)
-        print(add_new_transaction_form.incoming.data)
 
 
     return render_template('monthly_overview.html',

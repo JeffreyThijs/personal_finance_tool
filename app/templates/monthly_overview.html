@@ -117,6 +117,7 @@
       </div>
       <div class="modal-body">
         <form class="form form-basic" method="post" role="form" id="add_new_form">
+          {{ add_new_transaction_form.hidden_tag() }}
           {{ wtf.form_field(add_new_transaction_form.date, id="add_new_form_date")}}
           {{ wtf.form_field(add_new_transaction_form.price, id="add_new_form_price") }}
           {{ wtf.form_field(add_new_transaction_form.comment, id="add_new_form_comment") }}

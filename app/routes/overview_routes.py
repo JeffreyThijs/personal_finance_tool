@@ -69,6 +69,15 @@ def monthly_overview():
                             incoming=add_new_transaction_form.incoming.data)
         return redirect(url_for('monthly_overview'))
 
+    else:
+        print("is submitted: {}".format(add_new_transaction_form.is_submitted()))
+        print("is validated: {}".format(add_new_transaction_form.validate()))
+        print(add_new_transaction_form.price.data)
+        print(add_new_transaction_form.date.data)
+        print(add_new_transaction_form.comment.data)
+        print(add_new_transaction_form.category.data)
+        print(add_new_transaction_form.incoming.data)
+
 
     return render_template('monthly_overview.html',
                            title='Home',

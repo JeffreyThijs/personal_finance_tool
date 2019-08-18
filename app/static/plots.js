@@ -1,4 +1,4 @@
-function make_doughnut_plot(canvas_name, data) {
+function make_doughnut_plot(canvas_name, data, labels, title) {
   var ctx = document.getElementById(canvas_name).getContext('2d');
   var myDoughnutChart = new Chart(ctx, {
     type: 'doughnut',
@@ -15,13 +15,7 @@ function make_doughnut_plot(canvas_name, data) {
         label: 'Dataset 1'
       }]
       ,
-      labels: [
-        'Red',
-        'Orange',
-        'Yellow',
-        'Green',
-        'Blue'
-      ]
+      labels: labels
     },
     options: {
       responsive: true,
@@ -30,7 +24,7 @@ function make_doughnut_plot(canvas_name, data) {
       },
       title: {
         display: true,
-        text: 'Chart.js Doughnut Chart'
+        text: title
       },
       animation: {
         animateScale: true,

@@ -41,7 +41,7 @@
   <script type="text/javascript">
     make_line_plot("line_plot", {{ overall_data}}, {{labels | safe}});
     make_bar_plot("bar_plot",  {{ incoming_data }}, {{ outgoing_data }}, {{ labels_bar | safe}});
-    make_doughnut_plot("doughnut_plot_incoming", {{incoming_data}});
-    make_doughnut_plot("doughnut_plot_outgoing", {{outgoing_data}});
+    make_doughnut_plot("doughnut_plot_incoming", {{ incoming_data_donut }}, {{ labels_donut | safe }}, "Incoming Transactions");
+    make_doughnut_plot("doughnut_plot_outgoing", {{ outgoing_data_donut }}, {{ labels_donut | safe }}, "Outgoing Transactions");
   </script>
 {% endblock %}

@@ -11,3 +11,7 @@
 # look into flask-blueprints / refactoring to split more general parts
 # look into containered deployement ==> docker, uwsgi, ansible, ...
 # maybe try to make an API?
+
+
+#bugs:
+# adds new transaction instead changing the transaction

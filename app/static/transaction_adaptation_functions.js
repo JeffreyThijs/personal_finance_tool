@@ -20,7 +20,7 @@ function parse_transaction(transaction) {
 
 
 function obtain_transaction_info(transaction) {
-    // console.log(transaction);
+    console.log(transaction);
     var tr = parse_transaction(transaction);
     var transaction_id_field_element = document.getElementById("transaction_id");
     var date_field_element = document.getElementById("edit_form_date");
@@ -34,6 +34,7 @@ function obtain_transaction_info(transaction) {
     comment_field_element.value = tr.comment;
     incoming_field_element.checked = (tr.incoming == "True");
     category_field_element.value = tr.type;
+    console.log(transaction_id_field_element.value);
 }
 
 function remove_transaction(transaction_id){

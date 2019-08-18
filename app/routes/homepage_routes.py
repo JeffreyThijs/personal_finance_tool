@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_required
-from app.forms.forms import TransactionForm, TranactionButton, TaxForm
+from app.forms.forms import TransactionForm, TaxForm
 from app.tools.dateutils import filter_on_MonthYear, MONTHS, partition_in_MonthYear
 from werkzeug.urls import url_parse
 from app.sqldb.models import User

@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request, send_file
 from flask_login import current_user, login_required
-from app.forms.forms import TransactionForm, TranactionButton, TransactionRemovalForm
+from app.forms.forms import TransactionForm, TransactionRemovalForm, ChangeDateForm
 from app.tools.dateutils import filter_on_MonthYear, _next_month, _previous_month, generic_datetime_parse, MONTHS, date_time_parse
 from app.sqldb.dbutils import add_new_transaction, edit_transaction, remove_transaction
 from werkzeug.urls import url_parse
@@ -12,10 +12,7 @@ import json
 @app.route('/monthly_overview', methods=['GET', 'POST'])
 @login_required
 def monthly_overview():
-    new_transaction_button = TranactionButton()
-    if new_transaction_button.submit.data and new_transaction_button.validate_on_submit():
-        return redirect(url_for('entry'))
-
+    
     transactions = list(current_user.transactions)
     transactions.sort(key=lambda x: x.date, reverse=False)
 
@@ -32,6 +29,7 @@ def monthly_overview():
     # editing current transactions
     edit_transaction_form = TransactionForm()
     if edit_transaction_form.transaction_id.data and edit_transaction_form.validate_on_submit():
+        print("entered here 5")
         date = date_time_parse(edit_transaction_form.date.data, output_type="datetime", reverse_date=True)
         category = Transaction.TransactionType.coerce(edit_transaction_form.category.data)
         edit_transaction(id=edit_transaction_form.transaction_id.data, 
@@ -45,17 +43,50 @@ def monthly_overview():
     # removing current transaction
     remove_transaction_form = TransactionRemovalForm()
     if remove_transaction_form.remove_transaction_id.data and remove_transaction_form.validate_on_submit():
+        print("entered here 4")
         remove_transaction(id=remove_transaction_form.remove_transaction_id.data)
         return redirect(url_for('monthly_overview'))  
+
+    # change date
+    change_date_form = ChangeDateForm()
+    if change_date_form.change_date_id.data and change_date_form.validate_on_submit():
+        print("entered here")
+        month, year = change_date_form.change_date_id.data.split("-", 1)
+        current_user.last_date_viewed = current_user.last_date_viewed.replace(day=1, month=int(month), year=int(year))
+        db.session.add(current_user)
+        db.session.commit()
+        return redirect(url_for('monthly_overview'))  
+
+    # new transaction
+    add_new_transaction_form = TransactionForm()
+    if add_new_transaction_form.validate_on_submit():
+        print("entered here 2")
+        print("KKK"*100)
+        add_new_transaction(price=add_new_transaction_form.price.data,
+                            date=add_new_transaction_form.date.data,
+                            comment=add_new_transaction_form.comment.data,
+                            category=add_new_transaction_form.category.data,
+                            user_id=current_user.id,
+                            incoming=add_new_transaction_form.incoming.data)
+        return redirect(url_for('monthly_overview'))
+    else:
+        print(add_new_transaction_form.price.data)
+        print(add_new_transaction_form.date.data)
+        print(add_new_transaction_form.comment.data)
+        print(add_new_transaction_form.category.data)
+        print(add_new_transaction_form.incoming.data)
+        print("did not work")
+
 
     return render_template('monthly_overview.html',
                            title='Home',
                            transactions=transactions,
-                           new_transaction_button=new_transaction_button,
                            balance=balance,
                            current_date_view=current_date_view,
+                           add_new_transaction_form=add_new_transaction_form,
                            edit_transaction_form=edit_transaction_form,
-                           remove_transaction_form=remove_transaction_form)
+                           remove_transaction_form=remove_transaction_form,
+                           change_date_form=change_date_form)
 
 
 @app.route('/next_month', methods=['GET', 'POST'])
@@ -83,17 +114,3 @@ def previous_month():
     db.session.add(current_user)
     db.session.commit()
     return redirect(url_for('monthly_overview'))
-
-@app.route('/entry', methods=['GET', 'POST'])
-@login_required
-def entry():
-    form = TransactionForm()
-    if form.validate_on_submit():
-        add_new_transaction(price=form.price.data,
-                            date=form.date.data,
-                            comment=form.comment.data,
-                            category=form.category.data,
-                            user_id=current_user.id,
-                            incoming=form.incoming.data)
-        return redirect(url_for('monthly_overview'))
-    return render_template('entry.html', title='Entry', form=form)

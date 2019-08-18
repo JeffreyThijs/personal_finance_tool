@@ -3,8 +3,8 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField, Float
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from app.sqldb.models import User, Transaction
 
-class TranactionButton(FlaskForm):
-    submit = SubmitField('New Transaction')
+class ChangeDateForm(FlaskForm):
+    change_date_id = HiddenField()
 
 class TaxForm(FlaskForm):
     gross_wage = FloatField('Price', validators=[DataRequired()])
@@ -42,7 +42,7 @@ class TransactionForm(FlaskForm):
     category = SelectField("Category",  choices = Transaction.TransactionType.choices(),
                                         coerce = Transaction.TransactionType.coerce)
     incoming = BooleanField('Incoming transaction')
-    submit = SubmitField('Add Transaction')
+    # submit = SubmitField('Add Transaction')
 
 class TransactionRemovalForm(FlaskForm):
     remove_transaction_id = HiddenField()

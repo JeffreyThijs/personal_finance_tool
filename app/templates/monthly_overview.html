@@ -3,13 +3,30 @@
 
 {% block styles %}
 {{super()}}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
 <link rel="stylesheet" href="{{url_for('.static', filename='styles.css')}}">
+<!-- Special version of Bootstrap that only affects content wrapped in .bootstrap-iso -->
+<link rel="stylesheet" href="https://formden.com/static/cdn/bootstrap-iso.css" /> 
+
+<!--Font Awesome (added because you use icons in your prepend/append)-->
+<link rel="stylesheet" href="https://formden.com/static/cdn/font-awesome/4.4.0/css/font-awesome.min.css" />
+
+<!-- Inline CSS based on choices in "Settings" tab -->
+<style>.bootstrap-iso .formden_header h2, .bootstrap-iso .formden_header p, .bootstrap-iso form{font-family: Arial, Helvetica, sans-serif; color: black}.bootstrap-iso form button, .bootstrap-iso form button:hover{color: white !important;} .asteriskField{color: red;}</style>
+
 {% endblock %}
 
 
 {% block scripts %}
 {{super()}}
+
+<!-- Include jQuery -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
+<!-- Include Date Range Picker -->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
 <script src="{{ url_for('static', filename='transaction_adaptation_functions.js') }}"></script>
+<script src="{{ url_for('static', filename='calendar_date_change.js') }}"></script>
 {% endblock %}
 
 {% block app_content %}
@@ -19,16 +36,25 @@
     <li class="page-item">
       <a class="page-link" href="{{ url_for('previous_month') }}">&#60;&#60;</a>
     </li>
-    <li class="page-item"><a class="page-link" href=""> {{ current_date_view }} </a></li>
+    <li class="page-item">
+      <a>
+        <input onkeydown="return false" class="form-control" id="change_date_input" name="change_date_input" value={{current_date_view}} type="text"/>
+        <form class="form form-basic" method="post" role="form" id="change_date">
+            {{ change_date_form.hidden_tag() }}
+        </form>
+      </a>
+    </li>
     <li class="page-item">
       <a class="page-link" href="{{ url_for('next_month') }}"> &#62;&#62; </a>
     </li>
   </ul>
 </nav>
 
-<div>
-  {{ wtf.quick_form(new_transaction_button) }}
-</div>
+
+
+<button type="button" class="btn" data-toggle="modal" data-target="#AddNewTransactionModal">
+  New Transaction
+</button>
 
 <table class="table table-hover table-condensed" id="table">
   <thead>
@@ -89,6 +115,36 @@
   </tbody>
 </table>
 
+
+<!-- Add new Tranaction Modal -->
+<div class="modal fade" id="AddNewTransactionModal" tabindex="-1" role="dialog"
+  aria-labelledby="AddNewTransactionModal" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="AddNewTransactionModalTitle">Add new Transaction</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form class="form form-basic" method="post" role="form" id="add_new_form">
+          {{ add_new_transaction_form.hidden_tag()}}
+          {{ wtf.form_field(add_new_transaction_form.date, id="add_new_form_date")}}
+          {{ wtf.form_field(add_new_transaction_form.price, id="add_new_form_price") }}
+          {{ wtf.form_field(add_new_transaction_form.comment, id="add_new_form_comment") }}
+          {{ wtf.form_field(add_new_transaction_form.category, id="add_new_form_category") }}
+          {{ wtf.form_field(add_new_transaction_form.incoming, id="add_new_form_incoming") }}
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" form="add_new_form" class="btn btn-primary">Add Transaction</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Edit Tranaction Modal -->
 <div class="modal fade" id="EditTransactionModal" tabindex="-1" role="dialog"
   aria-labelledby="EditTransactionModalLabel" aria-hidden="true">
@@ -107,7 +163,7 @@
           {{ wtf.form_field(edit_transaction_form.price, id="edit_form_price") }}
           {{ wtf.form_field(edit_transaction_form.comment, id="edit_form_comment") }}
           {{ wtf.form_field(edit_transaction_form.category, id="edit_form_category") }}
-          {{ wtf.form_field(edit_transaction_form.incoming) }}
+          {{ wtf.form_field(edit_transaction_form.incoming, id="edit_form_incoming") }}
         </form>
       </div>
       <div class="modal-footer">
@@ -118,7 +174,7 @@
   </div>
 </div>
 
-<!-- Edit Tranaction Modal -->
+<!-- Remove Tranaction Modal -->
 <div class="modal fade" id="RemoveTransactionModal" tabindex="-1" role="dialog"
   aria-labelledby="RemoveTransactionModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">

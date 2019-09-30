@@ -2,7 +2,6 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, FloatField, SelectField, HiddenField, IntegerField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from app.sqldb.models import User, Transaction
-
 class ChangeDateForm(FlaskForm):
     change_date_id = HiddenField()
 

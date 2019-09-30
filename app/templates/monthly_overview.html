@@ -3,6 +3,7 @@
 
 {% block styles %}
 {{super()}}
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
 <link rel="stylesheet" href="{{url_for('.static', filename='styles.css')}}">
 {% endblock %}
@@ -30,13 +31,8 @@
         <a class="previous btn btn-primary ml-1" href="{{ url_for('next_month') }}"> &#62;&#62; </a>
     </div>
   </div>
-        
 
-  <button type="button" class="btn" data-toggle="modal" data-target="#AddNewTransactionModal">
-    New Transaction
-  </button>
-
-  <table class="table table-hover table-condensed" id="table">
+  <table class="table table-hover table-condensed table-bordered" id="table">
     <thead>
       <tr>
         <th scope="col">#</th>
@@ -45,7 +41,13 @@
         <th scope="col">Category</th>
         <th scope="col"></th>
         <th scope="col">Price</th>
-        <th scope="col"></th>
+        <th scope="col">
+
+            <button type="button" class="btn btn-sm" data-toggle="modal" data-target="#AddNewTransactionModal">
+                +
+            </button>
+
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -62,20 +64,20 @@
         <td> {{ transaction.category }} </td>
         <td>
         {% if transaction.incoming %}
-          <span class="glyphicon glyphicon-arrow-left"></span>
+          <span class="fa fa-arrow-left"></span>
         {% else %}
-          <span class="glyphicon glyphicon-arrow-right"></span>
+          <span class="fa fa-arrow-right"></span>
         {% endif %}
         </td>
         <td> {{ transaction.price }} </td>
         <td>
-          <button type="button" class="btn button_invisibe" data-toggle="modal" data-target="#EditTransactionModal"
+          <button type="button" class="btn btn-sm btn-outline-dark" data-toggle="modal" data-target="#EditTransactionModal"
             onclick='obtain_transaction_info("{{transaction | safe}}");'>
-            <span class="glyphicon glyphicon-edit"></span>
+            <span class="fa fa-edit"></span>
           </button>
-          <button type="button" class="btn button_invisibe" data-toggle="modal" data-target="#RemoveTransactionModal"
+          <button type="button" class="btn btn-sm btn-outline-dark" data-toggle="modal" data-target="#RemoveTransactionModal"
             onclick='remove_transaction("{{transaction.id | safe}}");'>
-            <span class="glyphicon glyphicon-remove"></span>
+            <span class="fa fa-remove"></span>
           </button>
         </td>
       </tr>
@@ -165,12 +167,10 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
-          <form class="form form-basic" method="post" role="form" id="remove_form">
-            {{ remove_transaction_form.hidden_tag() }}
-          </form>
-        </div>
         <div class="modal-footer">
+          <form class="form form-basic" method="post" role="form" id="remove_form">
+              {{ remove_transaction_form.hidden_tag() }}
+          </form>
           <button type="submit" form="remove_form" class="btn btn-primary">Yes</button>
           <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>
         </div>

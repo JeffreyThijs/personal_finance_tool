@@ -44,13 +44,13 @@ table.table.table-condensed {
 }
 
 .button_invisibe {
-  background-color: Transparent;
-  border-color: Transparent;
+  /* background-color: Transparent;
+  border-color: Transparent; */
   text-align: center;
   /* vertical-align: middle; */
   color: white;
   font-size: 15px;
-  height: 15px;
+  height: 30px;
   width: 20px;
   padding: 0;
   align-content: center

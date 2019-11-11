@@ -18,6 +18,9 @@ function parse_transaction(transaction) {
     return to_object(kv_pairs);
 }
 
+function get_type(obj) {
+    return ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1].toLowerCase()
+}
 
 function obtain_transaction_info(transaction) {
     console.log(transaction);
@@ -32,8 +35,8 @@ function obtain_transaction_info(transaction) {
     date_field_element.value = tr.fdate;
     price_field_element.value = tr.price;
     comment_field_element.value = tr.comment;
-    incoming_field_element.checked = (tr.incoming == "True");
     category_field_element.value = tr.type;
+    incoming_field_element.checked = tr.incoming;
 }
 
 function remove_transaction(transaction_id){

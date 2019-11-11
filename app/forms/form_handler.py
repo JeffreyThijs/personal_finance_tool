@@ -37,8 +37,7 @@ class FormHandler:
     @staticmethod
     def _handle_edit_current_transaction(form : EditTransactionForm) -> bool:
         if form.transaction_id.data and form.validate_on_submit():
-            print(form)
-            date = date_time_parse(form.date.data, output_type="datetime", reverse_date=True)
+            date = date_time_parse(form.date.data, output_type="datetime")
             category = Transaction.TransactionType.coerce(form.category.data)
             edit_transaction(id=form.transaction_id.data, 
                              price=form.price.data,

@@ -6,56 +6,75 @@ from werkzeug.urls import url_parse
 from app.sqldb.models import User, Transaction
 from app import app, db
 
-@app.route('/', methods=['GET', 'POST'])
-@app.route('/index', methods=['GET', 'POST'])
-@login_required
-def index():
-    transactions = list(current_user.transactions)
-    transactions.sort(key=lambda x: x.date, reverse=False)
-    transactions_montly = partition_in_MonthYear(transactions, "date")
+def _get_donut_charts_data(transactions):
 
-    labels_donut = [c[1] for c in Transaction.TransactionType.choices()]
-    incoming_data_donut, outgoing_data_donut = [0] * len(labels_donut), [0] * len(labels_donut)
+    donut_data = {}
+    donut_data["labels"] = [c[1] for c in Transaction.TransactionType.choices()]
+    donut_data["incoming"] =  [0] * len(donut_data["labels"])
+    donut_data["outgoing"] =  [0] * len(donut_data["labels"])
+
     for t in transactions:
-        _index = labels_donut.index(Transaction.TransactionType(t.type).name.title())
+        _index = donut_data["labels"].index(Transaction.TransactionType(t.type).name.title())
         if t.incoming:
-            incoming_data_donut[_index] += t.price
+            donut_data["incoming"][_index] += t.price
         else:
-            outgoing_data_donut[_index] += t.price
+            donut_data["outgoing"][_index] += t.price
 
-    incoming_data_donut = [round(x, 2) for x in incoming_data_donut]
-    outgoing_data_donut = [round(x, 2) for x in outgoing_data_donut]
+    donut_data["incoming"] = [round(x, 2) for x in donut_data["incoming"]]
+    donut_data["outgoing"] = [round(x, 2) for x in  donut_data["outgoing"]]
 
-    balance_montly = []
-    labels = []
-    _balance = 0
-    for year in transactions_montly:
-        for month in transactions_montly[year]:
-            _balance += (sum([t.price for t in transactions_montly[year][month] if t.incoming]) 
-                         - sum([t.price for t in transactions_montly[year][month] if not t.incoming]))
-            balance_montly.append(round(_balance, 2))
-            labels.append("{} {}".format(month, year))
+    return donut_data
 
-    incoming_data, outgoing_data = [], []
-    for month in MONTHS:
+def _get_bar_charts_data(transactions, year=2019):
+
+    bar_data = {"labels" : MONTHS,
+                "incoming" : [],
+                "outgoing" : []}
+
+    for month in bar_data["labels"]:
         sum_incoming, sum_outgoing = 0, 0
-        ts = filter_on_MonthYear(transactions, "date", month, "2019")
+        ts = filter_on_MonthYear(transactions, "date", month, str(year))
         for t in ts:
             if t.incoming:
                 sum_incoming += t.price
             else:
                 sum_outgoing += t.price
 
-        incoming_data.append(round(sum_incoming, 2))
-        outgoing_data.append(round(sum_outgoing, 2))
+        bar_data["incoming"].append(round(sum_incoming, 2))
+        bar_data["outgoing"].append(round(sum_outgoing, 2))
+
+    return bar_data
+
+def _get_line_charts_data(transactions):
+
+    line_data = {"labels" : [],
+                 "monthly_balance" : []}
+
+    transactions_montly = partition_in_MonthYear(transactions, "date")
+
+    _balance = 0
+    for year in transactions_montly:
+        for month in transactions_montly[year]:
+            _balance += (  sum([t.price for t in transactions_montly[year][month] if t.incoming]) 
+                         - sum([t.price for t in transactions_montly[year][month] if not t.incoming]))
+            line_data["labels"].append("{} {}".format(month, year))
+            line_data["monthly_balance"].append(round(_balance, 2))
+            
+    return line_data
+
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
+@login_required
+def index():
+
+    transactions = list(current_user.transactions)
+    transactions.sort(key=lambda x: x.date, reverse=False)
+
+    donut_data = _get_donut_charts_data(transactions)
+    bar_data = _get_bar_charts_data(transactions)
+    line_data = _get_line_charts_data(transactions)
 
     return render_template('index.html', 
-                            title='Plots', 
-                            labels=labels, 
-                            overall_data=balance_montly, 
-                            labels_bar=MONTHS,
-                            incoming_data=incoming_data,
-                            outgoing_data=outgoing_data,
-                            labels_donut=labels_donut,
-                            incoming_data_donut=incoming_data_donut,
-                            outgoing_data_donut=outgoing_data_donut)
+                            line_data=line_data,
+                            bar_data=bar_data,
+                            donut_data=donut_data)

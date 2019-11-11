@@ -25,7 +25,7 @@
         <a>
           <input onkeydown="return false" class="btn btn-primary form-control" id="change_date_input" name="change_date_input" value={{current_date_view}} type="button"/>
           <form class="form" method="post" role="form" id="change_date">
-              {{ change_date_form.hidden_tag() }}
+              {{ forms["change_date"].hidden_tag() }}
           </form>
         </a>
         <a class="previous btn btn-primary ml-1" href="{{ url_for('next_month') }}"> &#62;&#62; </a>
@@ -59,7 +59,7 @@
       {% endif %}
 
         <th scope="row">{{ loop.index }}</th>
-        <td> {{ transaction.date }} </td>
+        <td> {{ transaction.fdate }} </td>
         <td> {{ transaction.comment }} </td>
         <td> {{ transaction.category }} </td>
         <td>
@@ -111,12 +111,12 @@
         </div>
         <div class="modal-body">
           <form class="form form-basic" method="post" role="form" id="add_new_form">
-            {{ add_new_transaction_form.hidden_tag() }}
-            {{ wtf.form_field(add_new_transaction_form.date, id="add_new_form_date")}}
-            {{ wtf.form_field(add_new_transaction_form.price, id="add_new_form_price") }}
-            {{ wtf.form_field(add_new_transaction_form.comment, id="add_new_form_comment") }}
-            {{ wtf.form_field(add_new_transaction_form.category, id="add_new_form_category") }}
-            {{ wtf.form_field(add_new_transaction_form.incoming, id="add_new_form_incoming") }}
+            {{ forms["add_transaction"].hidden_tag() }}
+            {{ wtf.form_field(forms["add_transaction"].date, id="add_new_form_date")}}
+            {{ wtf.form_field(forms["add_transaction"].price, id="add_new_form_price") }}
+            {{ wtf.form_field(forms["add_transaction"].comment, id="add_new_form_comment") }}
+            {{ wtf.form_field(forms["add_transaction"].category, id="add_new_form_category") }}
+            {{ wtf.form_field(forms["add_transaction"].incoming, id="add_new_form_incoming") }}
           </form>
         </div>
         <div class="modal-footer">
@@ -140,12 +140,12 @@
         </div>
         <div class="modal-body">
           <form class="form form-basic" method="post" role="form" id="edit_form">
-            {{ edit_transaction_form.hidden_tag() }}
-            {{ wtf.form_field(edit_transaction_form.date, id="edit_form_date")}}
-            {{ wtf.form_field(edit_transaction_form.price, id="edit_form_price") }}
-            {{ wtf.form_field(edit_transaction_form.comment, id="edit_form_comment") }}
-            {{ wtf.form_field(edit_transaction_form.category, id="edit_form_category") }}
-            {{ wtf.form_field(edit_transaction_form.incoming, id="edit_form_incoming") }}
+            {{ forms["edit_transaction"].hidden_tag() }}
+            {{ wtf.form_field(forms["edit_transaction"].date, id="edit_form_date")}}
+            {{ wtf.form_field(forms["edit_transaction"].price, id="edit_form_price") }}
+            {{ wtf.form_field(forms["edit_transaction"].comment, id="edit_form_comment") }}
+            {{ wtf.form_field(forms["edit_transaction"].category, id="edit_form_category") }}
+            {{ wtf.form_field(forms["edit_transaction"].incoming, id="edit_form_incoming") }}
           </form>
         </div>
         <div class="modal-footer">
@@ -169,7 +169,7 @@
         </div>
         <div class="modal-footer">
           <form class="form form-basic" method="post" role="form" id="remove_form">
-              {{ remove_transaction_form.hidden_tag() }}
+              {{ forms["remove_transaction"].hidden_tag() }}
           </form>
           <button type="submit" form="remove_form" class="btn btn-primary">Yes</button>
           <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>

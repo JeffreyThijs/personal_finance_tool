@@ -5,6 +5,7 @@ from app.tools.dateutils import filter_on_MonthYear, MONTHS, partition_in_MonthY
 from werkzeug.urls import url_parse
 from app.sqldb.models import User, Transaction
 from app import app, db
+import datetime
 
 def _get_donut_charts_data(transactions):
 
@@ -25,7 +26,7 @@ def _get_donut_charts_data(transactions):
 
     return donut_data
 
-def _get_bar_charts_data(transactions, year=2019):
+def _get_bar_charts_data(transactions, year=datetime.datetime.now().year):
 
     bar_data = {"labels" : MONTHS,
                 "incoming" : [],

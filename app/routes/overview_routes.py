@@ -22,9 +22,6 @@ def monthly_overview():
 
     balance = round(sum(t.price for t in transactions if t.incoming) - sum(t.price for t in transactions if not t.incoming), 2)
 
-    # for i in range(len(transactions)):
-    #     transactions[i].category = Transaction.TransactionType(transactions[i].type).name
-
     # handle forms
     if f.handle_forms():
         return redirect(url_for('monthly_overview'))  

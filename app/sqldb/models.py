@@ -65,7 +65,7 @@ class Transaction(UserMixin, db.Model):
 
     @property
     def fdate(self):
-        return self.date.strftime("%m-%d-%Y")
+        return self.date.strftime("%d-%m-%Y")
 
     @property
     def category(self):

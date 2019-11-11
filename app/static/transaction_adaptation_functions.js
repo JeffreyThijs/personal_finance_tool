@@ -29,12 +29,11 @@ function obtain_transaction_info(transaction) {
     var category_field_element = document.getElementById("edit_form_category");
     var incoming_field_element = document.getElementById("incoming");
     transaction_id_field_element.value = parseInt(tr.id, 10);
-    date_field_element.value = tr.date;
+    date_field_element.value = tr.fdate;
     price_field_element.value = tr.price;
     comment_field_element.value = tr.comment;
     incoming_field_element.checked = (tr.incoming == "True");
     category_field_element.value = tr.type;
-    console.log(transaction_id_field_element.value);
 }
 
 function remove_transaction(transaction_id){

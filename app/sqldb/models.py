@@ -48,7 +48,7 @@ class User(UserMixin, db.Model):
 class Transaction(UserMixin, db.Model):
 
     class TransactionType(FormEnum):
-        UNKNOWN = 1
+        UNKOWN = 1
         GENERAL = 2
         RECREATIONAL = 3
 
@@ -57,18 +57,29 @@ class Transaction(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     date = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
     price = db.Column(db.Float(), default=0.0, nullable=False)
-    type = db.Column(db.Enum(TransactionType), default=TransactionType.UNKNOWN, nullable=False)
+    type = db.Column(db.Enum(TransactionType), default=TransactionType.UNKOWN, nullable=False)
     currency = db.Column(db.String(50), default="euro", nullable=False)
     incoming = db.Column(db.Boolean, default=False, nullable=False)
     comment = db.Column(db.String(500), default="placeholder", nullable=False)
-
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    @property
+    def fdate(self):
+        return self.date.strftime("%m-%d-%Y")
+
+    @property
+    def category(self):
+        return Transaction.TransactionType(self.type).name
+
+    @category.setter
+    def category(self, value):
+        self.type = Transaction.TransactionType.coerce(value)
 
     def __repr__(self):
         return '<Transaction {}>'.format(self.id)
 
     def __str__(self):
-        return "(id: {}, price: {}, type: {}, comment: {}, currency: {}, incoming: {}, user_id: {}, date: {})".format(
+        return "(id: {}, price: {}, type: {}, comment: {}, currency: {}, incoming: {}, user_id: {}, date: {}, fdate: {})".format(
             self.id,
             self.price,
             self.type,
@@ -76,5 +87,6 @@ class Transaction(UserMixin, db.Model):
             self.currency,
             self.incoming,
             self.user_id,
-            self.date
+            self.date,
+            self.fdate
         )

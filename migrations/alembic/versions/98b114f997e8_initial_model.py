@@ -22,7 +22,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('date', sa.DateTime(), nullable=False),
     sa.Column('price', sa.Float(), nullable=False),
-    sa.Column('type', sa.Enum('GENERAL', 'RECREATIONAL', 'UNKNOWN', name='transactiontype'), nullable=False),
+    sa.Column('type', sa.Enum('GENERAL', 'RECREATIONAL', 'UNKOWN', name='transactiontype'), nullable=False),
     sa.Column('currency', sa.String(length=50), nullable=False),
     sa.Column('comment', sa.String(length=500), nullable=False),
     sa.PrimaryKeyConstraint('id')

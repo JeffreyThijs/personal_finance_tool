@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from sqlalchemy import MetaData
 from flask_bootstrap import Bootstrap
+from flask_mail import Mail
 
 naming_convention = {
     "ix": 'ix_%(column_0_label)s',
@@ -16,6 +17,7 @@ naming_convention = {
 app = Flask(__name__)
 app.config.from_object(Config)
 bootstrap = Bootstrap(app)
+mail = Mail(app)
 db = SQLAlchemy(app, metadata=MetaData(naming_convention=naming_convention))
 login = LoginManager(app)
 login.login_view = 'login'

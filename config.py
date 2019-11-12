@@ -1,10 +1,14 @@
 import os
 from os.path import join, dirname
-from dotenv import load_dotenv
 from pathlib import Path
+import logging
 
-dotenv_path = join(dirname(__file__), '.env')
-load_dotenv(dotenv_path)
+try:
+    from dotenv import load_dotenv
+    dotenv_path = join(dirname(__file__), '.env')
+    load_dotenv(dotenv_path)
+except:
+    logging.warn("dotenv not loaded!")
 
 class Config(object):
     SECRET_KEY = os.environ.get('SECRET_KEY')

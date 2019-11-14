@@ -14,14 +14,33 @@ naming_convention = {
     "pk": "pk_%(table_name)s"
 }
 
-app = Flask(__name__)
-app.config.from_object(Config)
-bootstrap = Bootstrap(app)
-mail = Mail(app)
-db = SQLAlchemy(app, metadata=MetaData(naming_convention=naming_convention))
-login = LoginManager(app)
-login.login_view = 'login'
+db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
+bootstrap = Bootstrap()
+mail = Mail()
+login = LoginManager()
+login.login_view = 'auth.login'
+
+def create_app(config_class=Config):
+    app = Flask(__name__)
+    app.config.from_object(config_class)
+
+    db.init_app(app)
+    bootstrap.init_app(app)
+    mail.init_app(app)
+    login.init_app(app)
+
+    from app.auth import bp as auth_bp
+    app.register_blueprint(auth_bp, url_prefix='/auth')
+
+    from app.core.home import bp as home_bp
+    app.register_blueprint(home_bp, url_prefix='/core/home')
+
+    from app.core.overview import bp as overview_bp
+    app.register_blueprint(overview_bp, url_prefix='/core/overview')
+
+    from app.core.tax import bp as tax_bp
+    app.register_blueprint(tax_bp, url_prefix='/core/tax')
+
+    return app
 
 from app.sqldb import models, dbutils
-from app.routes import *
-from app.forms import forms

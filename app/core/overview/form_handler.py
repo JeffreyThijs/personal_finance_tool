@@ -1,12 +1,9 @@
-from flask import redirect, url_for
 from flask_login import current_user, login_required
-from app.forms.forms import TransactionForm, TransactionRemovalForm, ChangeDateForm, EditTransactionForm
+from app.core.overview.forms import TransactionForm, TransactionRemovalForm, ChangeDateForm, EditTransactionForm
 from app.tools.dateutils import filter_on_MonthYear, _next_month, _previous_month, generic_datetime_parse, MONTHS, date_time_parse
 from app.sqldb.dbutils import add_new_transaction, edit_transaction, remove_transaction
-from werkzeug.urls import url_parse
 from app.sqldb.models import User, Transaction
-from app import app, db
-import json
+from app import db
 
 class FormHandler:
     def __init__(self, forms=None):

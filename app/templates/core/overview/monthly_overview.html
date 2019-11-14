@@ -5,7 +5,7 @@
 {{super()}}
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
-<link rel="stylesheet" href="{{url_for('.static', filename='styles.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='styles.css')}}">
 {% endblock %}
 
 {% block scripts %}
@@ -21,14 +21,14 @@
 <div class="pt-3">
   <div class="container col-md-2">
     <div class="btn-group" role="group" aria-label="Basic example">
-        <a class="previous btn btn-primary mr-1" href="{{ url_for('previous_month') }}">&#60;&#60;</a>
+        <a class="previous btn btn-primary mr-1" href="{{ url_for('overview.previous_month') }}">&#60;&#60;</a>
         <a>
           <input onkeydown="return false" class="btn btn-primary form-control" id="change_date_input" name="change_date_input" value={{current_date_view}} type="button"/>
           <form class="form" method="post" role="form" id="change_date">
               {{ forms["change_date"].hidden_tag() }}
           </form>
         </a>
-        <a class="previous btn btn-primary ml-1" href="{{ url_for('next_month') }}"> &#62;&#62; </a>
+        <a class="previous btn btn-primary ml-1" href="{{ url_for('overview.next_month') }}"> &#62;&#62; </a>
     </div>
   </div>
 

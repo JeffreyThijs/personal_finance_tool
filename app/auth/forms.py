@@ -1,13 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, FloatField, SelectField, HiddenField, IntegerField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
-from app.sqldb.models import User, Transaction
-class ChangeDateForm(FlaskForm):
-    change_date_id = HiddenField()
-
-class TaxForm(FlaskForm):
-    gross_wage = FloatField('Price', validators=[DataRequired()])
-    submit = SubmitField('Calculate')
+from app.sqldb.models import User
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -32,19 +26,6 @@ class RegistrationForm(FlaskForm):
         if user is not None:
             raise ValidationError('Please use a different email address.')
 
-class TransactionForm(FlaskForm):
-    date = StringField('Date', validators=[DataRequired()])
-    price = FloatField('Price', validators=[DataRequired()])
-    comment = StringField('Comment', validators=[DataRequired()])
-    category = SelectField("Category",  choices = Transaction.TransactionType.choices(),
-                                        coerce = Transaction.TransactionType.coerce)
-    incoming = BooleanField('Incoming transaction')
-
-class EditTransactionForm(TransactionForm):
-    transaction_id = HiddenField()
-
-class TransactionRemovalForm(FlaskForm):
-    remove_transaction_id = HiddenField()
 
 class ResetPasswordRequestForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])

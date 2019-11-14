@@ -2,11 +2,12 @@ from flask import render_template, redirect, url_for
 from flask_login import current_user, login_required
 from app.tools.dateutils import filter_on_MonthYear, _next_month, _previous_month, generic_datetime_parse, MONTHS, date_time_parse
 from app.sqldb.models import User, Transaction
-from app import app, db
-from app.forms.form_handler import FormHandler
+from app.core.overview.form_handler import FormHandler
+from app.core.overview import bp
+from app import db
 
-@app.route('/', methods=['GET', 'POST'])
-@app.route('/monthly_overview', methods=['GET', 'POST'])
+@bp.route('/', methods=['GET', 'POST'])
+@bp.route('/monthly_overview', methods=['GET', 'POST'])
 @login_required
 def monthly_overview():
 
@@ -24,16 +25,16 @@ def monthly_overview():
 
     # handle forms
     if f.handle_forms():
-        return redirect(url_for('monthly_overview'))  
+        return redirect(url_for('overview.monthly_overview'))  
 
-    return render_template('monthly_overview.html',
+    return render_template('core/overview/monthly_overview.html',
                            transactions=transactions,
                            balance=balance,
                            current_date_view=current_date_view,
                            forms=f.forms)
 
 
-@app.route('/next_month', methods=['GET', 'POST'])
+@bp.route('/next_month', methods=['GET', 'POST'])
 @login_required
 def next_month():
     current_month = current_user.last_date_viewed.month
@@ -44,9 +45,9 @@ def next_month():
         current_user.last_date_viewed = current_user.last_date_viewed.replace(day=1, year=current_year+1)
     db.session.add(current_user)
     db.session.commit()
-    return redirect(url_for('monthly_overview'))
+    return redirect(url_for('overview.monthly_overview'))
 
-@app.route('/previous_month', methods=['GET', 'POST'])
+@bp.route('/previous_month', methods=['GET', 'POST'])
 @login_required
 def previous_month():
     current_month = current_user.last_date_viewed.month
@@ -57,4 +58,4 @@ def previous_month():
         current_user.last_date_viewed = current_user.last_date_viewed.replace(day=1, year=current_year-1)
     db.session.add(current_user)
     db.session.commit()
-    return redirect(url_for('monthly_overview'))
+    return redirect(url_for('overview.monthly_overview'))

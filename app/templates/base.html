@@ -12,18 +12,18 @@
 {% block navbar %}
     <nav class="container-fluid navbar navbar-dark bg-primary navbar-expand-sm justify-content-between">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('index') }}">Personal Finance Tool</a>
+            <a class="navbar-brand" href="{{ url_for('home.index') }}">Personal Finance Tool</a>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('index') }}">Home <span class="sr-only">(current)</span></a>
+                    <a class="nav-link" href="{{ url_for('home.index') }}">Home <span class="sr-only">(current)</span></a>
                     </li>
                     {% if not current_user.is_anonymous %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('monthly_overview') }}">Monthly Overview</a>
+                            <a class="nav-link" href="{{ url_for('overview.monthly_overview') }}">Monthly Overview</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('tax') }}">Calculate Net Wage</a>
+                            <a class="nav-link" href="{{ url_for('tax.tax') }}">Calculate Net Wage</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -31,11 +31,11 @@
             <ul class="navbar-nav mr-auto">
                 {% if current_user.is_anonymous %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('login') }}">Login</a>
+                        <a class="nav-link" href="{{ url_for('auth.login') }}">Login</a>
                     </li>
                 {% else %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                        <a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a>
                     </li>
                 {% endif %}
             </ul>

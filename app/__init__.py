@@ -33,7 +33,7 @@ def create_app(config_class=Config):
     app.register_blueprint(auth_bp, url_prefix='/auth')
 
     from app.core.home import bp as home_bp
-    app.register_blueprint(home_bp, url_prefix='/core/home')
+    app.register_blueprint(home_bp)
 
     from app.core.overview import bp as overview_bp
     app.register_blueprint(overview_bp, url_prefix='/core/overview')

@@ -46,6 +46,9 @@ def get_line_charts_data(transactions):
     line_data = {"labels" : [],
                  "monthly_balance" : []}
 
+    line_data["current_balance"] = (sum([t.price for t in transactions if (t.incoming and (t.date < datetime.datetime.now()))]) -
+                                    sum([t.price for t in transactions if (not t.incoming and (t.date < datetime.datetime.now()))]))
+    line_data["current_balance"] = round(line_data["current_balance"], 2)
     transactions_monthly = partition_in_MonthYear(transactions, "date")
 
     _balance = 0
@@ -55,5 +58,6 @@ def get_line_charts_data(transactions):
                          - sum([t.price for t in transactions_monthly[year][month] if not t.incoming]))
             line_data["labels"].append("{} {}".format(month, year))
             line_data["monthly_balance"].append(round(_balance, 2))
+
             
     return line_data

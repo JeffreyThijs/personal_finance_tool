@@ -1,7 +1,5 @@
-
 $(document).ready(function(){
     var date_input=$('input[name="change_date_input"]'); //our date input has the name "date"
-    // var container=$('.bootstrap-iso form').length>0 ? $('.bootstrap-iso form').parent() : "body";
     date_input.datepicker({
         format: 'mm-yyyy',
         autoclose: true,
@@ -14,10 +12,15 @@ $(document).ready(function(){
     })
 })
 
-var today = new Date();
-var dd = String(today.getDate()).padStart(2, '0');
-var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
-var yyyy = today.getFullYear();
-today = dd + '-' + mm + '-' + yyyy;
-var change_date_id_element = document.getElementById("add_new_form_date");
-change_date_id_element.value = today
+// updates add new form date in add new form
+function get_placeholder_date_today(){
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2, '0');
+    var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = today.getFullYear();
+    today = dd + '-' + mm + '-' + yyyy;
+    var change_date_id_element = document.getElementById("add_new_form_date");
+    change_date_id_element.value = today
+}
+
+get_placeholder_date_today();

@@ -4,7 +4,8 @@
 {% block styles %}
 {{super()}}
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css"/>
+<link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css" />
 <link rel="stylesheet" href="{{url_for('static', filename='styles.css')}}">
 {% endblock %}
 
@@ -12,7 +13,8 @@
 {{super()}}
 
 <!-- Include Date Range Picker -->
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
+<script type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
 <script src="{{ url_for('static', filename='transaction_adaptation_functions.js') }}"></script>
 <script src="{{ url_for('static', filename='calendar_date_change.js') }}"></script>
 <script src="{{ url_for('static', filename='tooltip.js') }}"></script>
@@ -20,22 +22,30 @@
 
 {% block app_content %}
 <div class="pt-3">
-  <div class="container col-md-2">
-    <div class="btn-group" role="group">
-        <a class="previous btn btn-primary mr-1" href="{{ url_for('overview.previous_month') }}"
-           data-placement="bottom" title="Previous month" data-toggle="tooltip"><i class="fa fa-backward"></i></a>
-        <a>
-          <input onkeydown="return false" class="btn btn-primary" id="change_date_input" name="change_date_input" value={{current_date_view}} type="button"/>
-          <form class="form" method="post" role="form" id="change_date">
-              {{ forms["change_date"].hidden_tag() }}
-          </form>
-        </a>
-        <a class="previous btn btn-primary ml-1" href="{{ url_for('overview.next_month') }}"
-           data-placement="bottom" title="Next month" data-toggle="tooltip"><i class="fa fa-forward"></i></a>
-    </div>
-  </div>
-
   <table class="table table-hover table-condensed table-bordered" id="table">
+    <caption>
+      <div class="row">
+        <div class="col-sm-4">
+          <div class="btn-group" role="group">
+            <input onkeydown="return false" class="previous btn" id="change_date_input" name="change_date_input"value={{current_date_view}} type="button"/>
+            <form class="form" method="post" role="form" id="change_date">
+              {{ forms["change_date"].hidden_tag() }}
+            </form>
+            <a class="previous btn" href="{{ url_for('overview.previous_month') }}" data-placement="bottom"
+              title="Previous month" data-toggle="tooltip">
+              <i class="fa fa-angle-left"></i>
+            </a>
+            <a class="previous btn" href="{{ url_for('overview.next_month') }}" data-placement="bottom"
+              title="Next month" data-toggle="tooltip">
+              <i class="fa fa-angle-right"></i>
+            </a>
+          </div>
+        </div>
+        <div class="col-sm-4">
+          <h3>{{current_date_view}}</h3>
+        </div>
+      </div>
+    </caption>
     <thead>
       <tr>
         <th scope="col">#</th>
@@ -47,7 +57,7 @@
         <th scope="col">
           <span data-toggle="modal" data-target="#AddNewTransactionModal">
             <a type="button" class="btn btn-sm btn-primary" data-placement="bottom" title="Add" data-toggle="tooltip">
-                <span class="fa fa-plus"></span>
+              <span class="fa fa-plus"></span>
             </a>
           </span>
         </th>
@@ -57,33 +67,33 @@
       {% for transaction in transactions %}
       {% if transaction.incoming %}
       <tr class="bg-success">
-      {% else %}
+        {% else %}
       <tr class="bg-danger">
-      {% endif %}
+        {% endif %}
 
         <th scope="row">{{ loop.index }}</th>
         <td> {{ transaction.fdate }} </td>
         <td> {{ transaction.comment }} </td>
         <td> {{ transaction.category }} </td>
         <td>
-        {% if transaction.incoming %}
+          {% if transaction.incoming %}
           <span class="fa fa-arrow-left"></span>
-        {% else %}
+          {% else %}
           <span class="fa fa-arrow-right"></span>
-        {% endif %}
+          {% endif %}
         </td>
         <td> {{ transaction.price }} </td>
         <td>
-          <span data-toggle="modal" data-target="#EditTransactionModal" >
-            <a type="button" class="btn btn-sm btn-outline-dark" data-placement="bottom" 
-               title="Remove" data-toggle="tooltip" onclick='obtain_transaction_info("{{transaction | safe}}");'>
-              <span class="fa fa-edit"></span>         
+          <span data-toggle="modal" data-target="#EditTransactionModal">
+            <a type="button" class="btn btn-sm btn-outline-dark" data-placement="bottom" title="Remove"
+              data-toggle="tooltip" onclick='obtain_transaction_info("{{transaction | safe}}");'>
+              <span class="fa fa-edit"></span>
             </a>
           </span>
           <span data-toggle="modal" data-target="#RemoveTransactionModal">
-            <a type="button" class="btn btn-sm btn-outline-dark" data-placement="bottom" 
-               title="Remove" data-toggle="tooltip" onclick='remove_transaction("{{transaction.id | safe}}");'>
-                <span class="fa fa-remove"></span>
+            <a type="button" class="btn btn-sm btn-outline-dark" data-placement="bottom" title="Remove"
+              data-toggle="tooltip" onclick='remove_transaction("{{transaction.id | safe}}");'>
+              <span class="fa fa-remove"></span>
             </a>
           </span>
         </td>
@@ -175,7 +185,7 @@
         </div>
         <div class="modal-footer">
           <form class="form form-basic" method="post" role="form" id="remove_form">
-              {{ forms["remove_transaction"].hidden_tag() }}
+            {{ forms["remove_transaction"].hidden_tag() }}
           </form>
           <button type="submit" form="remove_form" class="btn btn-primary">Yes</button>
           <button type="button" class="btn btn-primary" data-dismiss="modal">No</button>

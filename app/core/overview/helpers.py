@@ -10,7 +10,7 @@ def get_current_date_view(format='%B %Y', return_original=False):
         return f_current_data, current_user.last_date_viewed
     return f_current_data
 
-@cache.memoize(timeout=300)
+# @cache.memoize(timeout=300)
 @login_required
 def get_months_transactions(transactions, last_date_viewed):
     return filter_on_MonthYear(transactions, "date", str(last_date_viewed.month), str(last_date_viewed.year))

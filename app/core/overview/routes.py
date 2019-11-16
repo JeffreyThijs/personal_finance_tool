@@ -1,27 +1,23 @@
 from flask import render_template, redirect, url_for
-from flask_login import current_user, login_required
-from app.tools.dateutils import filter_on_MonthYear, _next_month, _previous_month, generic_datetime_parse, MONTHS, date_time_parse
-from app.sqldb.models import User, Transaction
+from flask_login import login_required
+from app.sqldb.dbutils import get_user_transactions
 from app.core.overview.form_handler import FormHandler
 from app.core.overview import bp
-from app import db
+from app.tools.financeutils import calc_balance
+from app.core.overview.helpers import get_current_date_view, get_months_transactions, transition_month
 
 @bp.route('/', methods=['GET', 'POST'])
 @bp.route('/monthly_overview', methods=['GET', 'POST'])
 @login_required
 def monthly_overview():
-
+    # init form handler
     f = FormHandler()
-
-    transactions = list(current_user.transactions)
-    transactions.sort(key=lambda x: x.date, reverse=False)
-
-    current_date_view = generic_datetime_parse(current_user.last_date_viewed, format='%B %Y')
-
-    current_month_view, current_year_view = str(current_user.last_date_viewed.month), str(current_user.last_date_viewed.year)
-    transactions = filter_on_MonthYear(transactions, "date", current_month_view, current_year_view)
-
-    balance = round(sum(t.price for t in transactions if t.incoming) - sum(t.price for t in transactions if not t.incoming), 2)
+    # get current date view
+    current_date_view, current_date = get_current_date_view(return_original=True)
+    # get transactions of current month view
+    transactions = get_months_transactions(get_user_transactions(), current_date)
+    # get balance of current transactions
+    balance = calc_balance(transactions)
 
     # handle forms
     if f.handle_forms():
@@ -33,29 +29,14 @@ def monthly_overview():
                            current_date_view=current_date_view,
                            forms=f.forms)
 
-
 @bp.route('/next_month', methods=['GET', 'POST'])
 @login_required
 def next_month():
-    current_month = current_user.last_date_viewed.month
-    new_month = _next_month(str(current_month))
-    current_user.last_date_viewed = current_user.last_date_viewed.replace(day=1, month=new_month)
-    if current_month == 12:
-        current_year = current_user.last_date_viewed.year
-        current_user.last_date_viewed = current_user.last_date_viewed.replace(day=1, year=current_year+1)
-    db.session.add(current_user)
-    db.session.commit()
+    transition_month(increment=True)
     return redirect(url_for('overview.monthly_overview'))
 
 @bp.route('/previous_month', methods=['GET', 'POST'])
 @login_required
 def previous_month():
-    current_month = current_user.last_date_viewed.month
-    new_month = _previous_month(str(current_month))
-    current_user.last_date_viewed = current_user.last_date_viewed.replace(day=1, month=new_month)
-    if current_month == 1:
-        current_year = current_user.last_date_viewed.year
-        current_user.last_date_viewed = current_user.last_date_viewed.replace(day=1, year=current_year-1)
-    db.session.add(current_user)
-    db.session.commit()
+    transition_month(increment=False)
     return redirect(url_for('overview.monthly_overview'))

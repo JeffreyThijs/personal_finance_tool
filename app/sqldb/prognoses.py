@@ -5,14 +5,14 @@ from datetime import datetime
 from flask_login import current_user, login_required
 from app import cache
 import logging
+import operator as op
 
 # @cache.memoize(timeout=300)
 @login_required
-def get_user_prognoses(reverse_order=False):
+def get_user_prognoses(sort_attr="date", *filter_rules):
     logging.info("Fetching user prognoses ...")
-    prognoses = list(current_user.prognoses)
-    prognoses.sort(key=lambda x: x.date, reverse=reverse_order)
-    return prognoses
+    prognoses_query = current_user.prognoses.filter(*filter_rules)
+    return prognoses_query.order_by(op.attrgetter(sort_attr)(Prognosis)).all()
 
 def _add_prognosis(amount : float,
                    date : datetime = None,

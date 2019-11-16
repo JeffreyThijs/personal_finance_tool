@@ -18,62 +18,35 @@
 {% endblock %}
 
 {% block app_content %}
+
+<span data-toggle="modal" data-target="#AddNewPrognosisModal">
+  <a type="button" class="btn btn-sm btn-primary" data-placement="bottom" title="Add" data-toggle="tooltip">
+    <span class="fa fa-plus"></span>
+  </a>
+</span>
+
 <div class="pt-3">
   <table class="table table-hover table-condensed table-bordered" id="table">
     <caption>
         <h3>Test</h3>
     <thead>
       <tr>
-        <th scope="col">#</th>
-        <th scope="col">Date</th>
-        <th scope="col">Comment</th>
-        <th scope="col">Occurance</th>
-        <th scope="col"></th>
-        <th scope="col">Amout</th>
-        <th scope="col">
-          <span data-toggle="modal" data-target="#AddNewPrognosisModal">
-            <a type="button" class="btn btn-sm btn-primary" data-placement="bottom" title="Add" data-toggle="tooltip">
-              <span class="fa fa-plus"></span>
-            </a>
-          </span>
+        <th scope="col">Month</th>
+        <th scope="col">Incoming</th>
+        <th scope="col">Outgoing</th>
+        <th scope="col">Balance</th>
         </th>
       </tr>
     </thead>
     <tbody>
-      {% for prognosis in prognoses %}
-      {% if prognosis.incoming %}
-      <tr class="bg-success">
-        {% else %}
-      <tr class="bg-danger">
-        {% endif %}
-
-        <th scope="row">{{ loop.index }}</th>
-        <td> {{ prognosis.fdate }} </td>
-        <td> {{ prognosis.comment }} </td>
-        <td> {{ prognosis.occurance_type }} </td>
-        <td>
-          {% if prognosis.incoming %}
-          <span class="fa fa-arrow-left"></span>
-          {% else %}
-          <span class="fa fa-arrow-right"></span>
-          {% endif %}
-        </td>
-        <td> {{ prognosis.amount }} </td>
-        <td>
-        </td>
+      {% for key, value in data.items() %}
+      <tr>
+          <th scope="row">{{ key }}</th>
+          <td> {{ value["incoming"] }} </td>
+          <td> {{ value["outgoing"] }} </td>
+          <td> {{ value["balance"] }} </td>
       </tr>
-
       {% endfor %}
-      {% if prognoses %}
-      <tr id={{ total }}>
-        <th scope="row"></th>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-      </tr>
-      {% endif %}
     </tbody>
   </table>
 

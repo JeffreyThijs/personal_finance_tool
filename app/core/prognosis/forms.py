@@ -8,7 +8,7 @@ class ChangeDateForm(FlaskForm):
 
 class PrognosisForm(FlaskForm):
     date = StringField('Date', validators=[DataRequired()])
-    price = FloatField('Price', validators=[DataRequired()])
+    amount = FloatField('Amount', validators=[DataRequired()])
     comment = StringField('Comment', validators=[DataRequired()])
     occurance_type = SelectField("Occurance",  choices = Prognosis.PrognosisOccuranceType.choices(),
                                                coerce = Prognosis.PrognosisOccuranceType.coerce)

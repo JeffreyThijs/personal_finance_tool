@@ -56,7 +56,7 @@ class FormHandler(BaseFormHandler):
     @staticmethod
     def _handle_add_new_prognosis_form(form : PrognosisForm):
         if form.validate_on_submit():
-            add_new_prognosis(amount=form.price.data,
+            add_new_prognosis(amount=form.amount.data,
                               date=form.date.data,
                               comment=form.comment.data,
                               occurance_type=form.occurance_type.data,

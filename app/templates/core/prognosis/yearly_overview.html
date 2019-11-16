@@ -15,9 +15,6 @@
 <!-- Include Date Range Picker -->
 <script type="text/javascript"
   src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
-<!-- <script src="{{ url_for('static', filename='transaction_adaptation_functions.js') }}"></script>
-<script src="{{ url_for('static', filename='calendar_date_change.js') }}"></script>
-<script src="{{ url_for('static', filename='tooltip.js') }}"></script> -->
 {% endblock %}
 
 {% block app_content %}
@@ -25,28 +22,6 @@
   <table class="table table-hover table-condensed table-bordered" id="table">
     <caption>
         <h3>Test</h3>
-      <!-- <div class="row">
-        <div class="col-sm-4">
-          <div class="btn-group" role="group">
-            <input onkeydown="return false" class="previous btn" id="change_date_input" name="change_date_input"value={{current_date_view}} type="button"/>
-            <form class="form" method="post" role="form" id="change_date">
-              {{ forms["change_date"].hidden_tag() }}
-            </form>
-            <a class="previous btn" href="{{ url_for('overview.previous_month') }}" data-placement="bottom"
-              title="Previous month" data-toggle="tooltip">
-              <i class="fa fa-angle-left"></i>
-            </a>
-            <a class="previous btn" href="{{ url_for('overview.next_month') }}" data-placement="bottom"
-              title="Next month" data-toggle="tooltip">
-              <i class="fa fa-angle-right"></i>
-            </a>
-          </div>
-        </div>
-        <div class="col-sm-4">
-          <h3>{{current_date_view}}</h3>
-        </div>
-      </div> -->
-    </caption>
     <thead>
       <tr>
         <th scope="col">#</th>
@@ -85,18 +60,6 @@
         </td>
         <td> {{ prognosis.amount }} </td>
         <td>
-          <!-- <span data-toggle="modal" data-target="#EditPrognosisModal">
-            <a type="button" class="btn btn-sm btn-outline-dark" data-placement="bottom" title="Remove"
-              data-toggle="tooltip" onclick='obtain_transaction_info("{{prognosis | safe}}");'>
-              <span class="fa fa-edit"></span>
-            </a>
-          </span>
-          <span data-toggle="modal" data-target="#RemovePrognosisModal">
-            <a type="button" class="btn btn-sm btn-outline-dark" data-placement="bottom" title="Remove"
-              data-toggle="tooltip" onclick='remove_transaction("{{prognosis.id | safe}}");'>
-              <span class="fa fa-remove"></span>
-            </a>
-          </span> -->
         </td>
       </tr>
 
@@ -127,7 +90,7 @@
         </div>
         <div class="modal-body">
           <form class="form form-basic" method="post" role="form" id="add_new_form">
-            {{ forms["add_transaction"].hidden_tag() }}
+            {{ forms["add_prognosis"].hidden_tag() }}
             {{ wtf.form_field(forms["add_prognosis"].date, id="add_new_form_date")}}
             {{ wtf.form_field(forms["add_prognosis"].amount, id="add_new_form_amount") }}
             {{ wtf.form_field(forms["add_prognosis"].comment, id="add_new_form_comment") }}

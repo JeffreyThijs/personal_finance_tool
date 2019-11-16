@@ -121,7 +121,7 @@ class Prognosis(UserMixin, db.Model):
     __tablename__ = 'prognosis'
 
     id = db.Column(db.Integer, primary_key=True)
-    # amount = db.Column(db.Float(), default=0.0, nullable=False)
+    amount = db.Column(db.Float(), default=0.0, nullable=False)
     date = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
     incoming = db.Column(db.Boolean, default=False, nullable=False)
     type = db.Column(db.Enum(PrognosisOccuranceType), default=PrognosisOccuranceType.ONCE, nullable=False)

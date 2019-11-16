@@ -6,7 +6,7 @@ from flask_login import current_user, login_required
 from app import cache
 import logging
 
-@cache.memoize(timeout=300)
+# @cache.memoize(timeout=300)
 @login_required
 def get_user_prognoses(reverse_order=False):
     logging.info("Fetching user prognoses ...")

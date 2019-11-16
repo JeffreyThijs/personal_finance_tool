@@ -27,6 +27,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), index=True, unique=True, nullable=False)
     password_hash = db.Column(db.String(128))
     transactions = db.relationship('Transaction', backref='user', lazy='dynamic')
+    prognoses = db.relationship('Prognosis', backref='user', lazy='dynamic')
     last_date_viewed = db.Column(db.DateTime(), default=datetime.date.today())
 
     @login.user_loader
@@ -103,6 +104,43 @@ class Transaction(UserMixin, db.Model):
             self.type,
             self.comment,
             self.currency,
+            self.incoming,
+            self.user_id,
+            self.date,
+            self.fdate
+        )
+
+class Prognosis(UserMixin, db.Model):
+
+    class PrognosisOccuranceType(FormEnum):
+        DAILY = 1
+        MONTHLY = 2
+        YEARLY = 3
+        ONCE = 4
+
+    __tablename__ = 'prognosis'
+
+    id = db.Column(db.Integer, primary_key=True)
+    # amount = db.Column(db.Float(), default=0.0, nullable=False)
+    date = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
+    incoming = db.Column(db.Boolean, default=False, nullable=False)
+    type = db.Column(db.Enum(PrognosisOccuranceType), default=PrognosisOccuranceType.ONCE, nullable=False)
+    comment = db.Column(db.String(500), default="placeholder", nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+
+    @property
+    def fdate(self):
+        return self.date.strftime("%d-%m-%Y")
+
+    def __repr__(self):
+        return '<Prognosis {}>'.format(self.id)
+
+    def __str__(self):
+        return "(id: {}, amount: {}, type: {}, comment: {}, incoming: {}, user_id: {}, date: {}, fdate: {})".format(
+            self.id,
+            self.amount,
+            self.type,
+            self.comment,
             self.incoming,
             self.user_id,
             self.date,

@@ -6,16 +6,14 @@ from app.sqldb.models import User, Transaction
 from app.tools.base_form_handler import BaseFormHandler
 from app import db
 
-
-_DEFAULT_FORMS = { "add_transaction" : TransactionForm(),
-                   "edit_transaction" : EditTransactionForm(),
-                   "remove_transaction" : TransactionRemovalForm(),
-                   "change_date" : ChangeDateForm() }
-
 class FormHandler(BaseFormHandler):
     
     def __init__(self, forms=None):
-        BaseFormHandler.__init__(self, forms=forms, default_forms=_DEFAULT_FORMS)
+        _default_forms = { "add_transaction" : TransactionForm(),
+                           "edit_transaction" : EditTransactionForm(),
+                           "remove_transaction" : TransactionRemovalForm(),
+                           "change_date" : ChangeDateForm() }
+        BaseFormHandler.__init__(self, forms=forms, default_forms=_default_forms)
 
     @staticmethod
     def _handle_edit_current_transaction(form : EditTransactionForm) -> bool:

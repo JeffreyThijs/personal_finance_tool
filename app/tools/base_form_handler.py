@@ -1,6 +1,6 @@
 class BaseFormHandler:
-    def __init__(self, forms=None, defaults_forms=None):
-        self._default_forms = defaults_forms
+    def __init__(self, forms=None, default_forms=None):
+        self._default_forms = default_forms
         self._forms = forms if forms is not None else self._default_forms
 
     @property

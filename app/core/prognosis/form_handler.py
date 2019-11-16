@@ -6,17 +6,16 @@ from app.sqldb.models import Prognosis
 from app import db
 from app.tools.base_form_handler import BaseFormHandler
 
-_DEFAULT_FORMS = { 
-                    "add_prognosis" : PrognosisForm(),
-                    # "edit_prognosis" : EditPrognosisForm(),
-                    # "remove_prognosis" : PrognosisRemovalForm(),
-                    # "change_date" : ChangeDateForm() 
-                 }
-
 class FormHandler(BaseFormHandler):
     
     def __init__(self, forms=None):
-        BaseFormHandler.__init__(self, forms=forms, default_forms=_DEFAULT_FORMS)
+        _default_forms = {
+                           "add_prognosis" : PrognosisForm(),
+                        #    "edit_prognosis" : EditPrognosisForm(),
+                        # "remove_prognosis" : PrognosisRemovalForm(),
+                        # "change_date" : ChangeDateForm() 
+                        }
+        BaseFormHandler.__init__(self, forms=forms, default_forms=_default_forms)
 
     @staticmethod
     def _handle_edit_current_prognosis(form : EditPrognosisForm) -> bool:

@@ -4,7 +4,7 @@ from app.tools.dateutils import filter_on_MonthYear, _next_month, _previous_mont
 from app.sqldb.prognoses import add_new_prognosis
 from app.sqldb.models import Prognosis
 from app import db
-from app.tools.base_form_handler import BaseFormHandler
+from app.tools.helpers_classes import BaseFormHandler
 
 class FormHandler(BaseFormHandler):
     

@@ -3,7 +3,7 @@ from app.core.overview.forms import TransactionForm, TransactionRemovalForm, Cha
 from app.tools.dateutils import filter_on_MonthYear, _next_month, _previous_month, generic_datetime_parse, MONTHS, date_time_parse
 from app.sqldb.transactions import add_new_transaction, edit_transaction, remove_transaction
 from app.sqldb.models import User, Transaction
-from app.tools.base_form_handler import BaseFormHandler
+from app.tools.helpers_classes import BaseFormHandler
 from app import db
 
 class FormHandler(BaseFormHandler):

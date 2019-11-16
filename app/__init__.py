@@ -6,6 +6,7 @@ from sqlalchemy import MetaData
 from flask_bootstrap import Bootstrap
 from flask_mail import Mail
 from flask_caching import Cache
+from flask_migrate import Migrate
 
 naming_convention = {
     "ix": 'ix_%(column_0_label)s',
@@ -19,6 +20,7 @@ db = SQLAlchemy(metadata=MetaData(naming_convention=naming_convention))
 bootstrap = Bootstrap()
 mail = Mail()
 cache = Cache()
+migrate = Migrate()
 login = LoginManager()
 login.login_view = 'auth.login'
 
@@ -30,6 +32,7 @@ def create_app(config_class=Config):
     bootstrap.init_app(app)
     mail.init_app(app)
     cache.init_app(app)
+    migrate.init_app(app, db=db)
     login.init_app(app)
 
     from app.auth import bp as auth_bp

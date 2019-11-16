@@ -4,14 +4,6 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 from logging.config import fileConfig
 
-
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(os.path.dirname(currentdir))
-sys.path.append(parentdir)
-from config import Config
-
-from app import db
-
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -24,11 +16,10 @@ fileConfig(config.config_file_name)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = db.Model.metadata
-
-config.set_main_option('sqlalchemy.url', Config.SQLALCHEMY_DATABASE_URI)
-
-
+from flask import current_app
+target_metadata = current_app.extensions['migrate'].db.metadata
+config.set_main_option('sqlalchemy.url',
+                       current_app.config.get('SQLALCHEMY_DATABASE_URI'))
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")

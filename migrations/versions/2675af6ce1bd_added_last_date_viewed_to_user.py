@@ -10,10 +10,6 @@ from alembic import op
 import sqlalchemy as sa
 import datetime
 
-from app import db
-from app.sqldb.models import User
-
-
 # revision identifiers, used by Alembic.
 revision = '2675af6ce1bd'
 down_revision = '21d9614ee9d5'

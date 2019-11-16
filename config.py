@@ -22,3 +22,6 @@ class Config(object):
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     CACHE_TYPE = os.environ.get("CACHE_TYPE") 
     CACHE_DEFAULT_TIMEOUT = int(os.environ.get("CACHE_DEFAULT_TIMEOUT") or 300)
+    if os.environ.get("SEND_FILE_MAX_AGE_DEFAULT"): 
+        SEND_FILE_MAX_AGE_DEFAULT = os.environ.get("SEND_FILE_MAX_AGE_DEFAULT")
+    TEMPLATES_AUTO_RELOAD=True

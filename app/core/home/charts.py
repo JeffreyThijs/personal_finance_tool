@@ -3,7 +3,7 @@ from app.sqldb.models import Transaction
 from app import cache
 import datetime
 
-# @cache.memoize(timeout=300)
+@cache.memoize(timeout=300)
 def get_donut_charts_data(transactions):
 
     donut_data = {}
@@ -23,7 +23,7 @@ def get_donut_charts_data(transactions):
 
     return donut_data
 
-# @cache.memoize(timeout=300)
+@cache.memoize(timeout=300)
 def get_bar_charts_data(transactions, year=datetime.datetime.now().year):
 
     bar_data = {"labels" : MONTHS,
@@ -44,7 +44,7 @@ def get_bar_charts_data(transactions, year=datetime.datetime.now().year):
 
     return bar_data
 
-# @cache.memoize(timeout=300)
+@cache.memoize(timeout=300)
 def get_line_charts_data(transactions):
 
     line_data = {"labels" : [],

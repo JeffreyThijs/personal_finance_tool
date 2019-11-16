@@ -24,4 +24,4 @@ class Config(object):
     CACHE_DEFAULT_TIMEOUT = int(os.environ.get("CACHE_DEFAULT_TIMEOUT") or 300)
     if os.environ.get("SEND_FILE_MAX_AGE_DEFAULT"): 
         SEND_FILE_MAX_AGE_DEFAULT = os.environ.get("SEND_FILE_MAX_AGE_DEFAULT")
-    TEMPLATES_AUTO_RELOAD=True
+    TEMPLATES_AUTO_RELOAD = os.environ.get("TEMPLATES_AUTO_RELOAD")

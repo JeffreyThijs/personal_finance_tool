@@ -47,6 +47,9 @@ def create_app(config_class=Config):
     from app.core.tax import bp as tax_bp
     app.register_blueprint(tax_bp, url_prefix='/core/tax')
 
+    from app.core.prognosis import bp as prognosis_bp
+    app.register_blueprint(prognosis_bp, url_prefix='/core/prognosis')
+
     return app
 
-from app.sqldb import models, transactions
+from app.sqldb import models, transactions, prognoses

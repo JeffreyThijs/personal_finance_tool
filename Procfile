@@ -1,1 +1,1 @@
-web: gunicorn pft:app
+web: flask db upgrade; gunicorn pft:app

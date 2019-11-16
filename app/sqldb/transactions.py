@@ -4,16 +4,18 @@ from app.tools.dateutils import convert_to_datetime, date_parse
 from datetime import datetime
 from flask_login import current_user, login_required
 from app import cache
+import logging
 
 @cache.memoize(timeout=300)
 @login_required
 def get_user_transactions(reverse_order=False):
+    logging.info("Fetching user transactions ...")
     transactions = list(current_user.transactions)
     transactions.sort(key=lambda x: x.date, reverse=reverse_order)
     return transactions
 
-
 def _clear_transaction_cache():
+    logging.info("Clearing cached user transactions ...")
     cache.delete_memoized(get_user_transactions)
 
 def add_new_transaction(price : float,
@@ -50,7 +52,7 @@ def _add_new_transaction(price : float,
     if date: transaction.date = date
     if user_id: transaction.user_id = user_id
 
-    print("Adding new transaction: {}".format(transaction))
+    logging.info("Adding new transaction: {}".format(transaction))
     db.session.add(transaction)
     db.session.commit()
 
@@ -74,7 +76,7 @@ def edit_transaction(id : int,
     if isinstance(category, Transaction.TransactionType): transaction.category = category
     if isinstance(incoming, bool): transaction.incoming = incoming
 
-    print("Edited transaction: {}".format(transaction))
+    logging.info("Edited transaction: {}".format(transaction))
     db.session.add(transaction)
     db.session.commit()
 
@@ -83,7 +85,7 @@ def edit_transaction(id : int,
 
 def remove_transaction(id : int):
     transaction = db.session.query(Transaction).get(id)
-    print("Removed transaction: {}".format(transaction))
+    logging.info("Removed transaction: {}".format(transaction))
     db.session.delete(transaction)
     db.session.commit()
 

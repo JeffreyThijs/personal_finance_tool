@@ -1,35 +1,21 @@
 from flask_login import current_user, login_required
 from app.core.overview.forms import TransactionForm, TransactionRemovalForm, ChangeDateForm, EditTransactionForm
 from app.tools.dateutils import filter_on_MonthYear, _next_month, _previous_month, generic_datetime_parse, MONTHS, date_time_parse
-from app.sqldb.dbutils import add_new_transaction, edit_transaction, remove_transaction
+from app.sqldb.transactions import add_new_transaction, edit_transaction, remove_transaction
 from app.sqldb.models import User, Transaction
+from app.tools.base_form_handler import BaseFormHandler
 from app import db
 
-class FormHandler:
+
+_DEFAULT_FORMS = { "add_transaction" : TransactionForm(),
+                   "edit_transaction" : EditTransactionForm(),
+                   "remove_transaction" : TransactionRemovalForm(),
+                   "change_date" : ChangeDateForm() }
+
+class FormHandler(BaseFormHandler):
+    
     def __init__(self, forms=None):
-        self._default_forms = {
-            "add_transaction" : TransactionForm(),
-            "edit_transaction" : EditTransactionForm(),
-            "remove_transaction" : TransactionRemovalForm(),
-            "change_date" : ChangeDateForm()
-        }
-        self._forms = forms if forms is not None else self._default_forms
-
-    @property
-    def default_forms(self):
-        return self.default_forms
-
-    @default_forms.setter
-    def default_forms(self, value):
-        raise Exception("Cant change the default forms")
-
-    @property
-    def forms(self):
-        return self._forms
-
-    @forms.setter
-    def forms(self, value):
-        self._forms = self.default_forms if not isinstance(value, dict) else value
+        BaseFormHandler.__init__(self, forms=forms, default_forms=_DEFAULT_FORMS)
 
     @staticmethod
     def _handle_edit_current_transaction(form : EditTransactionForm) -> bool:

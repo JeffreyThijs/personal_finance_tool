@@ -1,6 +1,6 @@
 from flask_login import current_user, login_required
 from app.tools.dateutils import filter_on_MonthYear, _next_month, _previous_month, generic_datetime_parse
-from app.sqldb.dbutils import update_last_date_viewed
+from app.sqldb.transactions import update_last_date_viewed
 from app import cache
 
 @login_required

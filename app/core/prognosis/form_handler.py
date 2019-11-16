@@ -1,7 +1,7 @@
 from flask_login import current_user, login_required
 from app.core.prognosis.forms import PrognosisForm, PrognosisRemovalForm, ChangeDateForm, EditPrognosisForm
 from app.tools.dateutils import filter_on_MonthYear, _next_month, _previous_month, generic_datetime_parse, MONTHS, date_time_parse
-from app.sqldb.prognoses import add_prognosis
+from app.sqldb.prognoses import add_new_prognosis
 from app.sqldb.models import Prognosis
 from app import db
 from app.tools.base_form_handler import BaseFormHandler
@@ -56,10 +56,10 @@ class FormHandler(BaseFormHandler):
     @staticmethod
     def _handle_add_new_prognosis_form(form : PrognosisForm):
         if form.validate_on_submit():
-            add_new_prognosis(price=form.price.data,
+            add_new_prognosis(amount=form.price.data,
                               date=form.date.data,
                               comment=form.comment.data,
-                              category=form.occurance_type.data,
+                              occurance_type=form.occurance_type.data,
                               incoming=form.incoming.data)
             return True
         return False

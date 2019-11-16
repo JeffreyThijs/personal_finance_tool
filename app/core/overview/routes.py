@@ -1,6 +1,6 @@
 from flask import render_template, redirect, url_for
 from flask_login import login_required
-from app.sqldb.dbutils import get_user_transactions
+from app.sqldb.transactions import get_user_transactions
 from app.core.overview.form_handler import FormHandler
 from app.core.overview import bp
 from app.tools.financeutils import calc_balance

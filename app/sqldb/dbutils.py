@@ -2,6 +2,19 @@ from app import db
 from app.sqldb.models import Transaction
 from app.tools.dateutils import convert_to_datetime, date_parse
 from datetime import datetime
+from flask_login import current_user, login_required
+from app import cache
+
+@cache.memoize(timeout=300)
+@login_required
+def get_user_transactions(reverse_order=False):
+    transactions = list(current_user.transactions)
+    transactions.sort(key=lambda x: x.date, reverse=reverse_order)
+    return transactions
+
+
+def _clear_transaction_cache():
+    cache.delete_memoized(get_user_transactions)
 
 def add_new_transaction(price : float,
                         date : str = None,
@@ -41,6 +54,9 @@ def _add_new_transaction(price : float,
     db.session.add(transaction)
     db.session.commit()
 
+    # clear transaction cache on update
+    _clear_transaction_cache()
+
 def edit_transaction(id : int,
                     price : float = None,
                     comment : str = None,
@@ -62,8 +78,19 @@ def edit_transaction(id : int,
     db.session.add(transaction)
     db.session.commit()
 
+    # clear transaction cache on update
+    _clear_transaction_cache()
+
 def remove_transaction(id : int):
     transaction = db.session.query(Transaction).get(id)
     print("Removed transaction: {}".format(transaction))
     db.session.delete(transaction)
+    db.session.commit()
+
+     # clear transaction cache on update
+    _clear_transaction_cache()
+
+def update_last_date_viewed(last_date_viewed):
+    current_user.last_date_viewed = last_date_viewed
+    db.session.add(current_user)
     db.session.commit()

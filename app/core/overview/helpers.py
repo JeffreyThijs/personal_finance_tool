@@ -20,7 +20,7 @@ def transition_month(increment : bool):
     new_month = _next_month(str(last_date_viewed.month)) if increment else _previous_month(str(last_date_viewed.month))
     last_date_viewed = last_date_viewed.replace(day=1, month=new_month)
     if increment and (last_date_viewed.month == 1):
-        last_date_viewed = current_user.last_date_viewed.replace(day=1, year=last_date_viewed.year-1)
+        last_date_viewed = last_date_viewed.replace(day=1, year=last_date_viewed.year+1)
     elif not increment and (last_date_viewed.month == 12):
-        last_date_viewed = current_user.last_date_viewed.replace(day=1, year=last_date_viewed.year+1)
+        last_date_viewed = last_date_viewed.replace(day=1, year=last_date_viewed.year-1)
     update_last_date_viewed(last_date_viewed)

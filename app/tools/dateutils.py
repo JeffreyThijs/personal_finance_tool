@@ -1,4 +1,5 @@
 import datetime
+from dateutil import relativedelta
 
 MONTHS = ['january', 'february', 'march', 'april', 'may', 'june', 'july',
           'august',  'september', 'october', 'november', 'december']
@@ -162,3 +163,6 @@ def get_days_in_month(month: int, year: int) -> int:
         return 29
     else:
         return 28
+
+def month_delta(date_1 : datetime.date, date_2 : datetime.date):
+    return relativedelta.relativedelta(date_1, date_2).months

@@ -18,7 +18,7 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
 
         if user is None or not user.check_password(form.password.data):
-            flash('Invalid username or password')
+            flash('Invalid username or password', 'error')
             return redirect(url_for('auth.login'))
         flash('Welcome {}!'.format(user.username))
         login_user(user, remember=form.remember_me.data)
@@ -48,7 +48,7 @@ def register():
                     password=form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Congratulations, you are now a registered user!')
+        flash('Congratulations, you are now a registered user!', 'success')
         return redirect(url_for('auth.login'))
 
     return render_template('auth/register.html', title='Register', form=form)

@@ -139,6 +139,14 @@ class Prognosis(UserMixin, db.Model):
     def fdate(self):
         return self.date.strftime("%d-%m-%Y")
 
+    @property
+    def occurance(self):
+        return Prognosis.PrognosisOccuranceType(self.type).name
+
+    @occurance.setter
+    def occurance(self, value):
+        self.type = Prognosis.PrognosisOccuranceType.coerce(value)
+
     def __repr__(self):
         return '<Prognosis {}>'.format(self.id)
 

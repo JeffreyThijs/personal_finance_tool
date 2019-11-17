@@ -2,6 +2,7 @@ import os
 from os.path import join, dirname
 from pathlib import Path
 import logging
+import tempfile
 
 try:
     from dotenv import load_dotenv
@@ -25,3 +26,13 @@ class Config(object):
     if os.environ.get("SEND_FILE_MAX_AGE_DEFAULT"): 
         SEND_FILE_MAX_AGE_DEFAULT = os.environ.get("SEND_FILE_MAX_AGE_DEFAULT")
     TEMPLATES_AUTO_RELOAD = os.environ.get("TEMPLATES_AUTO_RELOAD")
+
+class TestConfig(object):
+    SECRET_KEY = 'bad_secret_key'
+    DEBUG = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(tempfile.gettempdir(), 'app_test.db')
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    BCRYPT_LOG_ROUNDS = 4
+    TESTING = True
+    WTF_CSRF_ENABLED = False
+    CACHE_TYPE = 'simple'

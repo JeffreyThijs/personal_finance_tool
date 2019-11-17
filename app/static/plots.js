@@ -108,16 +108,16 @@ function make_bar_plot(canvas_name, data) {
   });
 }
 
-function make_line_plot(canvas_name, data, labels) {
+function make_line_plot(canvas_name, data) {
   var ctx = document.getElementById(canvas_name).getContext('2d');
   var myChart = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: labels,
+      labels: data["labels"],
       datasets:
         [
           {
-            data: data,
+            data: data["monthly_balance"],
             label: "Balance",
             backgroundColor: "rgba(0, 150, 255, 0.275)",
             borderColor: "rgba(0, 150, 255, 1)",

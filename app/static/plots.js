@@ -58,7 +58,7 @@ function make_bar_plot(canvas_name, incoming_data, outgoing_data, labels) {
           {
             data: incoming_data,
             label: "Incoming",
-            backgroundColor: "rgba(0, 255, 0, 1)",
+            backgroundColor: "rgba(92, 184, 92, 1)",
             borderColor: "#000000",
             borderWidth: 1,
             fill: true,
@@ -66,7 +66,7 @@ function make_bar_plot(canvas_name, incoming_data, outgoing_data, labels) {
           {
             data: outgoing_data,
             label: "Outgoing",
-            backgroundColor: "rgba(255, 0, 10, 1)",
+            backgroundColor: "rgba(217, 83, 79, 1)",
             borderColor: "#000000",
             borderWidth: 1,
             fill: true
@@ -100,8 +100,8 @@ function make_line_plot(canvas_name, data, labels) {
         [
           {
             data: data,
-            label: "Incoming",
-            backgroundColor: "rgba(0, 150, 255, 0.375)",
+            label: "Balance",
+            backgroundColor: "rgba(0, 150, 255, 0.275)",
             borderColor: "rgba(0, 150, 255, 1)",
             pointBackgroundColor: "rgba(0, 150, 255, 1)",
             pointBorderColor: "rgba(255, 255, 255, 1)",

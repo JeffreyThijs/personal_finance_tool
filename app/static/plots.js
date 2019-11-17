@@ -47,16 +47,16 @@ function make_doughnut_plot(canvas_name, data, labels, title) {
   });
 }
 
-function make_bar_plot(canvas_name, incoming_data, outgoing_data, labels) {
+function make_bar_plot(canvas_name, data) {
   var ctx = document.getElementById(canvas_name).getContext('2d');
   var myChart = new Chart(ctx, {
     type: 'bar',
     data: {
-      labels: labels,
+      labels: data["labels"],
       datasets:
         [
           {
-            data: incoming_data,
+            data: data["incoming"],
             label: "Incoming",
             backgroundColor: "rgba(92, 184, 92, 1)",
             borderColor: "#000000",
@@ -64,12 +64,30 @@ function make_bar_plot(canvas_name, incoming_data, outgoing_data, labels) {
             fill: true,
           },
           {
-            data: outgoing_data,
+            data: data["expected_incoming"],
+            label: "Expected incoming",
+            backgroundColor: "rgba(92, 184, 92, 1)",
+            borderColor: "#000000",
+            borderWidth: 1,
+            fill: true,
+            hidden: true
+          },
+          {
+            data: data["outgoing"],
             label: "Outgoing",
             backgroundColor: "rgba(217, 83, 79, 1)",
             borderColor: "#000000",
             borderWidth: 1,
             fill: true
+          },
+          {
+            data: data["expected_outgoing"],
+            label: "Expected outgoing",
+            backgroundColor: "rgba(217, 83, 79, 1)",
+            borderColor: "#000000",
+            borderWidth: 1,
+            fill: true,
+            hidden: true
           }
         ]
     },

@@ -54,7 +54,7 @@
   <script src="{{ url_for('static', filename='plots.js') }}"></script>
   <script type="text/javascript">
     make_line_plot("line_plot", {{ line_data["monthly_balance"] }}, {{ line_data["labels"] | safe}});
-    make_bar_plot("bar_plot",  {{ bar_data["incoming"] }}, {{ bar_data["outgoing"] }}, {{ bar_data["labels"] | safe}});
+    make_bar_plot("bar_plot",  {{ bar_data | safe }});
     make_doughnut_plot("doughnut_plot_incoming", {{ donut_data["incoming"] }}, {{ donut_data["labels"] | safe }}, "Incoming Transactions");
     make_doughnut_plot("doughnut_plot_outgoing", {{ donut_data["outgoing"] }}, {{ donut_data["labels"] | safe }}, "Outgoing Transactions");
   </script>

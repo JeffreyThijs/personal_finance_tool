@@ -2,6 +2,7 @@ from app.tools.dateutils import filter_on_MonthYear, MONTHS, partition_in_MonthY
 from app.sqldb.models import Transaction
 from app import cache
 import datetime
+from app.core.prognosis.helpers import get_prognosis_data
 
 @cache.memoize(timeout=300)
 def get_donut_charts_data(transactions):
@@ -41,6 +42,11 @@ def get_bar_charts_data(transactions, year=datetime.datetime.now().year):
 
         bar_data["incoming"].append(round(sum_incoming, 2))
         bar_data["outgoing"].append(round(sum_outgoing, 2))
+
+    # get prognoses
+    prognosis_data = get_prognosis_data(datetime.datetime.now().year)
+    bar_data["expected_incoming"] = [prognosis_data[x].incoming for x in prognosis_data.keys() if x != "Totals"]
+    bar_data["expected_outgoing"] = [prognosis_data[x].outgoing for x in prognosis_data.keys() if x != "Totals"]
 
     return bar_data
 

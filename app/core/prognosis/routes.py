@@ -11,9 +11,6 @@ def yearly_overview():
     f = FormHandler()
     # get prognoses
     data = get_prognosis_data(2019)
-    print("X"*100)
-    print(data)
-    print("X"*100)
     # handle forms
     if f.handle_forms():
         return redirect(url_for('prognosis.yearly_overview'))  

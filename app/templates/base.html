@@ -1,5 +1,12 @@
 {% extends 'bootstrap/base.html' %}
 
+{% set navigation_bar = [
+    ('home.index', 'index', 'Home'),
+    ('overview.monthly_overview', 'monthly_overview', 'Monthly Overview'),
+    ('tax.tax', 'tax', 'Calculate Net Wage'),
+    ('prognosis.yearly_overview', 'yearly_overview', 'Yearly Overview')
+] -%}
+
 {% block scripts %}
 {{super()}}
 <script src="{{ url_for('static', filename='navbar.js') }}"></script>
@@ -15,20 +22,17 @@
             <a class="navbar-brand" href="{{ url_for('home.index') }}">Personal Finance Tool</a>
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav mr-auto">
-                    <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('home.index') }}">Home <span class="sr-only">(current)</span></a>
-                    </li>
+                    {% for href, id, caption in navigation_bar %}
                     {% if not current_user.is_anonymous %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('overview.monthly_overview') }}">Monthly Overview</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('tax.tax') }}">Calculate Net Wage</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('prognosis.yearly_overview') }}">Yearly Overview</a>
+                        <li {% if id == active_page %} 
+                                class="active nav-item"
+                            {% else %}
+                                class="nav-item"
+                            {% endif %}>
+                            <a class="nav-link" href="{{ url_for(href) }}">{{ caption }}</a>
                         </li>
                     {% endif %}
+                    {% endfor %}
                 </ul>
             </div>
             <ul class="navbar-nav mr-auto">

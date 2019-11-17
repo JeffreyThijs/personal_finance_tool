@@ -42,8 +42,9 @@ def register():
 
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, email=form.email.data)
-        user.set_password(form.password.data)
+        user = User(username=form.username.data, 
+                    email=form.email.data,
+                    password=form.password.data)
         db.session.add(user)
         db.session.commit()
         flash('Congratulations, you are now a registered user!')
@@ -66,8 +67,6 @@ def reset_password_request():
                            title='Reset Password', 
                            form=form)
 
-
-
 @bp.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
     if current_user.is_authenticated:
@@ -77,7 +76,7 @@ def reset_password(token):
         return redirect(url_for('home.index'))
     form = ResetPasswordForm()
     if form.validate_on_submit():
-        user.set_password(form.password.data)
+        user.password = form.password.data
         db.session.commit()
         flash('Your password has been reset.')
         return redirect(url_for('auth.login'))

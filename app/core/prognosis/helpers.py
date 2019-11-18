@@ -11,7 +11,10 @@ def _get_year_data_base():
     year_data = AttrDict()
     rows = MONTHS + ["Totals"]
     for row in rows:
-        year_data[row] = AttrDict({"incoming" : 0, "outgoing" : 0, "balance" : 0})
+        year_data[row] = AttrDict({"incoming" : 0, 
+                                   "outgoing" : 0, 
+                                   "balance" : 0,
+                                   "tags" : set()})
     return year_data
 
 def _prognosis_date_rule(start_year, end_year=None, 
@@ -44,6 +47,7 @@ def _get_only_once_prognosis_data(year_data, year):
                 year_data[month].incoming += prognosis.amount
             else:
                 year_data[month].outgoing += prognosis.amount
+            year_data[month].tags.add("once:{}".format(prognosis.comment))
     return year_data
 
 def _get_daily_prognosis_data(year_data, year):
@@ -67,6 +71,7 @@ def _get_monthly_prognosis_data(year_data, year):
                     year_data[month].incoming += p.amount
                 else:
                     year_data[month].outgoing += p.amount
+                year_data[month].tags.add("monthly:{}".format(p.comment))
 
     return year_data
 
@@ -86,6 +91,7 @@ def _get_yearly_prognosis_data(year_data, year):
                 year_data[month].incoming += prognosis.amount
             else:
                 year_data[month].outgoing += prognosis.amount
+            year_data[month].tags.add("yearly:{}".format(prognosis.comment))
 
     return year_data
 

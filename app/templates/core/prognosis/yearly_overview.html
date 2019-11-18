@@ -17,14 +17,12 @@
 
 {% block app_content %}
 
-
-
 <div class="pt-3 accordion" id="TableAccordeon">
   <table class="table table-hover table-condensed table-bordered" id="table">
     <caption>
       <div class="row">
         <div class="col-sm">
-          <h3>Test</h3>
+          <h3>{{table_title}}</h3>
         </div>
         <div class="col-sm text-right">
           <span data-toggle="modal" data-target="#AddNewPrognosisModal">
@@ -51,15 +49,30 @@
           data-toggle="collapse" data-target="#{{data_target_name}}" class="accordion-toggle"
         {% endif %}>
             <th scope="row">{{ key }}</th>
-            <td> {{ value["incoming"] }} </td>
-            <td> {{ value["outgoing"] }} </td>
-            <td> {{ value["balance"] }} </td>
+            <td> {{ value.incoming }} </td>
+            <td> {{ value.outgoing }} </td>
+            <td> {{ value.balance }} </td>
         </tr>
         {% if key != "Totals" %} 
         <tr >
             <td colspan="4" class="hiddenRow">
               <div class="accordian-body collapse" id="{{data_target_name}}" data-parent="#TableAccordeon"> 
-                <p>{{ key }}</p>
+                {% for tag in value.tags %}
+                  <h6 style="display: inline">
+                    <span 
+                      {% if tag.startswith("monthly") %} 
+                        class="badge badge-pill badge-primary"
+                      {% elif tag.startswith("yearly") %} 
+                        class="badge badge-pill badge-success"
+                      {% elif tag.startswith("once") %} 
+                        class="badge badge-pill badge-danger"
+                      {% else %}
+                        class="badge badge-pill badge-dark"
+                      {% endif %}>
+                        {{ tag }}
+                    </span>
+                  </h6>
+                 {% endfor %}
               </div>
             </td> 
           </tr>

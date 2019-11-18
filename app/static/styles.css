@@ -3,6 +3,15 @@
   border: none;
 }
 
+.hiddenRow {
+  padding: 0 4px !important;
+  background-color: #eeeeee;
+  font-size: 13px;
+}
+.accordian-body span{
+color:#a2a2a2 !important;
+}
+
 caption{
   color: black;
   caption-side: top;

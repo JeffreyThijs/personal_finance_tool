@@ -46,4 +46,27 @@ def add_new_prognosis(amount : float,
                    incoming=incoming,
                    occurance_type=occurance_type,
                    comment=comment)
-    
+
+def edit_prognosis(id : int,
+                    amount : float = None,
+                    comment : str = None,
+                    date : datetime = None,
+                    user_id : int = None,
+                    occurance : Prognosis.PrognosisOccuranceType = None,
+                    incoming : bool = None):
+
+    prognosis = db.session.query(Prognosis).get(id)
+
+    if isinstance(amount, float): prognosis.amount = amount
+    if isinstance(comment, str): prognosis.comment = comment
+    if isinstance(date, datetime): prognosis.date = date
+    if isinstance(user_id, int): prognosis.user_id = user_id
+    if isinstance(occurance, Prognosis.PrognosisOccuranceType): prognosis.occurance = occurance
+    if isinstance(incoming, bool): prognosis.incoming = incoming
+
+    logging.info("Edited prognosis: {}".format(prognosis))
+    db.session.add(prognosis)
+    db.session.commit()
+
+    # clear prognosis cache on update
+    # _clear_prognosis_cache()

@@ -20,7 +20,7 @@ function make_doughnut_plot(canvas_name, data, labels, title) {
     options: {
       responsive: true,
       legend: {
-        position: 'top',
+        position: 'bottom',
       },
       title: {
         display: true,

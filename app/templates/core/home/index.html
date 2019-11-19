@@ -16,31 +16,28 @@
 
   <div>
     <div class="container">
-      <hr>
+      <br class="my-1">
       <h3>
           Current balance: &euro; {{ line_data["current_balance"] }}
       </h3>
-      <hr>
+      <hr class="my-4">
     </div>
   
-  
     <div>
-      <div class="row">
-        <div class="column_left">
+      <div class="row align-items-center">
+        <div class="col-sm-8">
           <canvas height="300" id="line_plot"></canvas>
         </div>
-        <div class="column_right">
-          <canvas id="doughnut_plot_incoming"></canvas>
+        <div class="col-sm-4">
+          <canvas height="200" id="doughnut_plot_incoming"></canvas>
         </div>
       </div>
-      <div class="row">
-  
-        <div class="column_left">
+      <div class="row align-items-center">
+        <div class="col-sm-8">
           <canvas id="bar_plot"></canvas>
         </div>
-  
-        <div class="column_right">
-          <canvas id="doughnut_plot_outgoing"></canvas>
+        <div class="col-sm-4">
+          <canvas height="200" id="doughnut_plot_outgoing"></canvas>
         </div>
       </div>
     </div>

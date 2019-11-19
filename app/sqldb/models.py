@@ -147,6 +147,10 @@ class Prognosis(UserMixin, db.Model):
     def occurance(self, value):
         self.type = Prognosis.PrognosisOccuranceType.coerce(value)
 
+    @property
+    def tag(self):
+        return "{}:{}".format(self.occurance.lower(), self.comment)
+
     def __repr__(self):
         return '<Prognosis {}>'.format(self.id)
 

@@ -13,17 +13,17 @@ def yearly_overview():
 
     # get year
     year = datetime.datetime.now().year
-    
-    # get prognoses
-    data = get_prognosis_data(year)
-    
-    # make table title
+
+     # make table title
     table_title = "Prognosis " + str(year)
 
     # handle forms
     if f.handle_forms():
         return redirect(url_for('prognosis.yearly_overview'))  
 
+    # get prognoses
+    data = get_prognosis_data(year)
+    
     return render_template('core/prognosis/yearly_overview.html',
                            table_title=table_title,
                            data=data,

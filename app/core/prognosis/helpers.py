@@ -67,7 +67,7 @@ def _get_monthly_prognosis_data(year_data, year):
     for p in prognosis:
         delta = month_delta(p.date.date(), first_day_of_year)
         for i, month in enumerate(MONTHS):
-            if (delta < 0) or (i >= (delta - 1)):
+            if (delta < 0) or (i > (delta - 1)):
                 if p.incoming:
                     year_data[month].incoming += p.amount
                 else:

@@ -14,25 +14,18 @@ def _get_year_data_base():
         year_data[row] = AttrDict({"incoming" : 0, 
                                    "outgoing" : 0, 
                                    "balance" : 0,
-                                   "tags" : set(),
                                    "prognoses" : set()})
     return year_data
 
 def _prognosis_date_rule(start_year, end_year=None, 
                         start_month=1, end_month=12, 
-                        start_day=1, end_day=31,
-                        verbose=False):
+                        start_day=1, end_day=31):
 
     end_year = start_year if end_year == None else end_year
     end_day = get_days_in_month(end_month, end_year) if get_days_in_month(end_month, end_year) < end_day else end_day
 
     start_date = datetime.date(day=start_day, month=start_month, year=start_year)
     end_date = datetime.date(day=end_day, month=end_month, year=end_year) + datetime.timedelta(days=1)
-
-    if verbose:
-        print("start: {}, end: {}".format(start_date, end_date))
-        # print("start: {}-{}-{}, end: {}-{}-{}".format(start_day, start_month, start_year,
-        #                                               end_day, end_month, end_year))
 
     return [Prognosis.date >= start_date,
             Prognosis.date < end_date]

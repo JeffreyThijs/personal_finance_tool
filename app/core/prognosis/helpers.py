@@ -14,7 +14,8 @@ def _get_year_data_base():
         year_data[row] = AttrDict({"incoming" : 0, 
                                    "outgoing" : 0, 
                                    "balance" : 0,
-                                   "tags" : set()})
+                                   "tags" : set(),
+                                   "prognoses" : set()})
     return year_data
 
 def _prognosis_date_rule(start_year, end_year=None, 
@@ -47,7 +48,7 @@ def _get_only_once_prognosis_data(year_data, year):
                 year_data[month].incoming += prognosis.amount
             else:
                 year_data[month].outgoing += prognosis.amount
-            year_data[month].tags.add("once:{}".format(prognosis.comment))
+            year_data[month].prognoses.add(prognosis)
     return year_data
 
 def _get_daily_prognosis_data(year_data, year):
@@ -71,7 +72,7 @@ def _get_monthly_prognosis_data(year_data, year):
                     year_data[month].incoming += p.amount
                 else:
                     year_data[month].outgoing += p.amount
-                year_data[month].tags.add("monthly:{}".format(p.comment))
+                year_data[month].prognoses.add(p)
 
     return year_data
 
@@ -81,7 +82,7 @@ def _get_yearly_prognosis_data(year_data, year):
         current_month = i + 1
         filter_rules = _prognosis_date_rule(start_year=1, end_year=year, 
                                             start_month=1, end_month=current_month,
-                                            start_day=1, end_day=31, verbose=True)
+                                            start_day=1, end_day=31)
         filter_rules += [Prognosis.type == Prognosis.PrognosisOccuranceType.YEARLY]
         yearly_prognosis = get_user_prognoses("date", *filter_rules)
         for prognosis in yearly_prognosis:
@@ -91,7 +92,7 @@ def _get_yearly_prognosis_data(year_data, year):
                 year_data[month].incoming += prognosis.amount
             else:
                 year_data[month].outgoing += prognosis.amount
-            year_data[month].tags.add("yearly:{}".format(prognosis.comment))
+            year_data[month].prognoses.add(prognosis)
 
     return year_data
 

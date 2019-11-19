@@ -1,7 +1,7 @@
 from flask_login import current_user, login_required
 from app.core.prognosis.forms import PrognosisForm, PrognosisRemovalForm, ChangeDateForm, EditPrognosisForm
 from app.tools.dateutils import filter_on_MonthYear, _next_month, _previous_month, generic_datetime_parse, MONTHS, date_time_parse
-from app.sqldb.prognoses import add_new_prognosis
+from app.sqldb.prognoses import add_new_prognosis, edit_prognosis
 from app.sqldb.models import Prognosis
 from app import db
 from app.tools.helpers_classes import BaseFormHandler
@@ -21,13 +21,13 @@ class FormHandler(BaseFormHandler):
     def _handle_edit_current_prognosis(form : EditPrognosisForm) -> bool:
         if form.prognosis_id.data and form.validate_on_submit():
             date = date_time_parse(form.date.data, output_type="datetime")
-            occurance_type = Prognosis.PrognosisType.coerce(form.category.data)
-            # edit_prognosis(id=form.prognosis_id.data, 
-            #                price=form.price.data,
-            #                comment=form.comment.data,
-            #                occurance_type=occurance_type,
-            #                incoming=form.incoming.data,
-            #                date=date)
+            occurance_type = Prognosis.PrognosisOccuranceType.coerce(form.occurance_type.data)
+            edit_prognosis(id=form.prognosis_id.data, 
+                           amount=form.amount.data,
+                           comment=form.comment.data,
+                           occurance=occurance_type,
+                           incoming=form.incoming.data,
+                           date=date)
             return True
         return False 
 

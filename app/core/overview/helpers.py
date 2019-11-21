@@ -2,9 +2,13 @@ from flask_login import current_user, login_required
 from app.tools.dateutils import filter_on_MonthYear, _next_month, _previous_month, generic_datetime_parse
 from app.sqldb.transactions import update_last_date_viewed
 from app import cache
+import time
+import datetime
 
 @login_required
 def get_current_date_view(format='%B %Y', return_original=False):
+    if not current_user.last_date_viewed:
+         update_last_date_viewed(datetime.datetime.now())
     f_current_data = generic_datetime_parse(current_user.last_date_viewed, format=format)
     if return_original:
         return f_current_data, current_user.last_date_viewed

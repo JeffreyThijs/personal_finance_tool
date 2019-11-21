@@ -29,6 +29,8 @@ class User(UserMixin, db.Model):
     transactions = db.relationship('Transaction', backref='user', lazy='dynamic')
     prognoses = db.relationship('Prognosis', backref='user', lazy='dynamic')
     last_date_viewed = db.Column(db.DateTime(), default=datetime.date.today())
+    email_verified = db.Column(db.Boolean, default=False, nullable=False)
+    register_date = db.Column(db.DateTime(), default=datetime.datetime.utcnow, nullable=False)
 
     @login.user_loader
     def load_user(id):
@@ -37,6 +39,11 @@ class User(UserMixin, db.Model):
     def get_reset_password_token(self, expires_in=600):
         return jwt.encode(
             {'reset_password': self.id, 'exp': time() + expires_in},
+            current_app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+
+    def get_verify_email_token(self, expires_in=60*60*24*7):
+        return jwt.encode(
+            {'verify_email': self.id, 'exp': time() + expires_in},
             current_app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
 
     @staticmethod
@@ -48,6 +55,15 @@ class User(UserMixin, db.Model):
             return
         return User.query.get(id)
 
+    @staticmethod
+    def verify_verify_email_password_token(token):
+        try:
+            id = jwt.decode(token, current_app.config['SECRET_KEY'],
+                            algorithms=['HS256'])['verify_email']
+        except:
+            return
+        return User.query.get(id)
+
     @property
     def password(self):
         return self.password_hash
@@ -55,6 +71,14 @@ class User(UserMixin, db.Model):
     @password.setter
     def password(self, value):
         self.set_password(value)
+
+    @property
+    def verified(self):
+        return self.email_verified
+        
+    @verified.setter
+    def verified(self, value):
+        self.email_verified = value
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)

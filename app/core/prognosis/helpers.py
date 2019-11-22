@@ -1,7 +1,7 @@
 from flask_login import current_user
 from app.sqldb.prognoses import get_user_prognoses, update_last_prognosis_viewed
 from app.sqldb.models import Prognosis
-from app.tools.dateutils import MONTHS, get_days_in_month, month_delta
+from app.tools.dateutils import MONTHS, get_days_in_month, month_delta, date_delta
 from app.tools.helpers_classes import AttrDict
 import datetime
 
@@ -51,14 +51,14 @@ def _get_daily_prognosis_data(year_data, year):
     first_day_of_year = datetime.date(day=1, month=1, year=year)
 
     for p in prognosis:
-        delta = month_delta(p.date.date(), first_day_of_year)
+        dd = date_delta(p.date.date(), first_day_of_year)
         for i, month in enumerate(MONTHS):
             current_month = i + 1
-            if (delta < 0) or (current_month > delta):
+            if (dd.years <= 0) and (current_month > dd.months):
                 if p.date.month == current_month:
-                    amount = p.amount * (get_days_in_month(month, year) - p.date.day + 1)
+                    amount = p.amount * (get_days_in_month(current_month, year) - p.date.day + 1)
                 else:
-                    amount = p.amount * get_days_in_month(month, year)
+                    amount = p.amount * get_days_in_month(current_month, year)
 
                 if p.incoming:
                     year_data[month].incoming += amount
@@ -74,11 +74,12 @@ def _get_monthly_prognosis_data(year_data, year):
     filter_rules = [Prognosis.type == Prognosis.PrognosisOccuranceType.MONTHLY]
     prognosis = get_user_prognoses("date", *filter_rules)
     first_day_of_year = datetime.date(day=1, month=1, year=year)
-
+    
     for p in prognosis:
-        delta = month_delta(p.date.date(), first_day_of_year)
+        dd = date_delta(p.date.date(), first_day_of_year)
         for i, month in enumerate(MONTHS):
-            if (delta < 0) or (i > (delta - 1)):
+            current_month = i + 1
+            if (dd.years <= 0) and (current_month > dd.months):
                 if p.incoming:
                     year_data[month].incoming += p.amount
                 else:
@@ -117,6 +118,7 @@ def _calc_totals(year_data):
     return year_data
 
 def get_prognosis_data(year):
+    print("getting data from year: {}".format(year))
     year_data = _get_year_data_base()
     year_data = _get_only_once_prognosis_data(year_data, year)
     year_data = _get_monthly_prognosis_data(year_data, year)

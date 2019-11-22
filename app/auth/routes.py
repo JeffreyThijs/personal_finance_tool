@@ -8,8 +8,8 @@ from app.auth.email import send_password_reset_email, send_verify_email
 from app.auth import bp
 
 def verified_and_authenticated():
-    print(dir(current_user))
-    return current_user.is_authenticated and current_user.email_verified
+    # return current_user.is_authenticated and current_user.email_verified
+    return current_user.is_authenticated
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -25,10 +25,10 @@ def login():
             flash('Invalid username or password', 'error')
             return redirect(url_for('auth.login'))
 
-        if user and not user.verified:
-            send_verify_email(user)
-            flash('Please verifiy your email, check your email for instructions!')
-            return redirect(url_for('auth.login'))
+        # if user and not user.verified:
+        #     send_verify_email(user)
+        #     flash('Please verifiy your email, check your email for instructions!')
+        #     return redirect(url_for('auth.login'))
 
         flash('Welcome {}!'.format(user.username))
         login_user(user, remember=form.remember_me.data)

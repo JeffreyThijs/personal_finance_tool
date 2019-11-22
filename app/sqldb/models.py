@@ -173,7 +173,9 @@ class Prognosis(UserMixin, db.Model):
 
     @property
     def tag(self):
-        return "{}:{}".format(self.occurance.lower(), self.comment)
+        return "{}:{}:{}".format(self.occurance.lower(),
+                                 "in" if self.incoming else "out",
+                                 self.comment)
 
     def __repr__(self):
         return '<Prognosis {}>'.format(self.id)

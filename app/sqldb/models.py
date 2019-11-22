@@ -29,8 +29,9 @@ class User(UserMixin, db.Model):
     transactions = db.relationship('Transaction', backref='user', lazy='dynamic')
     prognoses = db.relationship('Prognosis', backref='user', lazy='dynamic')
     last_date_viewed = db.Column(db.DateTime(), default=datetime.date.today())
-    email_verified = db.Column(db.Boolean, default=False, nullable=False)
-    register_date = db.Column(db.DateTime(), default=datetime.datetime.utcnow, nullable=False)
+    email_verified = db.Column(db.Boolean, default=False)
+    register_date = db.Column(db.DateTime(), default=datetime.datetime.utcnow)
+    last_prognosis_viewed = db.Column(db.DateTime(), default=datetime.date.today())
 
     @login.user_loader
     def load_user(id):

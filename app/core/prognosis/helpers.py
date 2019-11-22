@@ -52,8 +52,7 @@ def _get_daily_prognosis_data(year_data, year):
 
 def _get_monthly_prognosis_data(year_data, year):
 
-    filter_rules = _prognosis_date_rule(year)
-    filter_rules += [Prognosis.type == Prognosis.PrognosisOccuranceType.MONTHLY]
+    filter_rules = [Prognosis.type == Prognosis.PrognosisOccuranceType.MONTHLY]
     prognosis = get_user_prognoses("date", *filter_rules)
     first_day_of_year = datetime.date(day=1, month=1, year=year)
 

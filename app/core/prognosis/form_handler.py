@@ -13,7 +13,7 @@ class FormHandler(BaseFormHandler):
                            "add_prognosis" : PrognosisForm(),
                            "edit_prognosis" : EditPrognosisForm(),
                         # "remove_prognosis" : PrognosisRemovalForm(),
-                        # "change_date" : ChangeDateForm() 
+                           "change_date" : ChangeDateForm() 
                         }
         BaseFormHandler.__init__(self, forms=forms, default_forms=_default_forms)
 
@@ -43,14 +43,13 @@ class FormHandler(BaseFormHandler):
     # @login_required
     @staticmethod
     def _handle_change_date_form(form : ChangeDateForm) -> bool:
-        raise NotImplementedError
-        # if form.change_date_id.data and form.validate_on_submit():
-        #     month, year = form.change_date_id.data.split("-", 1)
-        #     current_user.last_date_viewed = current_user.last_date_viewed.replace(day=1, month=int(month), year=int(year))
-        #     db.session.add(current_user)
-        #     db.session.commit()
-        #     return True
-        # return False
+        if form.change_date_id.data and form.validate_on_submit():
+            year = form.change_date_id.data
+            current_user.last_prognosis_viewed = current_user.last_date_viewed.replace(day=1, year=int(year))
+            db.session.add(current_user)
+            db.session.commit()
+            return True
+        return False
 
     @staticmethod
     def _handle_add_new_prognosis_form(form : PrognosisForm):
@@ -75,8 +74,8 @@ class FormHandler(BaseFormHandler):
         #     return True  
 
         # # change date
-        # elif ("change_date" in self.forms) and self._handle_change_date_form(self.forms["change_date"]):
-        #     return True  
+        elif ("change_date" in self.forms) and self._handle_change_date_form(self.forms["change_date"]):
+            return True  
 
         # new prognosis
         elif ("add_prognosis" in self.forms) and self._handle_add_new_prognosis_form(self.forms["add_prognosis"]):

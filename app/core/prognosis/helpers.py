@@ -46,7 +46,26 @@ def _get_only_once_prognosis_data(year_data, year):
 
 def _get_daily_prognosis_data(year_data, year):
 
-    # TODO
+    filter_rules = [Prognosis.type == Prognosis.PrognosisOccuranceType.DAILY]
+    prognosis = get_user_prognoses("date", *filter_rules)
+    first_day_of_year = datetime.date(day=1, month=1, year=year)
+
+    for p in prognosis:
+        delta = month_delta(p.date.date(), first_day_of_year)
+        for i, month in enumerate(MONTHS):
+            current_month = i + 1
+            if (delta < 0) or (current_month > delta):
+                if p.date.month == current_month:
+                    amount = p.amount * (get_days_in_month(month, year) - p.date.day + 1)
+                else:
+                    amount = p.amount * get_days_in_month(month, year)
+
+                if p.incoming:
+                    year_data[month].incoming += amount
+                else:
+                    year_data[month].outgoing += amount
+                year_data[month].prognoses.add(p)
+
 
     return year_data
 
@@ -102,6 +121,7 @@ def get_prognosis_data(year):
     year_data = _get_only_once_prognosis_data(year_data, year)
     year_data = _get_monthly_prognosis_data(year_data, year)
     year_data = _get_yearly_prognosis_data(year_data, year)
+    year_data = _get_daily_prognosis_data(year_data, year)
     year_data = _calc_totals(year_data)
 
     return year_data

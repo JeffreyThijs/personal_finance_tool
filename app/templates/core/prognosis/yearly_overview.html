@@ -59,7 +59,7 @@
             <td colspan="4" class="hiddenRow">
               <div class="accordian-body collapse" id="{{data_target_name}}" data-parent="#TableAccordeon"> 
                 {% for prognosis in value.prognoses %}
-                  <h6 style="display: inline">
+                  <h5 style="display: inline">
                     <span data-toggle="modal" data-target="#EditPrognosisModal">
                       <a data-toggle="tooltip" onclick='obtain_prognosis_info("{{ prognosis | safe}}");'
                         {% if prognosis.tag.startswith("monthly") %} 
@@ -68,13 +68,15 @@
                           class="badge badge-success"
                         {% elif prognosis.tag.startswith("once") %} 
                           class="badge badge-danger"
+                        {% elif prognosis.tag.startswith("daily") %} 
+                          class="badge badge-warning"
                         {% else %}
-                          class="badge badge-dark"
+                          class="badge badge-info"
                         {% endif %}>
                           {{ prognosis.tag }}
                       </a>
                     </span>
-                  </h6>
+                  </h5>
                  {% endfor %}
               </div>
             </td> 

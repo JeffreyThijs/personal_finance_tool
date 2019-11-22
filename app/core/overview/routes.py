@@ -4,7 +4,7 @@ from app.sqldb.transactions import get_user_transactions
 from app.core.overview.form_handler import FormHandler
 from app.core.overview import bp
 from app.tools.financeutils import calc_balance
-from app.core.overview.helpers import get_current_date_view, get_months_transactions, transition_month
+from app.core.overview.helpers import get_current_date_view, get_months_transactions, transition_monthly_overview
 
 @bp.route('/', methods=['GET', 'POST'])
 @bp.route('/monthly_overview', methods=['GET', 'POST'])
@@ -32,11 +32,11 @@ def monthly_overview():
 @bp.route('/next_month', methods=['GET', 'POST'])
 @login_required
 def next_month():
-    transition_month(increment=True)
+    transition_monthly_overview(increment=True)
     return redirect(url_for('overview.monthly_overview'))
 
 @bp.route('/previous_month', methods=['GET', 'POST'])
 @login_required
 def previous_month():
-    transition_month(increment=False)
+    transition_monthly_overview(increment=False)
     return redirect(url_for('overview.monthly_overview'))

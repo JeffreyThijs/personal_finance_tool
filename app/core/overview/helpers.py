@@ -19,8 +19,8 @@ def get_current_date_view(format='%B %Y', return_original=False):
 def get_months_transactions(transactions, last_date_viewed):
     return filter_on_MonthYear(transactions, "date", str(last_date_viewed.month), str(last_date_viewed.year))
 
-def transition_month(increment : bool):
-    last_date_viewed = current_user.last_date_viewed
+def transition_monthly_overview(increment : bool):
+    last_date_viewed = current_user.last_date_viewed if current_user.last_date_viewed else datetime.datetime.now()
     new_month = _next_month(str(last_date_viewed.month)) if increment else _previous_month(str(last_date_viewed.month))
     last_date_viewed = last_date_viewed.replace(day=1, month=new_month)
     if increment and (last_date_viewed.month == 1):

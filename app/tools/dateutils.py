@@ -164,5 +164,15 @@ def get_days_in_month(month: int, year: int) -> int:
     else:
         return 28
 
+def date_delta(date_1 : datetime.date, date_2 : datetime.date):
+    dd = relativedelta.relativedelta(date_1, date_2)
+    # dd.year = dd.year if dd.year else 0
+    # dd.month = dd.month if dd.month else 0
+    # dd.day = dd.day if dd.day else 0
+    return dd
+
+def year_delta(date_1 : datetime.date, date_2 : datetime.date):
+    return date_delta(date_1, date_2).year
+
 def month_delta(date_1 : datetime.date, date_2 : datetime.date):
-    return relativedelta.relativedelta(date_1, date_2).months
+    return date_delta(date_1, date_2).months

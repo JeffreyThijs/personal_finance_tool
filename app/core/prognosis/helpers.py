@@ -109,11 +109,11 @@ def _get_yearly_prognosis_data(year_data, year):
 
 def _calc_totals(year_data):
     for month in MONTHS:
-        year_data[month].balance = year_data[month].incoming - year_data[month].outgoing
+        year_data[month].balance = round(year_data[month].incoming - year_data[month].outgoing, 2)
 
-    year_data.Totals.incoming = sum([year_data[str(key)].incoming for key in year_data.keys()])
-    year_data.Totals.outgoing = sum([year_data[str(key)].outgoing for key in year_data.keys()])
-    year_data.Totals.balance = year_data.Totals.incoming - year_data.Totals.outgoing
+    year_data.Totals.incoming = round(sum([year_data[str(key)].incoming for key in year_data.keys()]), 2)
+    year_data.Totals.outgoing = round(sum([year_data[str(key)].outgoing for key in year_data.keys()]), 2)
+    year_data.Totals.balance = round(year_data.Totals.incoming - year_data.Totals.outgoing, 2)
     return year_data
 
 def get_prognosis_data(year):

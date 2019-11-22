@@ -1,9 +1,9 @@
 from flask_login import current_user
-from app.sqldb.prognoses import get_user_prognoses
+from app.sqldb.prognoses import get_user_prognoses, update_last_prognosis_viewed
 from app.sqldb.models import Prognosis
-import datetime
 from app.tools.dateutils import MONTHS, get_days_in_month, month_delta
 from app.tools.helpers_classes import AttrDict
+import datetime
 
 MONTHS = [x.capitalize() for x in MONTHS]
 
@@ -125,3 +125,9 @@ def get_prognosis_data(year):
     year_data = _calc_totals(year_data)
 
     return year_data
+
+def transition_yearly_overview(increment : bool):
+    last_prognosis_viewed = current_user.last_prognosis_viewed if current_user.last_prognosis_viewed else datetime.datetime.now()
+    last_prognosis_viewed = last_prognosis_viewed.replace(year=last_prognosis_viewed.year+1) \
+                            if increment else last_prognosis_viewed.replace(year=last_prognosis_viewed.year - 1)
+    update_last_prognosis_viewed(last_prognosis_viewed)

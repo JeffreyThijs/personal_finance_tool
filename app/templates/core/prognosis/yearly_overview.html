@@ -12,27 +12,47 @@
 
 {% block scripts %}
 {{super()}}
+<script type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
 <script src="{{ url_for('static', filename='yearly_overview.js') }}"></script>
 <script src="{{ url_for('static', filename='prognosis_adaptation_function.js') }}"></script>
+<script src="{{ url_for('static', filename='tooltip.js') }}"></script>
 {% endblock %}
 
 {% block app_content %}
 
 <div class="pt-3 accordion" id="TableAccordeon">
-  <table class="table table-hover table-condensed table-bordered" id="table">
+  <table class="table table-sm table-hover table-condensed table-bordered" id="table">
     <caption>
-      <div class="row">
-        <div class="col-sm">
+    <div class="row">
+        <div class="col-sm-2">
+          <div class="btn-group" role="group">
+            <input onkeydown="return false" class="previous btn" id="change_date_input" name="change_date_input" value={{current_date_view}} type="button"/>
+            <form class="form" method="post" role="form" id="change_date">
+                {{ forms["change_date"].hidden_tag() }}
+            </form>
+            <a class="previous btn" href="{{ url_for('prognosis.previous_year') }}" data-placement="bottom"
+              title="Previous year" data-toggle="tooltip">
+              <i class="fa fa-angle-left"></i>
+            </a>
+            <a class="previous btn" href="{{ url_for('prognosis.next_year') }}" data-placement="bottom"
+              title="Next year" data-toggle="tooltip">
+              <i class="fa fa-angle-right"></i>
+            </a>
+          </div>
+        </div>
+        <div class="col-sm-4">
           <h3>{{table_title}}</h3>
         </div>
-        <div class="col-sm text-right">
-          <span data-toggle="modal" data-target="#AddNewPrognosisModal">
-              <a type="button" class="btn btn-sm btn-primary" data-placement="bottom" title="Add" data-toggle="tooltip">
-                <span class="fa fa-plus text-light"></span>
-              </a>
-          </span>
+        <div class="col-sm-4 text-right">
+            <span data-toggle="modal" data-target="#AddNewPrognosisModal">
+                <a type="button" class="btn btn-sm btn-primary" data-placement="bottom" title="Add" data-toggle="tooltip">
+                  <span class="fa fa-plus text-light"></span>
+                </a>
+            </span>
         </div>
       </div>
+    </caption>
     <thead>
       <tr>
         <th scope="col">Month</th>

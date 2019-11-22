@@ -70,3 +70,8 @@ def edit_prognosis(id : int,
 
     # clear prognosis cache on update
     # _clear_prognosis_cache()
+
+def update_last_prognosis_viewed(last_prognosis_viewed):
+    current_user.last_prognosis_viewed = last_prognosis_viewed
+    db.session.add(current_user)
+    db.session.commit()

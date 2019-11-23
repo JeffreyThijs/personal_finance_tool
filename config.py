@@ -26,7 +26,7 @@ class Config(object):
     if os.environ.get("SEND_FILE_MAX_AGE_DEFAULT"): 
         SEND_FILE_MAX_AGE_DEFAULT = os.environ.get("SEND_FILE_MAX_AGE_DEFAULT")
     TEMPLATES_AUTO_RELOAD = os.environ.get("TEMPLATES_AUTO_RELOAD")
-    VERIFIED_LOGIN = os.environ.get("VERIFIED_LOGIN")
+    VERIFIED_LOGIN = bool(os.environ.get("VERIFIED_LOGIN") == "True")
 
 class TestConfig(object):
     SECRET_KEY = 'bad_secret_key'

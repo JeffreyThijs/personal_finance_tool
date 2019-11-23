@@ -66,7 +66,7 @@ function make_bar_plot(canvas_name, data) {
           {
             data: data["expected_incoming"],
             label: "Expected incoming",
-            backgroundColor: "rgba(92, 184, 92, 1)",
+            backgroundColor: "rgba(92, 184, 92, 0.625)",
             borderColor: "#000000",
             borderWidth: 1,
             fill: true,
@@ -83,7 +83,7 @@ function make_bar_plot(canvas_name, data) {
           {
             data: data["expected_outgoing"],
             label: "Expected outgoing",
-            backgroundColor: "rgba(217, 83, 79, 1)",
+            backgroundColor: "rgba(217, 83, 79, 0.625)",
             borderColor: "#000000",
             borderWidth: 1,
             fill: true,

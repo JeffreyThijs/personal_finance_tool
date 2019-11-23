@@ -5,6 +5,8 @@ from config import TestConfig
 from app import create_app, db
 from faker import Faker
 from app.tools.helpers_classes import AttrDict
+from tests.helpers.fake_smtp import FakeSMTPServer
+import asyncore
 
 @pytest.fixture(scope="module")
 def test_users():
@@ -19,6 +21,7 @@ def test_users():
             f = Faker()
             profile = AttrDict(f.profile())
             users.append(User(id=i,
+                              verified=True,
                               username=profile.username, 
                               password=profile.job, 
                               email=profile.mail))
@@ -76,3 +79,11 @@ def init_database(test_users):
     yield db  # this is where the testing happens!
 
     db.drop_all()
+
+@pytest.fixture(scope='module')
+def init_smtp():
+    smtp_server = FakeSMTPServer(('localhost', 25), None)
+    try:
+        asyncore.loop()
+    except KeyboardInterrupt:
+        smtp_server.close()

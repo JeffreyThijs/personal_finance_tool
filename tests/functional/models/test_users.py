@@ -18,9 +18,9 @@ def test_valid_login_logout(test_client, init_database):
                                 follow_redirects=True)
     assert response.status_code == 200
     assert b"Welcome test_user!" in response.data
-    assert b"Monthly Overview" in response.data
-    assert b"Calculate Net Wage" in response.data
-    assert b"Yearly Overview" in response.data
+    assert b"Overview" in response.data
+    assert b"Tax" in response.data
+    assert b"Prognosis" in response.data
     assert b"Current balance" in response.data
     assert b"logout" in response.data
 
@@ -29,9 +29,9 @@ def test_valid_login_logout(test_client, init_database):
     assert response.status_code == 200
     assert b"New User?" in response.data
     assert b"Please log in to access this page." in response.data
-    assert b"Monthly Overview" not in response.data
-    assert b"Calculate Net Wage" not in response.data
-    assert b"Yearly Overview" not in response.data
+    assert b"Overview" not in response.data
+    assert b"Tax" not in response.data
+    assert b"Prognosis" not in response.data
     assert b"Current balance" not in response.data
     assert b"login" in response.data
 
@@ -57,7 +57,6 @@ def test_valid_registration(test_client, init_database):
                                           password2='averygoodpassword'),
                                 follow_redirects=True)
     assert response.status_code == 200
-    assert b"Congratulations, you are now a registered user!" in response.data
     assert b"Sign In" in response.data
     assert b"New User?" in response.data
     assert b"Forgot Your Password?" in response.data
@@ -68,9 +67,10 @@ def test_valid_registration(test_client, init_database):
                                 follow_redirects=True)
     assert response.status_code == 200
     assert b"Welcome KoolKat!" in response.data
-    assert b"Monthly Overview" in response.data
-    assert b"Calculate Net Wage" in response.data
-    assert b"Yearly Overview" in response.data
+    assert b"Please verifiy your email, check your email for instructions!"
+    assert b"Overview" in response.data
+    assert b"Tax" in response.data
+    assert b"Prognosis" in response.data
     assert b"Current balance" in response.data
     assert b"logout" in response.data
 
@@ -79,9 +79,9 @@ def test_valid_registration(test_client, init_database):
     assert response.status_code == 200
     assert b"New User?" in response.data
     assert b"Please log in to access this page." in response.data
-    assert b"Monthly Overview" not in response.data
-    assert b"Calculate Net Wage" not in response.data
-    assert b"Yearly Overview" not in response.data
+    assert b"Overview" not in response.data
+    assert b"Tax" not in response.data
+    assert b"Prognosis" not in response.data
     assert b"Current balance" not in response.data
     assert b"login" in response.data
 

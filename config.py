@@ -26,6 +26,7 @@ class Config(object):
     if os.environ.get("SEND_FILE_MAX_AGE_DEFAULT"): 
         SEND_FILE_MAX_AGE_DEFAULT = os.environ.get("SEND_FILE_MAX_AGE_DEFAULT")
     TEMPLATES_AUTO_RELOAD = os.environ.get("TEMPLATES_AUTO_RELOAD")
+    VERIFIED_LOGIN = os.environ.get("VERIFIED_LOGIN")
 
 class TestConfig(object):
     SECRET_KEY = 'bad_secret_key'
@@ -36,3 +37,8 @@ class TestConfig(object):
     TESTING = True
     WTF_CSRF_ENABLED = False
     CACHE_TYPE = 'simple'
+    MAIL_PORT = 25
+    MAIL_SERVER = "127.0.0.1"
+    MAIL_USERNAME = "test"
+    MAIL_PASSWORD = "test"
+    VERIFIED_LOGIN = False

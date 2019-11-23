@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, current_app
 from flask_login import login_user, logout_user, current_user, login_required
 from app.auth.forms import LoginForm, RegistrationForm, ResetPasswordForm, ResetPasswordRequestForm
 from werkzeug.urls import url_parse
@@ -8,8 +8,10 @@ from app.auth.email import send_password_reset_email, send_verify_email
 from app.auth import bp
 
 def verified_and_authenticated():
-    # return current_user.is_authenticated and current_user.email_verified
-    return current_user.is_authenticated
+    if current_app.config['VERIFIED_LOGIN']:
+        return current_user.is_authenticated and current_user.email_verified
+    else:
+        return current_user.is_authenticated
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -25,10 +27,11 @@ def login():
             flash('Invalid username or password', 'error')
             return redirect(url_for('auth.login'))
 
-        # if user and not user.verified:
-        #     send_verify_email(user)
-        #     flash('Please verifiy your email, check your email for instructions!')
-        #     return redirect(url_for('auth.login'))
+        if current_app.config['VERIFIED_LOGIN']:
+            if user and not user.verified:
+                send_verify_email(user)
+                flash('Please verifiy your email, check your email for instructions!')
+                return redirect(url_for('auth.login'))
 
         flash('Welcome {}!'.format(user.username))
         login_user(user, remember=form.remember_me.data)
@@ -59,8 +62,9 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        send_verify_email(user)
-        flash('Check your email for the instructions to verify your email!')
+        if current_app.config['VERIFIED_LOGIN']:
+            send_verify_email(user)
+            flash('Check your email for the instructions to verify your email!')
 
         # flash('Congratulations, you are now a registered user!', 'success')
         return redirect(url_for('auth.login'))

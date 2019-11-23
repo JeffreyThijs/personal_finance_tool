@@ -7,7 +7,7 @@
 <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
 <link rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/css/bootstrap-datepicker3.css" />
-<link rel="stylesheet" href="{{url_for('static', filename='styles.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='css/styles.css')}}">
 {% endblock %}
 
 {% block scripts %}
@@ -16,9 +16,9 @@
 <!-- Include Date Range Picker -->
 <script type="text/javascript"
   src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.4.1/js/bootstrap-datepicker.min.js"></script>
-<script src="{{ url_for('static', filename='transaction_adaptation_functions.js') }}"></script>
-<script src="{{ url_for('static', filename='calendar_date_change.js') }}"></script>
-<script src="{{ url_for('static', filename='tooltip.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/monthly_overview.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/alter_forms.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/tooltip.js') }}"></script>
 {% endblock %}
 
 {% block app_content %}

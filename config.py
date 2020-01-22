@@ -27,6 +27,7 @@ class Config(object):
         SEND_FILE_MAX_AGE_DEFAULT = os.environ.get("SEND_FILE_MAX_AGE_DEFAULT")
     TEMPLATES_AUTO_RELOAD = os.environ.get("TEMPLATES_AUTO_RELOAD")
     VERIFIED_LOGIN = bool(os.environ.get("VERIFIED_LOGIN") == "True")
+    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
 
 class TestConfig(object):
     SECRET_KEY = 'bad_secret_key'
@@ -42,3 +43,4 @@ class TestConfig(object):
     MAIL_USERNAME = "test"
     MAIL_PASSWORD = "test"
     VERIFIED_LOGIN = False
+    JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")

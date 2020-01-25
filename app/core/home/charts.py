@@ -3,6 +3,7 @@ from app.sqldb.models import Transaction
 from app import cache
 import datetime
 from app.core.prognosis.helpers import get_prognosis_data
+from app.sqldb.api.v1.transactions import get_current_user_partial_transactions, TransactionPartitionRule
 
 @cache.memoize(timeout=300)
 def get_donut_charts_data(transactions):
@@ -33,8 +34,10 @@ def get_bar_charts_data(transactions, last_x_months=12):
                 "expected_incoming" :  [0.0] * last_x_months,
                 "expected_outgoing" :  [0.0] * last_x_months}
 
-    ts = filter_on_last_x_months(transactions, last_x_months)
-    ts = partition_in_MonthYear(ts)
+    ts = get_current_user_partial_transactions(partition_rule=TransactionPartitionRule.PER_MONTH,
+                                               start_year=datetime.datetime.now().year - 1)
+    # ts = filter_on_last_x_months(transactions, last_x_months)
+    # ts = partition_in_MonthYear(ts)
     last_ordered_x_months, last_ordered_x_months_year = get_x_prev_months(last_x_months)
 
     unique_years = list(set(last_ordered_x_months_year))

@@ -28,6 +28,8 @@ class Config(object):
     TEMPLATES_AUTO_RELOAD = os.environ.get("TEMPLATES_AUTO_RELOAD")
     VERIFIED_LOGIN = bool(os.environ.get("VERIFIED_LOGIN") == "True")
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
+    JWT_BLACKLIST_ENABLED = os.environ.get("JWT_BLACKLIST_ENABLED")
+    JWT_BLACKLIST_TOKEN_CHECKS = os.environ.get("JWT_BLACKLIST_TOKEN_CHECKS").split(",")
 
 class TestConfig(object):
     SECRET_KEY = 'bad_secret_key'
@@ -44,3 +46,5 @@ class TestConfig(object):
     MAIL_PASSWORD = "test"
     VERIFIED_LOGIN = False
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
+    JWT_BLACKLIST_ENABLED = os.environ.get("JWT_BLACKLIST_ENABLED")
+    JWT_BLACKLIST_TOKEN_CHECKS = os.environ.get("JWT_BLACKLIST_TOKEN_CHECKS").split(",")

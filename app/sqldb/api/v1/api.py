@@ -2,9 +2,10 @@ from flask import Blueprint, request
 from flask_restplus import Resource, Api
 from app import ma, db
 from app.sqldb.api.v1.schemas import TransactionSchema, UserRegistrationSchema, UserLoginSchema
-from app.sqldb.models import Transaction, User
+from app.sqldb.models import Transaction, User, RevokedTokenModel
 from app.sqldb.api.v1 import _api as api
 from app.sqldb.api.v1 import bp
+from app.sqldb.api.v1.transactions import get_current_user_transactions
 from flask_jwt_extended import (create_access_token, 
                                 create_refresh_token, 
                                 jwt_required, 
@@ -14,8 +15,9 @@ from flask_jwt_extended import (create_access_token,
 
 @api.route('/transactions')
 class Transactions(Resource):
+    @jwt_required
     def get(self):
-        transactions = db.session.all()
+        transactions = get_current_user_transactions()
         ts = TransactionSchema(many=True)
         return ts.dump(transactions)
 
@@ -39,7 +41,7 @@ class UserRegistration(Resource):
 
             # add user to db
             db.session.add(user)
-            # db.session.commit()
+            db.session.commit()
 
             # create jwt tokens
             access_token = create_access_token(identity = data['username'])
@@ -83,14 +85,26 @@ class UserLogin(Resource):
             return {'message': 'wrong login info'}, 500
       
 class UserLogoutAccess(Resource):
+    @jwt_required
     def post(self):
-        return {'message': 'User logout'}
-      
-      
+        jti = get_raw_jwt()['jti']
+        try:
+            revoked_token = RevokedTokenModel(jti = jti)
+            db.session.add(revoked_token)
+            return {'message': 'Access token has been revoked'}
+        except:
+            return {'message': 'Something went wrong'}, 500
+
 class UserLogoutRefresh(Resource):
+    @jwt_refresh_token_required
     def post(self):
-        return {'message': 'User logout'}
-      
+        jti = get_raw_jwt()['jti']
+        try:
+            revoked_token = RevokedTokenModel(jti = jti)
+            db.session.add(revoked_token)
+            return {'message': 'Refresh token has been revoked'}
+        except:
+            return {'message': 'Something went wrong'}, 500
       
 class TokenRefresh(Resource):
     @jwt_refresh_token_required
@@ -98,15 +112,6 @@ class TokenRefresh(Resource):
         current_user = get_jwt_identity()
         access_token = create_access_token(identity = current_user)
         return {'access_token': access_token}
-      
-      
-# class AllUsers(Resource):
-#     def get(self):
-#         return {'message': 'List of users'}
-
-#     def delete(self):
-#         return {'message': 'Delete all users'}
-      
       
 class SecretResource(Resource):
     @jwt_required
@@ -120,5 +125,4 @@ api.add_resource(UserLogin, '/login')
 api.add_resource(UserLogoutAccess, '/logout/access')
 api.add_resource(UserLogoutRefresh, '/logout/refresh')
 api.add_resource(TokenRefresh, '/token/refresh')
-# api.add_resource(AllUsers, '/users')
 api.add_resource(SecretResource, '/secret')

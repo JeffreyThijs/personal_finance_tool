@@ -63,3 +63,4 @@ def create_app(config_class=Config):
 
 from app.sqldb import models
 from app.sqldb.api.v1 import api as _api
+from app.auth import jwt as _jwt

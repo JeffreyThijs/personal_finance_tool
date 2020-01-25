@@ -18,7 +18,7 @@ def get_user_transactions(user_id, order_attr=None, filter_rules=[]):
                                        order_attr=order_attr,
                                        filter_rules=filter_rules)
 
-def get_current_user_transactions(user_id, order_rules=None, filter_rules=[]):
+def get_current_user_transactions(order_rules=None, filter_rules=[]):
     return get_user_transactions(user_id=current_user.id, 
                                  order_attr=order_rules,
                                  filter_rules=filter_rules)

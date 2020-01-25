@@ -1,7 +1,7 @@
 from flask_login import current_user, login_required
 from app.core.prognosis.forms import PrognosisForm, PrognosisRemovalForm, ChangeDateForm, EditPrognosisForm
-from app.tools.dateutils import filter_on_MonthYear, _next_month, _previous_month, generic_datetime_parse, MONTHS, date_time_parse
-from app.sqldb.prognoses import add_new_prognosis, edit_prognosis
+from app.tools.dateutils import _next_month, _previous_month, generic_datetime_parse, MONTHS, date_time_parse
+from app.sqldb.api.v1.prognoses import add_new_prognosis, edit_prognosis
 from app.sqldb.models import Prognosis
 from app import db
 from app.tools.helpers_classes import BaseFormHandler

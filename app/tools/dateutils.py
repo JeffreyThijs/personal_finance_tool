@@ -92,49 +92,6 @@ def filter_on_datetime(objects,
 
     return list(filter(lambda o: (o.date <= end_dt) and (o.date >= start_dt), objects))
 
-def partition_in_MonthYear(datetime_objects):
-
-    dt_dict = dict()
-
-    for datetime_object in datetime_objects:
-        dt = datetime_object.date
-        year_str = str(dt.year)
-        month_str = MONTHS[dt.month - 1]
-
-        if year_str not in dt_dict:
-            dt_dict[year_str] = dict()
-        
-        if month_str not in dt_dict[year_str]:
-            dt_dict[year_str][month_str] = []
-
-        dt_dict[year_str][month_str].append(datetime_object)
-
-    return dt_dict
-
-
-def filter_on_last_x_months(objects, x_months):
-
-    if not isinstance(x_months, int) or x_months < 1:
-        raise ValueError("invalid months")
-
-    start_month = change_month(datetime.datetime.now().month, -x_months + 1)
-    year_compensation = 1 if datetime.datetime.now().month < start_month else 0
-    start_year = datetime.datetime.now().year - (np.floor((x_months - 1) / 12).astype(int)) - year_compensation
-    end_month = datetime.datetime.now().month
-    end_year = datetime.datetime.now().year
-    
-    end_day = str(get_days_in_month(int(end_month), int(end_year)))
-
-    begin_date = "01" + "-" + str(start_month) + "-" + str(start_year)
-    end_date = end_day + "-" + str(end_month) + "-" + str(end_year)
-
-    print(begin_date)
-    print(end_date)
-
-    return filter_on_datetime(objects=objects,
-                              begin_date=begin_date,
-                              end_date=end_date)
-
 def get_x_prev_months(x : int):
 
     if not isinstance(x, int) or x < 0:
@@ -159,21 +116,6 @@ def get_x_prev_months(x : int):
 
     # only keep last x values
     return prev_months[-x:], prev_years[-x:]
-
-
-def filter_on_MonthYear(objects,
-                        datetime_attr : str,
-                        month : str,
-                        year : str):
-
-    if month.lower() in MONTHS: month = convert_month(month)
-    end_day = str(get_days_in_month(int(month), int(year)))
-    begin_date = "01-"+month+"-"+year
-    end_date = end_day+"-"+month+"-"+year
-
-    return filter_on_datetime(objects=objects,
-                              begin_date=begin_date,
-                              end_date=end_date)
 
 def convert_month(month: str) -> str:
     def is_number(s):

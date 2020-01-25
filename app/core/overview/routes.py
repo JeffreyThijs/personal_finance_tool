@@ -1,6 +1,6 @@
 from flask import render_template, redirect, url_for
 from flask_login import login_required
-from app.sqldb.transactions import get_user_transactions
+from app.sqldb.api.v1.transactions import get_user_transactions
 from app.core.overview.form_handler import FormHandler
 from app.core.overview import bp
 from app.tools.financeutils import calc_balance
@@ -15,7 +15,7 @@ def monthly_overview():
     # get current date view
     current_date_view, current_date = get_current_date_view(return_original=True)
     # get transactions of current month view
-    transactions = get_months_transactions(get_user_transactions(), current_date)
+    transactions = get_months_transactions(current_date)
     # get balance of current transactions
     balance = calc_balance(transactions)
 

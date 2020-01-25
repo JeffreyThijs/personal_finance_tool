@@ -1,18 +1,42 @@
-from app import db
-from app.sqldb.models import Prognosis
-from app.tools.dateutils import convert_to_datetime, date_parse
-from datetime import datetime
-from flask_login import current_user, login_required
-from app import cache
 import logging
-import operator as op
+from datetime import datetime
+from app import db, cache
+from flask_login import current_user, login_required
+from app.sqldb.models import Prognosis
+from app.sqldb.api.v1.helpers.date_querying_helpers import DateQueryHelper, QueryPartitionRule, __MONTHS__
+from app.tools.dateutils import convert_to_datetime, date_parse
+
+_dqh = DateQueryHelper(query_class=Prognosis)
 
 # @cache.memoize(timeout=300)
-@login_required
-def get_user_prognoses(sort_attr="date", *filter_rules):
-    logging.info("Fetching user prognoses ...")
-    prognoses_query = current_user.prognoses.filter(*filter_rules)
-    return prognoses_query.order_by(op.attrgetter(sort_attr)(Prognosis)).all()
+def get_user_prognoses(user_id, order_attr=None, filter_rules=[]):
+    return _dqh.get_user_query_objects(user_id=user_id,  
+                                       order_attr=order_attr,
+                                       filter_rules=filter_rules)
+
+def get_current_user_prognoses(user_id, order_rules=None, filter_rules=[]):
+    return get_user_prognoses(user_id=current_user.id, 
+                              order_attr=order_rules,
+                              filter_rules=filter_rules)
+
+def get_user_partial_prognoses(user_id, order_attr=None, partition_rule=None, occurrence_type=None, **kwargs):
+
+    filter_rules = []
+    if occurrence_type:
+        filter_rules += [Prognosis.type == occurrence_type]
+
+    return _dqh.get_user_partial_query_objects(user_id=user_id, 
+                                               order_attr=order_attr,
+                                               partition_rule=partition_rule,
+                                               filter_rules=filter_rules,
+                                               **kwargs)
+
+def get_current_user_partial_prognoses(order_attr=None, partition_rule=None, occurrence_type=None, **kwargs):
+    return get_user_partial_prognoses(user_id=current_user.id,
+                                      order_attr=order_attr,
+                                      partition_rule=partition_rule,
+                                      occurrence_type=occurrence_type,
+                                      **kwargs)
 
 def _add_prognosis(amount : float,
                    date : datetime = None,
@@ -48,12 +72,12 @@ def add_new_prognosis(amount : float,
                    comment=comment)
 
 def edit_prognosis(id : int,
-                    amount : float = None,
-                    comment : str = None,
-                    date : datetime = None,
-                    user_id : int = None,
-                    occurance : Prognosis.PrognosisOccuranceType = None,
-                    incoming : bool = None):
+                   amount : float = None,
+                   comment : str = None,
+                   date : datetime = None,
+                   user_id : int = None,
+                   occurance : Prognosis.PrognosisOccuranceType = None,
+                   incoming : bool = None):
 
     prognosis = db.session.query(Prognosis).get(id)
 

@@ -1,96 +1,22 @@
-from app import db
+import logging
+from datetime import datetime
+from app import db, cache
+from flask_login import current_user, login_required
 from app.sqldb.models import Transaction
-from flask_login import current_user
-import operator as op
-import datetime
-from enum import IntEnum
-from app.tools.helpers_classes import AttrDict
+from app.sqldb.api.v1.helpers.date_querying_helpers import DateQueryHelper, QueryPartitionRule, __MONTHS__
+from app.tools.dateutils import convert_to_datetime, date_parse
+from typing import List
 
-__MONTHS__ = ['january', 'february', 'march', 'april', 'may', 'june', 'july',
-              'august',  'september', 'october', 'november', 'december']
+# typing helper
+Transactions = List[Transaction]
 
-class TransactionPartitionRule(IntEnum):
-    PER_DAY = 1
-    PER_WEEK = 2
-    PER_MONTH = 3
-    PER_YEAR = 4
-    PER_DECADE = 5
-    NONE = 6
+_dqh = DateQueryHelper(query_class=Transaction)
 
-class TransactionDate:
-    def __init__(self, year=None, month=None, day=None):
-        self.year = year
-        self.month = month
-        self.day = day
-
-    def __str__(self):
-        return "day: {}, month: {}, year: {}".format(self.day, self.month, self.year)
-
-    @property
-    def date(self):
-        return datetime.date(year=self._year,
-                             month=self._month,
-                             day=self._day)
-    @property
-    def week(self):
-        return self.date.isocalendar()[1]
-
-    @property
-    def decade(self):
-        return int(int(self._year / 10) * 10)
-
-    @property
-    def year(self):
-        return self._year
-
-    @year.setter
-    def year(self, value : int):
-        if (value is None) or (not isinstance(value, int)):
-            self._year = datetime.datetime.now().year
-        else:
-            self._year = value
-
-    @property
-    def month(self):
-        return self._month
-
-    @property
-    def smonth(self):
-        return __MONTHS__[self.month - 1]
-
-    @month.setter
-    def month(self, value : int):
-        if (value is None) or (not isinstance(value, int)):
-            self._month = datetime.datetime.now().month
-        else:
-            self._month = value
-
-    @property
-    def day(self):
-        return self._day
-
-    @day.setter
-    def day(self, value : int):
-        if (value is None) or (not isinstance(value, int)):
-            self._day = datetime.datetime.now().day
-        else:
-            self._day = value
-
-def transaction_user_rule(user_id):
-    return [Transaction.user_id == user_id]
-
-def transaction_date_rule(start_date : TransactionDate, end_date : TransactionDate):
-    return [Transaction.date >= start_date.date, Transaction.date < end_date.date]
-
-def get_transactions(order_attr="date", *filter_rules):
-    return current_user.transactions.filter(*filter_rules)\
-                     .order_by(op.attrgetter(order_attr)(Transaction))\
-                     .all()
-
+# @cache.memoize(timeout=300)
 def get_user_transactions(user_id, order_attr=None, filter_rules=[]):
-    filter_rules += transaction_user_rule(user_id)
-    if order_attr is None: order_attr = "date"
-    return get_transactions(order_attr, *filter_rules)
+    return _dqh.get_user_query_objects(user_id=user_id,  
+                                       order_attr=order_attr,
+                                       filter_rules=filter_rules)
 
 def get_current_user_transactions(user_id, order_rules=None, filter_rules=[]):
     return get_user_transactions(user_id=current_user.id, 
@@ -98,25 +24,11 @@ def get_current_user_transactions(user_id, order_rules=None, filter_rules=[]):
                                  filter_rules=filter_rules)
 
 def get_user_partial_transactions(user_id, order_attr=None, partition_rule=None, **kwargs):
-
-    start_date = TransactionDate(year=kwargs.get("start_year", None),
-                                 month=kwargs.get("start_month", None),
-                                 day=kwargs.get("start_day", None))
-    end_date = TransactionDate(year=kwargs.get("end_year", None),
-                               month=kwargs.get("end_month", None),
-                               day=kwargs.get("end_day", None))
-    
-    print("start: {} end: {}".format(start_date.date, end_date.date))
-    filter_rules = transaction_date_rule(start_date, end_date)
-
-    transactions = get_user_transactions(user_id=user_id, 
-                                         order_attr=order_attr,
-                                         filter_rules=filter_rules)
-
-    if partition_rule and isinstance(partition_rule, TransactionPartitionRule):
-        transactions = partition_transactions_by(transactions, partition_rule)
-
-    return transactions
+    return _dqh.get_user_partial_query_objects(user_id=user_id, 
+                                               order_attr=order_attr,
+                                               partition_rule=partition_rule,
+                                               filter_rules=[],
+                                               **kwargs)
 
 def get_current_user_partial_transactions(order_attr=None, partition_rule=None, **kwargs):
     return get_user_partial_transactions(user_id=current_user.id,
@@ -124,70 +36,98 @@ def get_current_user_partial_transactions(order_attr=None, partition_rule=None, 
                                          partition_rule=partition_rule,
                                          **kwargs)
 
-def partition_transactions_by(transactions, partition_rule : TransactionPartitionRule = TransactionPartitionRule.NONE):
+def get_current_balance(precision=2):
+    transactions = get_current_user_partial_transactions(start_year=1)
+    return calculate_balance(transactions, precision=precision)
 
-    def get_transactions_dates(transactions):
-        return [TransactionDate(year=t.date.year,
-                                month=t.date.month,
-                                day=t.date.day) for t in transactions]
+def calculate_balance(transactions : Transactions,
+                      precision : float = 2) -> float:
 
-    def partion_by_decade(transactions, transaction_dates):
-        transactions_dict = AttrDict()
-        for t, date in zip(transactions, transactions_dates): 
-            t_decade = str(date.decade)
-            if t_decade not in transactions_dict:
-                transactions_dict[t_decade] = []
-            transactions_dict[t_decade].append(t)
-        return transactions_dict
+    profits = sum(t.price for t in transactions if t.incoming)
+    losses = sum(t.price for t in transactions if not t.incoming)
+    result = round(profits - losses, precision) if precision else (profits - losses)
+    return result
 
-    def partion_by_week(transactions, transaction_dates):
-        transactions_dict = AttrDict()
-        for t, date in zip(transactions, transactions_dates):
-            t_year = str(date.year)
-            if t_year not in transactions_dict:
-                transactions_dict[t_year] = AttrDict()
-            t_week = str(date.week)
-            if t_week not in transactions_dict[t_year]:
-                transactions_dict[t_year][t_week] = []
-            transactions_dict[t_year][t_week].append(t)
-        return transactions_dict
 
-    def partition_by_year_month_day(transactions, transaction_dates, partition_rule : TransactionPartitionRule):
-        transactions_dict = AttrDict()
-        for t, date in zip(transactions, transactions_dates):
-            t_year = str(date.year)
-            if partition_rule.value < TransactionPartitionRule.PER_YEAR:
-                if t_year not in transactions_dict:
-                    transactions_dict[t_year] = AttrDict()
-                t_month = date.smonth
-                if partition_rule.value < TransactionPartitionRule.PER_MONTH:
-                    if t_month not in transactions_dict[t_year]:
-                        transactions_dict[t_year][t_month] = AttrDict()
-                    t_day = str(date.day)
-                    if t_day not in transactions_dict[t_year][t_month]:
-                        transactions_dict[t_year][t_month][t_day] = []
-                    transactions_dict[t_year][t_month][t_day].append(t)
-                else:
-                    if t_month not in transactions_dict[t_year]:
-                        transactions_dict[t_year][t_month] = []
-                    transactions_dict[t_year][t_month].append(t)
-            else:
-                if t_year not in transactions_dict:
-                    transactions_dict[t_year] = []
-                transactions_dict[t_year].append(t)
-        return transactions_dict
-    
-    if partition_rule.value == TransactionPartitionRule.NONE:
-        return transactions
+def _clear_transaction_cache():
+    logging.info("Clearing cached user transactions ...")
+    cache.delete_memoized(get_user_transactions)
 
-    # get transaction dates
-    transactions_dates = get_transactions_dates(transactions)
-
-    if partition_rule.value == TransactionPartitionRule.PER_DECADE:
-        transactions_dict = partion_by_decade(transactions, transactions_dates)
-    elif partition_rule.value == TransactionPartitionRule.PER_WEEK:
-        transactions_dict.value = partion_by_week(transactions, transactions_dates)
+def add_new_transaction(price : float,
+                        date : str = None,
+                        comment : str = "placeholder",
+                        user_id : int = None,
+                        category : Transaction.TransactionType = Transaction.TransactionType.UNKOWN,
+                        incoming : bool = False):
+    if date:
+        day, month, year = date_parse(date)
+        dt = convert_to_datetime(day, month, year)
     else:
-        transactions_dict = partition_by_year_month_day(transactions, transactions_dates, partition_rule)
-       
-    return transactions_dict
+        dt = None
+
+    _add_new_transaction(price=price,
+                         comment=comment,
+                         date=dt,
+                         user_id=user_id,
+                         category=category,
+                         incoming=incoming)
+
+def _add_new_transaction(price : float,
+                         comment : str,
+                         date : datetime = None,
+                         user_id : int = None,
+                         category : Transaction.TransactionType = Transaction.TransactionType.UNKOWN,
+                         incoming : bool = False):
+
+    transaction = Transaction(price=price,
+                              comment=comment,
+                              type=category,
+                              incoming=incoming)
+
+    if date: transaction.date = date
+    if user_id: transaction.user_id = user_id
+
+    logging.info("Adding new transaction: {}".format(transaction))
+    db.session.add(transaction)
+    db.session.commit()
+
+    # clear transaction cache on update
+    _clear_transaction_cache()
+
+def edit_transaction(id : int,
+                    price : float = None,
+                    comment : str = None,
+                    date : datetime = None,
+                    user_id : int = None,
+                    category : Transaction.TransactionType = None,
+                    incoming : bool = None):
+
+    transaction = db.session.query(Transaction).get(id)
+
+    if isinstance(price, float): transaction.price = price
+    if isinstance(comment, str): transaction.comment = comment
+    if isinstance(date, datetime): transaction.date = date
+    if isinstance(user_id, int): transaction.user_id = user_id
+    if isinstance(category, Transaction.TransactionType): transaction.category = category
+    if isinstance(incoming, bool): transaction.incoming = incoming
+
+    logging.info("Edited transaction: {}".format(transaction))
+    db.session.add(transaction)
+    db.session.commit()
+
+    # clear transaction cache on update
+    _clear_transaction_cache()
+
+def remove_transaction(id : int):
+    transaction = db.session.query(Transaction).get(id)
+    logging.info("Removed transaction: {}".format(transaction))
+    db.session.delete(transaction)
+    db.session.commit()
+
+     # clear transaction cache on update
+    _clear_transaction_cache()
+
+def update_last_date_viewed(last_date_viewed):
+    current_user.last_date_viewed = last_date_viewed
+    db.session.add(current_user)
+    db.session.commit()

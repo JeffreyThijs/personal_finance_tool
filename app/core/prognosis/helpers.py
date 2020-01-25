@@ -1,11 +1,11 @@
-from flask_login import current_user
-from app.sqldb.prognoses import get_user_prognoses, update_last_prognosis_viewed
-from app.sqldb.models import Prognosis
-from app.tools.dateutils import MONTHS, get_days_in_month, month_delta, date_delta
-from app.tools.helpers_classes import AttrDict
 import datetime
-
-MONTHS = [x.capitalize() for x in MONTHS]
+from flask_login import current_user
+from app.sqldb.models import Prognosis
+from app.sqldb.api.v1.prognoses import update_last_prognosis_viewed
+from app.tools.dateutils import get_days_in_month, month_delta, date_delta
+from app.tools.helpers_classes import AttrDict
+from app.sqldb.api.v1.prognoses import get_current_user_partial_prognoses, QueryPartitionRule
+from app.sqldb.api.v1.prognoses import __MONTHS__ as MONTHS
 
 def _get_year_data_base():
     year_data = AttrDict()
@@ -17,96 +17,74 @@ def _get_year_data_base():
                                    "prognoses" : set()})
     return year_data
 
-def _prognosis_date_rule(start_year, end_year=None, 
-                        start_month=1, end_month=12, 
-                        start_day=1, end_day=31):
-
-    end_year = start_year if end_year == None else end_year
-    end_day = get_days_in_month(end_month, end_year) if get_days_in_month(end_month, end_year) < end_day else end_day
-
-    start_date = datetime.date(day=start_day, month=start_month, year=start_year)
-    end_date = datetime.date(day=end_day, month=end_month, year=end_year) + datetime.timedelta(days=1)
-
-    return [Prognosis.date >= start_date,
-            Prognosis.date < end_date]
-
-def _get_only_once_prognosis_data(year_data, year):
-    for i, month in enumerate(MONTHS):
-        current_month = i + 1
-        filter_rules = _prognosis_date_rule(year, start_month=current_month, end_month=current_month)
-        filter_rules += [Prognosis.type == Prognosis.PrognosisOccuranceType.ONCE]
-        monthly_prognosis = get_user_prognoses("date", *filter_rules)
-        for prognosis in monthly_prognosis:
-            if prognosis.incoming:
-                year_data[month].incoming += prognosis.amount
+def _get_only_once_prognosis_data(year_data, year_prognoses, year):
+    for syear in year_prognoses:
+        prognoses = list(filter(lambda x: x.type == Prognosis.PrognosisOccuranceType.ONCE, year_prognoses[syear]))
+        for p in prognoses:
+            smonth = MONTHS[p.date.month]
+            year_data[smonth].prognoses.add(p)
+            if p.incoming:  
+                year_data[smonth].incoming += p.amount
             else:
-                year_data[month].outgoing += prognosis.amount
-            year_data[month].prognoses.add(prognosis)
-    return year_data
-
-def _get_daily_prognosis_data(year_data, year):
-
-    filter_rules = [Prognosis.type == Prognosis.PrognosisOccuranceType.DAILY]
-    prognosis = get_user_prognoses("date", *filter_rules)
-    first_day_of_year = datetime.date(day=1, month=1, year=year)
-
-    for p in prognosis:
-        dd = date_delta(p.date.date(), first_day_of_year)
-        for i, month in enumerate(MONTHS):
-            current_month = i + 1
-            if (dd.years <= 0) and (current_month > dd.months):
-                if p.date.month == current_month:
-                    amount = p.amount * (get_days_in_month(current_month, year) - p.date.day + 1)
-                else:
-                    amount = p.amount * get_days_in_month(current_month, year)
-
-                if p.incoming:
-                    year_data[month].incoming += amount
-                else:
-                    year_data[month].outgoing += amount
-                year_data[month].prognoses.add(p)
-
+                year_data[smonth].outgoing += p.amount
 
     return year_data
 
-def _get_monthly_prognosis_data(year_data, year):
-
-    filter_rules = [Prognosis.type == Prognosis.PrognosisOccuranceType.MONTHLY]
-    prognosis = get_user_prognoses("date", *filter_rules)
-    first_day_of_year = datetime.date(day=1, month=1, year=year)
-    
-    for p in prognosis:
-        dd = date_delta(p.date.date(), first_day_of_year)
-        for i, month in enumerate(MONTHS):
-            current_month = i + 1
-            if (dd.years <= 0) and (current_month > dd.months):
-                if p.incoming:
-                    year_data[month].incoming += p.amount
+def _get_daily_prognosis_data(year_data, year_prognoses, year):
+    for syear in year_prognoses:
+        prognoses = list(filter(lambda x: x.type == Prognosis.PrognosisOccuranceType.DAILY, year_prognoses[syear]))
+        for p in prognoses:
+            month = p.date.month 
+            start_month_idx = month-1 if int(syear) == year else 0
+            for i in range(start_month_idx, len(MONTHS)):
+                smonth = MONTHS[i]
+                year_data[smonth].prognoses.add(p)
+                days_in_month = (get_days_in_month(i + 1, year) if ((i + 1) != p.date.month)
+                                 else (get_days_in_month(i + 1, year) - p.date.day + 1))
+                if p.incoming:  
+                    year_data[smonth].incoming += (p.amount * days_in_month)
                 else:
-                    year_data[month].outgoing += p.amount
-                year_data[month].prognoses.add(p)
+                    year_data[smonth].outgoing += (p.amount * days_in_month)
 
     return year_data
 
-def _get_yearly_prognosis_data(year_data, year):
+def _get_monthly_prognosis_data(year_data, year_prognoses, year):
+    for syear in year_prognoses:
+        prognoses = list(filter(lambda x: x.type == Prognosis.PrognosisOccuranceType.MONTHLY, year_prognoses[syear]))
+        for p in prognoses:
+            month = p.date.month 
+            start_month_idx = month-1 if int(syear) == year else 0
+            for i in range(start_month_idx, len(MONTHS)):
+                smonth = MONTHS[i]
+                year_data[smonth].prognoses.add(p)
+                if p.incoming:  
+                    year_data[smonth].incoming += p.amount
+                else:
+                    year_data[smonth].outgoing += p.amount
 
-    for i, month in enumerate(MONTHS):
-        current_month = i + 1
-        filter_rules = _prognosis_date_rule(start_year=1, end_year=year, 
-                                            start_month=1, end_month=current_month,
-                                            start_day=1, end_day=31)
-        filter_rules += [Prognosis.type == Prognosis.PrognosisOccuranceType.YEARLY]
-        yearly_prognosis = get_user_prognoses("date", *filter_rules)
-        for prognosis in yearly_prognosis:
-            if prognosis.date.month != current_month:
-                continue
-            if prognosis.incoming:
-                year_data[month].incoming += prognosis.amount
+    return year_data
+
+def _get_yearly_prognosis_data(year_data, year_prognoses, year):
+    for syear in year_prognoses:
+        prognoses = list(filter(lambda x: x.type == Prognosis.PrognosisOccuranceType.YEARLY, year_prognoses[syear]))
+        for p in prognoses:
+            smonth = MONTHS[p.date.month - 1]
+            year_data[smonth].prognoses.add(p)
+            if p.incoming:  
+                year_data[smonth].incoming += p.amount
             else:
-                year_data[month].outgoing += prognosis.amount
-            year_data[month].prognoses.add(prognosis)
+                 year_data[smonth].outgoing += p.amount
 
     return year_data
+
+def get_year_prognosis_data(year):
+    return get_current_user_partial_prognoses(partition_rule=QueryPartitionRule.PER_YEAR, 
+                                              start_year=1, 
+                                              start_month=1, 
+                                              start_day=1,
+                                              end_year=year+1, 
+                                              end_month=1, 
+                                              end_day=1)
 
 def _calc_totals(year_data):
     for month in MONTHS:
@@ -119,11 +97,12 @@ def _calc_totals(year_data):
 
 def get_prognosis_data(year):
     print("getting data from year: {}".format(year))
+    year_prognoses = get_year_prognosis_data(year)
     year_data = _get_year_data_base()
-    year_data = _get_only_once_prognosis_data(year_data, year)
-    year_data = _get_monthly_prognosis_data(year_data, year)
-    year_data = _get_yearly_prognosis_data(year_data, year)
-    year_data = _get_daily_prognosis_data(year_data, year)
+    year_data = _get_only_once_prognosis_data(year_data, year_prognoses, year)
+    year_data = _get_monthly_prognosis_data(year_data, year_prognoses, year)
+    year_data = _get_yearly_prognosis_data(year_data, year_prognoses, year)
+    year_data = _get_daily_prognosis_data(year_data, year_prognoses, year)
     year_data = _calc_totals(year_data)
 
     return year_data

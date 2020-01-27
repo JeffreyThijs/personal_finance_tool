@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, post_load
+from marshmallow import Schema, fields, post_load, pre_load
 from app.sqldb.models import User
 from app import ma
 from app.sqldb.models import Transaction

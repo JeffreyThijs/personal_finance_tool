@@ -31,16 +31,6 @@ class UserRegistration(Resource):
     def post(self):
         data = request.get_json()
         try:
-            # check username
-            user = User.query.filter_by(username=data['username']).first()
-            if user is not None:
-                raise ValueError('Please use a different username.')
-
-            # check email
-            user = User.query.filter_by(email=data['email']).first()
-            if user is not None:
-                raise ValueError('Please use a different email address.')
-
             # deserialize
             urs = UserRegistrationSchema()
             user = urs.load(data)
@@ -65,15 +55,6 @@ class UserLogin(Resource):
     def post(self):
         data = request.get_json()
         try:
-            # check username
-            user = User.query.filter_by(username=data['username']).first()
-            if user is None:
-                raise ValueError('User does not exist')
-
-            # check password
-            if not user.check_password(data['password']):
-                raise ValueError('Wrong password')
-
             # deserialize
             urs = UserLoginSchema()
             user = urs.load(data)

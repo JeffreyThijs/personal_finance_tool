@@ -34,12 +34,12 @@ class UserRegistration(Resource):
             # check username
             user = User.query.filter_by(username=data['username']).first()
             if user is not None:
-                raise ValidationError('Please use a different username.')
+                raise ValueError('Please use a different username.')
 
             # check email
             user = User.query.filter_by(email=data['email']).first()
             if user is not None:
-                raise ValidationError('Please use a different email address.')
+                raise ValueError('Please use a different email address.')
 
             # deserialize
             urs = UserRegistrationSchema()
@@ -68,11 +68,11 @@ class UserLogin(Resource):
             # check username
             user = User.query.filter_by(username=data['username']).first()
             if user is None:
-                raise ValidationError('User does not exist')
+                raise ValueError('User does not exist')
 
             # check password
             if not user.check_password(data['password']):
-                raise ValidationError('Wrong password')
+                raise ValueError('Wrong password')
 
             # deserialize
             urs = UserLoginSchema()

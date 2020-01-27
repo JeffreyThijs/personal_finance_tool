@@ -74,23 +74,7 @@ def add_new_transaction(price : float,
                         incoming : bool = False):
     if date:
         day, month, year = date_parse(date)
-        dt = convert_to_datetime(day, month, year)
-    else:
-        dt = None
-
-    _add_new_transaction(price=price,
-                         comment=comment,
-                         date=dt,
-                         user_id=user_id,
-                         category=category,
-                         incoming=incoming)
-
-def _add_new_transaction(price : float,
-                         comment : str,
-                         date : datetime = None,
-                         user_id : int = None,
-                         category : Transaction.TransactionType = Transaction.TransactionType.UNKOWN,
-                         incoming : bool = False):
+        date = convert_to_datetime(day, month, year)
 
     transaction = Transaction(price=price,
                               comment=comment,

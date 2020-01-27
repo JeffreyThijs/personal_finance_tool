@@ -38,11 +38,15 @@ def get_current_user_partial_prognoses(order_attr=None, partition_rule=None, occ
                                       occurrence_type=occurrence_type,
                                       **kwargs)
 
-def _add_prognosis(amount : float,
-                   date : datetime = None,
-                   incoming : bool = False,
-                   occurance_type : Prognosis.PrognosisOccuranceType = Prognosis.PrognosisOccuranceType.ONCE,
-                   comment : str = "placeholder"):
+def add_new_prognosis(amount : float,
+                      date : str = None,
+                      incoming : bool = False,
+                      occurance_type : Prognosis.PrognosisOccuranceType = Prognosis.PrognosisOccuranceType.ONCE,
+                      comment : str = "placeholder"):
+
+    if date:
+        day, month, year = date_parse(date)
+        date = convert_to_datetime(day, month, year)
 
     prognosis = Prognosis(amount=amount,
                           date=date,
@@ -52,24 +56,6 @@ def _add_prognosis(amount : float,
                           user_id=current_user.id)
     db.session.add(prognosis)
     db.session.commit()
-
-def add_new_prognosis(amount : float,
-                      date : str = None,
-                      incoming : bool = False,
-                      occurance_type : Prognosis.PrognosisOccuranceType = Prognosis.PrognosisOccuranceType.ONCE,
-                      comment : str = "placeholder"):
-
-    if date:
-        day, month, year = date_parse(date)
-        dt = convert_to_datetime(day, month, year)
-    else:
-        dt = None
-
-    _add_prognosis(amount=amount,
-                   date=dt,
-                   incoming=incoming,
-                   occurance_type=occurance_type,
-                   comment=comment)
 
 def edit_prognosis(id : int,
                    amount : float = None,

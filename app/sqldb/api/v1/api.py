@@ -5,7 +5,7 @@ from app.sqldb.api.v1.schemas import TransactionSchema, UserRegistrationSchema, 
 from app.sqldb.models import Transaction, User, RevokedTokenModel
 from app.sqldb.api.v1 import _api as api
 from app.sqldb.api.v1 import bp
-from app.sqldb.api.v1.transactions import get_current_user_transactions
+from app.sqldb.api.v1.transactions import get_current_user_transactions, get_current_user_monthly_transactions
 from flask_jwt_extended import (create_access_token, 
                                 create_refresh_token, 
                                 jwt_required, 
@@ -13,11 +13,17 @@ from flask_jwt_extended import (create_access_token,
                                 get_jwt_identity, 
                                 get_raw_jwt)
 
-@api.route('/transactions')
 class Transactions(Resource):
     @jwt_required
     def get(self):
         transactions = get_current_user_transactions()
+        ts = TransactionSchema(many=True)
+        return ts.dump(transactions)
+
+class MonthlyTransactions(Resource):
+    @jwt_required
+    def get(self, year : str, month : str):
+        transactions = get_current_user_monthly_transactions(year=year, month=month)
         ts = TransactionSchema(many=True)
         return ts.dump(transactions)
 
@@ -126,3 +132,5 @@ api.add_resource(UserLogoutAccess, '/logout/access')
 api.add_resource(UserLogoutRefresh, '/logout/refresh')
 api.add_resource(TokenRefresh, '/token/refresh')
 api.add_resource(SecretResource, '/secret')
+api.add_resource(Transactions, '/transactions')
+api.add_resource(MonthlyTransactions, '/transactions/<string:year>/<string:month>')

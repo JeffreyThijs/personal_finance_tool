@@ -35,6 +35,19 @@ def get_current_user_partial_transactions(order_attr=None, partition_rule=None, 
                                          order_attr=order_attr,
                                          partition_rule=partition_rule,
                                          **kwargs)
+                
+def get_user_monthly_transactions(user_id, year, month, order_attr=None, partition_rule=None):
+    year = int(year)
+    month = __MONTHS__.index(month.lower()) if (isinstance(month, str) and not month.isdigit()) else int(month)
+    return get_user_partial_transactions(user_id=user_id, 
+                                         start_year=year, end_year=year, 
+                                         start_month=month, end_month=month+1,
+                                         start_day=1, end_day=1)
+
+def get_current_user_monthly_transactions(year, month, order_attr=None, partition_rule=None):
+    return get_user_monthly_transactions(user_id=current_user.id, 
+                                         year=year, month=month,
+                                         order_attr=order_attr, partition_rule=partition_rule)
 
 def get_current_balance(precision=2):
     transactions = get_current_user_partial_transactions(start_year=1)

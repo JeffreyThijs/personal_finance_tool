@@ -38,6 +38,20 @@ def get_current_user_partial_prognoses(order_attr=None, partition_rule=None, occ
                                       occurrence_type=occurrence_type,
                                       **kwargs)
 
+def get_user_monthly_prognoses(user_id, year, month, order_attr=None, partition_rule=None):
+    return _dqh.get_query_objects_monthly(user_id=user_id, 
+                                          year=year, 
+                                          month=month, 
+                                          order_attr=order_attr, 
+                                          partition_rule=partition_rule)
+
+def get_current_user_monthly_prognoses(year, month, order_attr=None, partition_rule=None):
+    return get_user_monthly_prognoses(user_id=current_user.id,
+                                      year=year, 
+                                      month=month,
+                                      order_attr=order_attr, 
+                                      partition_rule=partition_rule)
+
 def add_new_prognosis(amount : float,
                       date : str = None,
                       incoming : bool = False,

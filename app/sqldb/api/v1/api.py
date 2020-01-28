@@ -55,15 +55,12 @@ class UserLogin(Resource):
     def post(self):
         data = request.get_json()
         try:
-            # deserialize
+            # deserialize and receive username and tokens
             urs = UserLoginSchema()
-            user = urs.load(data)
+            username, access_token, refresh_token = urs.load(data)
 
-            # create jwt tokens
-            access_token = create_access_token(identity = data['username'])
-            refresh_token = create_refresh_token(identity = data['username'])
             return {
-                'message': 'Logged in as {}'.format(data['username']),
+                'message': 'Logged in as {}'.format(username),
                 'access_token': access_token,
                 'refresh_token': refresh_token 
             }

@@ -2,6 +2,12 @@ from marshmallow import Schema, fields, post_load, pre_load
 from app.sqldb.models import User
 from app import ma
 from app.sqldb.models import Transaction
+from flask_jwt_extended import (create_access_token, 
+                                create_refresh_token, 
+                                jwt_required, 
+                                jwt_refresh_token_required, 
+                                get_jwt_identity, 
+                                get_raw_jwt)
 
 class TransactionSchema(ma.ModelSchema):
     class Meta:
@@ -44,5 +50,8 @@ class UserLoginSchema(Schema):
             raise ValueError('Wrong password')
 
     @post_load
-    def make_user(self, data, **kwargs):
-        return User(**data)
+    def get_user_tokens(self, data, **kwargs):
+        username = data['username']
+        access_token = create_access_token(identity = username)
+        refresh_token = create_refresh_token(identity = username)
+        return username, access_token, refresh_token

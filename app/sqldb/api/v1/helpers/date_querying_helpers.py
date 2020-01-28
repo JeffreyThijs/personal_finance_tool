@@ -122,6 +122,25 @@ class DateQueryHelper:
 
         return query_objects
 
+    def get_query_objects_yearly(self, user_id, year, order_attr=None, partition_rule=None):
+        year = int(year)
+        return self.get_user_partial_query_objects(user_id=user_id, 
+                                                   order_attr=order_attr, 
+                                                   partition_rule=partition_rule,
+                                                   start_year=year, end_year=year+1, 
+                                                   start_month=1, end_month=1,
+                                                   start_day=1, end_day=1)
+
+    def get_query_objects_monthly(self, user_id, year, month, order_attr=None, partition_rule=None):
+        year = int(year)
+        month = __MONTHS__.index(month.lower()) if (isinstance(month, str) and not month.isdigit()) else int(month)
+        return self.get_user_partial_query_objects(user_id=user_id, 
+                                                   order_attr=order_attr, 
+                                                   partition_rule=partition_rule,
+                                                   start_year=year, end_year=year, 
+                                                   start_month=month, end_month=month+1,
+                                                   start_day=1, end_day=1)
+
     def partition_query_objects_by(self, query_objects, partition_rule : QueryPartitionRule = QueryPartitionRule.NONE):
 
         def get_query_objects_dates(query_objects):

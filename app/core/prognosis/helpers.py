@@ -1,11 +1,11 @@
 import datetime
 from flask_login import current_user
 from app.sqldb.models import Prognosis
-from app.sqldb.api.v1.prognoses import update_last_prognosis_viewed
 from app.tools.dateutils import get_days_in_month, month_delta, date_delta
 from app.tools.helpers_classes import AttrDict
-from app.sqldb.api.v1.prognoses import get_current_user_partial_prognoses, QueryPartitionRule
-from app.sqldb.api.v1.prognoses import __MONTHS__ as MONTHS
+from app.sqldb.api.v1.prognoses import get_current_user_partial_prognoses, update_last_prognosis_viewed
+from app.sqldb.api.v1.helpers.date_querying_helpers import QueryPartitionRule
+from app.sqldb.api.v1.helpers.date_querying_helpers import __MONTHS__ as MONTHS
 
 def _get_year_data_base():
     year_data = AttrDict()

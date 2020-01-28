@@ -141,6 +141,15 @@ class DateQueryHelper:
                                                    start_month=month, end_month=month+1,
                                                    start_day=1, end_day=1)
 
+    def get_query_objects_last_x_months(self, user_id, x_months : int, order_attr=None, partition_rule=None):
+        _now = datetime.datetime.now()
+        return self.get_user_partial_query_objects(user_id=user_id, 
+                                                   order_attr=order_attr, 
+                                                   partition_rule=partition_rule,
+                                                   start_year=_now.year, end_year=_now.year, 
+                                                   start_month=_now.month - x_months, end_month=_now.month,
+                                                   start_day=_now.day, end_day=_now.day)
+
     def partition_query_objects_by(self, query_objects, partition_rule : QueryPartitionRule = QueryPartitionRule.NONE):
 
         def get_query_objects_dates(query_objects):

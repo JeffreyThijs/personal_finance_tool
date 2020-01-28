@@ -31,11 +31,11 @@ def monthly_overview():
 @bp.route('/next_month', methods=['GET', 'POST'])
 @login_required
 def next_month():
-    transition_monthly_overview(increment=True)
+    transition_monthly_overview(1)
     return redirect(url_for('overview.monthly_overview'))
 
 @bp.route('/previous_month', methods=['GET', 'POST'])
 @login_required
 def previous_month():
-    transition_monthly_overview(increment=False)
+    transition_monthly_overview(-1)
     return redirect(url_for('overview.monthly_overview'))

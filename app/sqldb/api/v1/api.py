@@ -16,34 +16,44 @@ from flask_jwt_extended import (create_access_token,
 class Transactions(Resource):
     @jwt_required
     def get(self):
-        transactions = get_current_user_transactions()
-        ts = TransactionSchema(many=True)
-        return ts.dump(transactions)
+        try:
+            transactions = get_current_user_transactions()
+            ts = TransactionSchema(many=True)
+
+            return { 
+                'message': 'Found {} transactions'.format(len(transactions)),
+                'transactions': ts.dump(transactions)
+            }
+            
+        except:
+            return {'message': 'Something went wrong'}, 500
+
 
 class MonthlyTransactions(Resource):
     @jwt_required
     def get(self, year : str, month : str):
-        transactions = get_current_user_monthly_transactions(year=year, month=month)
-        ts = TransactionSchema(many=True)
-        return ts.dump(transactions)
+        try:
+            transactions = get_current_user_monthly_transactions(year=year, month=month)
+            ts = TransactionSchema(many=True)
+
+            return { 
+                'message': 'Found {} transactions'.format(len(transactions)),
+                'transactions': ts.dump(transactions)
+            }
+
+        except:
+            return {'message': 'Something went wrong'}, 500
 
 class UserRegistration(Resource):
     def post(self):
         data = request.get_json()
         try:
-            # deserialize
+            # deserialize and receive username and tokens
             urs = UserRegistrationSchema()
-            user = urs.load(data)
+            username, access_token, refresh_token = urs.load(data)
 
-            # add user to db
-            db.session.add(user)
-            db.session.commit()
-
-            # create jwt tokens
-            access_token = create_access_token(identity = data['username'])
-            refresh_token = create_refresh_token(identity = data['username'])
             return {
-                'message': 'User {} was created'.format(data['username']),
+                'message': 'User {} was created'.format(username),
                 'access_token': access_token,
                 'refresh_token': refresh_token 
             }

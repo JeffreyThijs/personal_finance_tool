@@ -5,7 +5,9 @@ from app.sqldb.api.v1.schemas import TransactionSchema, UserRegistrationSchema, 
 from app.sqldb.models import Transaction, User, RevokedTokenModel
 from app.sqldb.api.v1 import _api as api
 from app.sqldb.api.v1 import bp
-from app.sqldb.api.v1.transactions import get_current_user_transactions, get_current_user_monthly_transactions
+from app.sqldb.api.v1.transactions import (get_current_user_transactions, 
+                                           get_current_user_monthly_transactions, 
+                                           get_current_user_yearly_transactions)
 from flask_jwt_extended import (create_access_token, 
                                 create_refresh_token, 
                                 jwt_required, 
@@ -34,6 +36,21 @@ class MonthlyTransactions(Resource):
     def get(self, year : str, month : str):
         try:
             transactions = get_current_user_monthly_transactions(year=year, month=month)
+            ts = TransactionSchema(many=True)
+
+            return { 
+                'message': 'Found {} transactions'.format(len(transactions)),
+                'transactions': ts.dump(transactions)
+            }
+
+        except:
+            return {'message': 'Something went wrong'}, 500
+
+class YearlyTransactions(Resource):
+    @jwt_required
+    def get(self, year : str, month : str):
+        try:
+            transactions = get_current_user_yearly_transactions(year=year)
             ts = TransactionSchema(many=True)
 
             return { 
@@ -121,4 +138,5 @@ api.add_resource(UserLogoutRefresh, '/logout/refresh')
 api.add_resource(TokenRefresh, '/token/refresh')
 api.add_resource(SecretResource, '/secret')
 api.add_resource(Transactions, '/transactions')
+api.add_resource(YearlyTransactions, '/transactions/<string:year>')
 api.add_resource(MonthlyTransactions, '/transactions/<string:year>/<string:month>')

@@ -50,6 +50,18 @@ def get_current_user_monthly_transactions(year, month, order_attr=None, partitio
                                          order_attr=order_attr, 
                                          partition_rule=partition_rule)
 
+def get_user_yearly_transactions(user_id, year, order_attr=None, partition_rule=None):
+    return _dqh.get_query_objects_yearly(user_id=user_id, 
+                                         year=year, 
+                                         order_attr=order_attr, 
+                                         partition_rule=partition_rule)
+
+def get_current_user_yearly_transactions(year, order_attr=None, partition_rule=None):
+    return get_user_yearly_transactions(user_id=current_user.id,
+                                        year=year,
+                                        order_attr=order_attr, 
+                                        partition_rule=partition_rule)
+
 def get_current_balance(precision=2):
     transactions = get_current_user_partial_transactions(start_year=1)
     return calculate_balance(transactions, precision=precision)

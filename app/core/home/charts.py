@@ -56,7 +56,7 @@ def get_bar_charts_data(last_x_months=12):
                 else:
                     sum_outgoing += t.price
 
-        bar_data["labels"][i] = month + " " + year
+        bar_data["labels"][i] = "{} {}".format(month, year)
         bar_data["incoming"][i] = round(sum_incoming, 2)
         bar_data["outgoing"][i] = round(sum_outgoing, 2)
 

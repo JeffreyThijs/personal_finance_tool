@@ -31,8 +31,18 @@ class UserRegistrationSchema(Schema):
             raise ValueError('Please use a different email address.')
 
     @post_load
-    def make_user(self, data, **kwargs):
-        return User(**data)
+    def make_user_and_tokens(self, data, **kwargs):
+        
+        # make new user and add it to db
+        user = User(**data)
+        db.session.add(user)
+        db.session.commit()
+
+        # create tokens
+        access_token = create_access_token(identity = user.username)
+        refresh_token = create_refresh_token(identity = user.username)
+
+        return user.username, access_token, refresh_token
 
 class UserLoginSchema(Schema):
     username = fields.Str()
@@ -50,7 +60,7 @@ class UserLoginSchema(Schema):
             raise ValueError('Wrong password')
 
     @post_load
-    def get_user_tokens(self, data, **kwargs):
+    def make_user_tokens(self, data, **kwargs):
         username = data['username']
         access_token = create_access_token(identity = username)
         refresh_token = create_refresh_token(identity = username)

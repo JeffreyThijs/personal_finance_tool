@@ -1,7 +1,8 @@
 from flask import Blueprint, request
 from flask_restplus import Resource, Api
+from flask_login import login_required
 from app import ma, db
-from app.sqldb.api.v1.schemas import TransactionSchema, UserRegistrationSchema, UserLoginSchema
+from app.sqldb.api.v1.schemas import TransactionSchema, UserRegistrationSchema, UserLoginSchema, EditUserSchema
 from app.sqldb.models import Transaction, User, RevokedTokenModel
 from app.sqldb.api.v1 import _api as api
 from app.sqldb.api.v1 import bp
@@ -17,6 +18,7 @@ from flask_jwt_extended import (create_access_token,
 
 class Transactions(Resource):
     @jwt_required
+    @login_required
     def get(self):
         try:
             transactions = get_current_user_transactions()
@@ -33,6 +35,7 @@ class Transactions(Resource):
 
 class MonthlyTransactions(Resource):
     @jwt_required
+    @login_required
     def get(self, year : str, month : str):
         try:
             transactions = get_current_user_monthly_transactions(year=year, month=month)
@@ -48,6 +51,7 @@ class MonthlyTransactions(Resource):
 
 class YearlyTransactions(Resource):
     @jwt_required
+    @login_required
     def get(self, year : str, month : str):
         try:
             transactions = get_current_user_yearly_transactions(year=year)
@@ -71,6 +75,25 @@ class UserRegistration(Resource):
 
             return {
                 'message': 'User {} was created'.format(username),
+                'access_token': access_token,
+                'refresh_token': refresh_token 
+            }
+
+        except:
+            return {'message': 'Something went wrong'}, 500
+
+class UserUpdate(Resource):
+    @jwt_required
+    @login_required
+    def post(self):
+        data = request.get_json()
+        try:
+            # deserialize and receive username and tokens
+            eus = EditUserSchema()
+            username, access_token, refresh_token = eus.load(data)
+
+            return {
+                'message': 'User {} has been updated'.format(username),
                 'access_token': access_token,
                 'refresh_token': refresh_token 
             }
@@ -133,6 +156,7 @@ class SecretResource(Resource):
 
 api.add_resource(UserRegistration, '/registration')
 api.add_resource(UserLogin, '/login')
+api.add_resource(UserUpdate, '/user/update')
 api.add_resource(UserLogoutAccess, '/logout/access')
 api.add_resource(UserLogoutRefresh, '/logout/refresh')
 api.add_resource(TokenRefresh, '/token/refresh')

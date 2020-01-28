@@ -1,7 +1,9 @@
 from marshmallow import Schema, fields, post_load, pre_load
+from flask_login import current_user
 from app.sqldb.models import User
-from app import ma
+from app import ma, db
 from app.sqldb.models import Transaction
+from flask_login import login_user
 from flask_jwt_extended import (create_access_token, 
                                 create_refresh_token, 
                                 jwt_required, 
@@ -38,6 +40,9 @@ class UserRegistrationSchema(Schema):
         db.session.add(user)
         db.session.commit()
 
+        # login user
+        login_user(user)
+
         # create tokens
         access_token = create_access_token(identity = user.username)
         refresh_token = create_refresh_token(identity = user.username)
@@ -59,9 +64,20 @@ class UserLoginSchema(Schema):
         if not user.check_password(data['password']):
             raise ValueError('Wrong password')
 
+        # login user
+        login_user(user)
+
     @post_load
     def make_user_tokens(self, data, **kwargs):
         username = data['username']
         access_token = create_access_token(identity = username)
         refresh_token = create_refresh_token(identity = username)
         return username, access_token, refresh_token
+
+class EditUserSchema(Schema):
+    username = fields.Str()
+    password = fields.Str()
+
+    @post_load
+    def edit_user(self, data, **args):
+        pass

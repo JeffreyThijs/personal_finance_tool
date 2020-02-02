@@ -21,3 +21,4 @@ flask-marshmallow>=0.10.1
 flask-restplus>=0.13.0
 marshmallow>=3.3.0
 marshmallow-sqlalchemy>=0.21.0
+flask-cors>=3.0.8

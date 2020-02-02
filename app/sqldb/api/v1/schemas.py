@@ -21,7 +21,7 @@ class UserRegistrationSchema(Schema):
     password = fields.Str()
 
     @pre_load
-    def check_user(self, data, **kwargs):
+    def check_user(self, data, many, **kwargs):
         # check username
         user = User.query.filter_by(username=data['username']).first()
         if user is not None:
@@ -31,6 +31,8 @@ class UserRegistrationSchema(Schema):
         user = User.query.filter_by(email=data['email']).first()
         if user is not None:
             raise ValueError('Please use a different email address.')
+
+        return data
 
     @post_load
     def make_user_and_tokens(self, data, **kwargs):
@@ -54,7 +56,7 @@ class UserLoginSchema(Schema):
     password = fields.Str()
 
     @pre_load
-    def check_user(self, data, **kwargs):
+    def check_user(self, data, many, **kwargs):
         # check username
         user = User.query.filter_by(username=data['username']).first()
         if user is None:
@@ -66,6 +68,8 @@ class UserLoginSchema(Schema):
 
         # login user
         login_user(user)
+        
+        return data
 
     @post_load
     def make_user_tokens(self, data, **kwargs):

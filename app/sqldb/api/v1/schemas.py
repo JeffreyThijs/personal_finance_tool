@@ -42,9 +42,6 @@ class UserRegistrationSchema(Schema):
         db.session.add(user)
         db.session.commit()
 
-        # login user
-        login_user(user)
-
         # create tokens
         access_token = create_access_token(identity = user.username)
         refresh_token = create_refresh_token(identity = user.username)
@@ -65,9 +62,6 @@ class UserLoginSchema(Schema):
         # check password
         if not user.check_password(data['password']):
             raise ValueError('Wrong password')
-
-        # login user
-        login_user(user)
         
         return data
 

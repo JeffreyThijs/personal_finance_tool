@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime
 from app import db, cache
-from flask_login import current_user, login_required
+from flask_jwt_extended import current_user
 from app.sqldb.models import Transaction
 from app.sqldb.api.v1.helpers.date_querying_helpers import DateQueryHelper, QueryPartitionRule, QueryDate, __MONTHS__
 from app.tools.dateutils import convert_to_datetime, date_parse

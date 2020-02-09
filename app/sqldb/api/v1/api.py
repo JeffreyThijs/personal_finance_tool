@@ -1,19 +1,21 @@
 from flask import Blueprint, request
 from flask_restplus import Resource, Api
 from app import ma, db
-from app.sqldb.api.v1.schemas import TransactionSchema, UserRegistrationSchema, UserLoginSchema, EditUserSchema
+from app.sqldb.api.v1.schemas import *
 from app.sqldb.models import Transaction, User, RevokedTokenModel
 from app.sqldb.api.v1 import _api as api
 from app.sqldb.api.v1 import bp
 from app.sqldb.api.v1.transactions import (get_current_user_transactions, 
                                            get_current_user_monthly_transactions, 
                                            get_current_user_yearly_transactions)
+from app.sqldb.api.v1.helpers.date_querying_helpers import QueryPartitionRule, QueryPartitionObject
 from flask_jwt_extended import (create_access_token, 
                                 create_refresh_token, 
                                 jwt_required, 
                                 jwt_refresh_token_required, 
                                 get_jwt_identity, 
                                 get_raw_jwt)
+
 
 class Transactions(Resource):
     @jwt_required
@@ -49,10 +51,16 @@ class MonthlyTransactions(Resource):
 class YearlyTransactions(Resource):
     @jwt_required
     def get(self, year : str):
-        print("got here")
         try:
-            transactions = get_current_user_yearly_transactions(year=year)
-            ts = TransactionSchema(many=True)
+            partition_rule = None
+            if "partition_rule" in request.args:
+                try:
+                    partition_rule = getattr(QueryPartitionRule,  request.args["partition_rule"])
+                except:
+                    raise ValueError("Unknown partion rule")
+
+            transactions = get_current_user_yearly_transactions(year=year, partition_rule=partition_rule, return_dict=False)
+            ts = PartitionedTransactionSchema(many=True)
 
             return { 
                 'message': 'Found {} transactions'.format(len(transactions)),

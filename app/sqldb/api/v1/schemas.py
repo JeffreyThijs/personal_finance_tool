@@ -13,6 +13,7 @@ from flask_jwt_extended import (create_access_token,
 
 class TransactionSchema(ma.ModelSchema):
     class Meta:
+        model = Transaction
         fields = ("date", "price", "category", "currency", "incoming", "comment")
 
 class UserRegistrationSchema(Schema):
@@ -79,3 +80,8 @@ class EditUserSchema(Schema):
     @post_load
     def edit_user(self, data, **args):
         pass
+    
+class PartitionedTransactionSchema(Schema):
+    year = fields.String()
+    month = fields.String()
+    transactions = fields.List(fields.Nested(TransactionSchema()))

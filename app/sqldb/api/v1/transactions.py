@@ -68,6 +68,18 @@ def get_current_user_yearly_transactions(year, order_attr=None, partition_rule=N
                                         partition_rule=partition_rule,
                                         return_dict=return_dict)
 
+def get_user_partitioned_transactions(user_id, order_attr=None, partition_rule=None, return_dict=True):
+    return get_current_user_partial_transactions(user_id=user_id,
+                                                 order_attr=order_attr,
+                                                 partition_rule=partition_rule,
+                                                 start_year=1)
+
+def get_current_user_partitioned_transactions(order_attr=None, partition_rule=None, return_dict=True):
+    return get_current_user_partial_transactions(order_attr=order_attr,
+                                                 partition_rule=partition_rule,
+                                                 return_dict=return_dict,
+                                                 start_year=1)
+
 def get_current_balance(precision=2):
     transactions = get_current_user_partial_transactions(start_year=1)
     return calculate_balance(transactions, precision=precision)

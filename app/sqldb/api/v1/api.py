@@ -7,7 +7,8 @@ from app.sqldb.api.v1 import _api as api
 from app.sqldb.api.v1 import bp
 from app.sqldb.api.v1.transactions import (get_current_user_transactions, 
                                            get_current_user_monthly_transactions, 
-                                           get_current_user_yearly_transactions)
+                                           get_current_user_yearly_transactions,
+                                           get_current_user_partitioned_transactions)
 from app.sqldb.api.v1.helpers.date_querying_helpers import QueryPartitionRule, QueryPartitionObject
 from flask_jwt_extended import (create_access_token, 
                                 create_refresh_token, 
@@ -17,12 +18,26 @@ from flask_jwt_extended import (create_access_token,
                                 get_raw_jwt)
 
 
+def extract_partition_rule(req):
+    partition_rule = None
+    if "partition_rule" in req.args:
+        try:
+            partition_rule = getattr(QueryPartitionRule,  req.args["partition_rule"])
+        except:
+            raise ValueError("Unknown partion rule")
+    return partition_rule
+
 class Transactions(Resource):
     @jwt_required
     def get(self):
         try:
-            transactions = get_current_user_transactions()
-            ts = TransactionSchema(many=True)
+            partition_rule = extract_partition_rule(request)
+            if not partition_rule:
+                transactions = get_current_user_transactions()
+                ts = TransactionSchema(many=True)
+            else:
+                transactions = get_current_user_partitioned_transactions(partition_rule=partition_rule, return_dict=False)
+                ts = PartitionedTransactionSchema(many=True)
 
             return { 
                 'message': 'Found {} transactions'.format(len(transactions)),
@@ -37,8 +52,9 @@ class MonthlyTransactions(Resource):
     @jwt_required
     def get(self, year : str, month : str):
         try:
-            transactions = get_current_user_monthly_transactions(year=year, month=month)
-            ts = TransactionSchema(many=True)
+            partition_rule = extract_partition_rule(request)
+            transactions = get_current_user_monthly_transactions(year=year, month=month, partition_rule=partition_rule, return_dict=False)
+            ts = PartitionedTransactionSchema(many=True)
 
             return { 
                 'message': 'Found {} transactions'.format(len(transactions)),
@@ -52,13 +68,7 @@ class YearlyTransactions(Resource):
     @jwt_required
     def get(self, year : str):
         try:
-            partition_rule = None
-            if "partition_rule" in request.args:
-                try:
-                    partition_rule = getattr(QueryPartitionRule,  request.args["partition_rule"])
-                except:
-                    raise ValueError("Unknown partion rule")
-
+            partition_rule = extract_partition_rule(request)
             transactions = get_current_user_yearly_transactions(year=year, partition_rule=partition_rule, return_dict=False)
             ts = PartitionedTransactionSchema(many=True)
 

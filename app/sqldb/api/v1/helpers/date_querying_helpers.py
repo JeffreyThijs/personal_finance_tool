@@ -17,6 +17,14 @@ class QueryPartitionRule(IntEnum):
     PER_DECADE = 5
     NONE = 6
 
+class QueryPartitionObject:
+    def __init__(self, query_objects=[], **kwargs):
+        for key, value in kwargs.items():
+            if key == "slug":
+                setattr(self, value, query_objects) 
+            else:
+                setattr(self, key, value)
+
 class QueryDate:
     def __init__(self, year=None, month=None, day=None):
         self.year = year
@@ -85,6 +93,7 @@ class QueryDate:
 class DateQueryHelper:
     def __init__(self, query_class):
         self.query_class = query_class
+        self.query_class_slug = "{}s".format(query_class.__name__.lower())
 
     def query_object_user_rule(self, user_id):
         return [self.query_class.user_id == user_id]
@@ -102,7 +111,7 @@ class DateQueryHelper:
         if order_attr is None: order_attr = "date"
         return self.get_query_objects(order_attr, *filter_rules)
 
-    def get_user_partial_query_objects(self, user_id, order_attr=None, partition_rule=None, filter_rules=[], **kwargs):
+    def get_user_partial_query_objects(self, user_id, order_attr=None, partition_rule=None, filter_rules=[], return_dict=True, **kwargs):
 
         start_date = QueryDate(year=kwargs.get("start_year", None),
                                month=kwargs.get("start_month", None),
@@ -118,39 +127,74 @@ class DateQueryHelper:
                                                     filter_rules=filter_rules)
 
         if partition_rule and isinstance(partition_rule, QueryPartitionRule):
-            query_objects = self.partition_query_objects_by(query_objects, partition_rule)
+            query_objects = self.partition_query_objects_by(query_objects, partition_rule, return_dict=return_dict)
 
         return query_objects
 
-    def get_query_objects_yearly(self, user_id, year, order_attr=None, partition_rule=None):
+    def get_query_objects_yearly(self, user_id, year, order_attr=None, partition_rule=None, return_dict=True):
         year = int(year)
         return self.get_user_partial_query_objects(user_id=user_id, 
                                                    order_attr=order_attr, 
                                                    partition_rule=partition_rule,
+                                                   return_dict=return_dict,
                                                    start_year=year, end_year=year+1, 
                                                    start_month=1, end_month=1,
                                                    start_day=1, end_day=1)
 
-    def get_query_objects_monthly(self, user_id, year, month, order_attr=None, partition_rule=None):
+    def get_query_objects_monthly(self, user_id, year, month, order_attr=None, partition_rule=None, return_dict=True):
         year = int(year)
         month = __MONTHS__.index(month.lower()) if (isinstance(month, str) and not month.isdigit()) else int(month)
         return self.get_user_partial_query_objects(user_id=user_id, 
                                                    order_attr=order_attr, 
                                                    partition_rule=partition_rule,
+                                                   return_dict=return_dict,
                                                    start_year=year, end_year=year, 
                                                    start_month=month, end_month=month+1,
                                                    start_day=1, end_day=1)
 
-    def get_query_objects_last_x_months(self, user_id, x_months : int, order_attr=None, partition_rule=None):
+    def get_query_objects_last_x_months(self, user_id, x_months : int, order_attr=None, partition_rule=None, return_dict=True):
         _now = datetime.datetime.now()
         return self.get_user_partial_query_objects(user_id=user_id, 
                                                    order_attr=order_attr, 
                                                    partition_rule=partition_rule,
+                                                   return_dict=return_dict,
                                                    start_year=_now.year, end_year=_now.year, 
                                                    start_month=_now.month - x_months, end_month=_now.month,
                                                    start_day=_now.day, end_day=_now.day)
 
-    def partition_query_objects_by(self, query_objects, partition_rule : QueryPartitionRule = QueryPartitionRule.NONE):
+    def convert_partition_dict_to_qp_object_list(self, query_dict, partition_rule : QueryPartitionRule):
+        if partition_rule == QueryPartitionRule.PER_DECADE:
+            return [QueryPartitionObject(query_objects=query_objects,
+                                         decade=decade, 
+                                         slug=self.query_class_slug) for decade, query_objects in query_dict.items()]
+        elif partition_rule == QueryPartitionRule.PER_YEAR:
+            return [QueryPartitionObject(query_objects=query_objects,
+                                         year=year,
+                                         slug=self.query_class_slug) for year, query_objects in query_dict.items()]
+        elif partition_rule == QueryPartitionRule.PER_MONTH:
+            qp_object_list = []
+            for year, monthly_query_dict in query_dict.items():
+                for month, query_objects in monthly_query_dict.items():
+                    qp_object_list.append(QueryPartitionObject(query_objects=query_objects,
+                                                               year=year, 
+                                                               month=month, 
+                                                               slug=self.query_class_slug))
+            return qp_object_list
+        elif partition_rule == QueryPartitionRule.PER_MONTH:
+            qp_object_list = []
+            for year, monthly_query_dict in query_dict.items():
+                for month, daily_query_objects in monthly_query_dict.items():
+                    for day, query_objects in daily_query_objects.items():
+                        qp_object_list.append(QueryPartitionObject(query_objects=query_objects,
+                                                                   year=year,
+                                                                   month=month, 
+                                                                   day=day,
+                                                                   slug=self.query_class_slug))
+            return qp_object_list
+        else:
+            raise NotImplementedError()
+        
+    def partition_query_objects_by(self, query_objects, partition_rule : QueryPartitionRule = QueryPartitionRule.NONE, return_dict=True):
 
         def get_query_objects_dates(query_objects):
             return [QueryDate(year=t.date.year,
@@ -216,4 +260,7 @@ class DateQueryHelper:
         else:
             query_objects_dict = partition_by_year_month_day(query_objects, query_objects_dates, partition_rule)
         
-        return query_objects_dict
+        if return_dict:
+            return query_objects_dict
+        else:
+            return self.convert_partition_dict_to_qp_object_list(query_objects_dict, partition_rule=partition_rule)

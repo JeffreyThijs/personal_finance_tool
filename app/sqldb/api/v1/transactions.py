@@ -3,7 +3,7 @@ from datetime import datetime
 from app import db, cache
 from flask_jwt_extended import current_user
 from app.sqldb.models import Transaction
-from app.sqldb.api.v1.helpers.date_querying_helpers import DateQueryHelper, QueryPartitionRule, QueryDate, __MONTHS__
+from app.sqldb.api.v1.helpers.date_querying_helpers import DateQueryHelper, QueryPartitionRule, QueryDate, QueryPartitionObject, __MONTHS__
 from app.tools.dateutils import convert_to_datetime, date_parse
 from typing import List
 
@@ -23,44 +23,50 @@ def get_current_user_transactions(order_rules=None, filter_rules=[]):
                                  order_attr=order_rules,
                                  filter_rules=filter_rules)
 
-def get_user_partial_transactions(user_id, order_attr=None, partition_rule=None, **kwargs):
+def get_user_partial_transactions(user_id, order_attr=None, partition_rule=None, return_dict=True, **kwargs):
     return _dqh.get_user_partial_query_objects(user_id=user_id, 
                                                order_attr=order_attr,
                                                partition_rule=partition_rule,
+                                               return_dict=return_dict,
                                                filter_rules=[],
                                                **kwargs)
 
-def get_current_user_partial_transactions(order_attr=None, partition_rule=None, **kwargs):
+def get_current_user_partial_transactions(order_attr=None, partition_rule=None, return_dict=True, **kwargs):
     return get_user_partial_transactions(user_id=current_user.id,
                                          order_attr=order_attr,
                                          partition_rule=partition_rule,
+                                         return_dict=return_dict,
                                          **kwargs)
                 
-def get_user_monthly_transactions(user_id, year, month, order_attr=None, partition_rule=None):
+def get_user_monthly_transactions(user_id, year, month, order_attr=None, partition_rule=None, return_dict=True):
     return _dqh.get_query_objects_monthly(user_id=user_id, 
                                           year=year, 
                                           month=month, 
                                           order_attr=order_attr, 
+                                          return_dict=return_dict,
                                           partition_rule=partition_rule)
 
-def get_current_user_monthly_transactions(year, month, order_attr=None, partition_rule=None):
+def get_current_user_monthly_transactions(year, month, order_attr=None, partition_rule=None, return_dict=True):
     return get_user_monthly_transactions(user_id=current_user.id,
                                          year=year, 
                                          month=month,
-                                         order_attr=order_attr, 
+                                         order_attr=order_attr,
+                                         return_dict=return_dict, 
                                          partition_rule=partition_rule)
 
-def get_user_yearly_transactions(user_id, year, order_attr=None, partition_rule=None):
+def get_user_yearly_transactions(user_id, year, order_attr=None, partition_rule=None, return_dict=True):
     return _dqh.get_query_objects_yearly(user_id=user_id, 
-                                         year=year, 
-                                         order_attr=order_attr, 
-                                         partition_rule=partition_rule)
+                                           year=year, 
+                                           order_attr=order_attr, 
+                                           partition_rule=partition_rule,
+                                           return_dict=return_dict)
 
-def get_current_user_yearly_transactions(year, order_attr=None, partition_rule=None):
+def get_current_user_yearly_transactions(year, order_attr=None, partition_rule=None, return_dict=True):
     return get_user_yearly_transactions(user_id=current_user.id,
                                         year=year,
                                         order_attr=order_attr, 
-                                        partition_rule=partition_rule)
+                                        partition_rule=partition_rule,
+                                        return_dict=return_dict)
 
 def get_current_balance(precision=2):
     transactions = get_current_user_partial_transactions(start_year=1)

@@ -143,7 +143,7 @@ class DateQueryHelper:
 
     def get_query_objects_monthly(self, user_id, year, month, order_attr=None, partition_rule=None, return_dict=True):
         year = int(year)
-        month = __MONTHS__.index(month.lower()) if (isinstance(month, str) and not month.isdigit()) else int(month)
+        month = __MONTHS__.index(month.lower()) + 1 if (isinstance(month, str) and not month.isdigit()) else int(month)
         return self.get_user_partial_query_objects(user_id=user_id, 
                                                    order_attr=order_attr, 
                                                    partition_rule=partition_rule,

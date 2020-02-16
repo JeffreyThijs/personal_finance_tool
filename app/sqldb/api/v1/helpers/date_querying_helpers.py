@@ -106,12 +106,16 @@ class DateQueryHelper:
                          .order_by(op.attrgetter(order_attr)(self.query_class))\
                          .all()
 
-    def get_user_query_objects(self, user_id, order_attr=None, filter_rules=[]):
+    def get_user_query_objects(self, user_id, order_attr=None, filter_rules=None):
+        
         filter_rules += self.query_object_user_rule(user_id)
         if order_attr is None: order_attr = "date"
         return self.get_query_objects(order_attr, *filter_rules)
 
-    def get_user_partial_query_objects(self, user_id, order_attr=None, partition_rule=None, filter_rules=[], return_dict=True, **kwargs):
+    def get_user_partial_query_objects(self, user_id, order_attr=None, partition_rule=None, filter_rules=None, return_dict=True, **kwargs):
+
+        if filter_rules is None:
+            filter_rules = []
 
         start_date = QueryDate(year=kwargs.get("start_year", None),
                                month=kwargs.get("start_month", None),
@@ -119,7 +123,7 @@ class DateQueryHelper:
         end_date = QueryDate(year=kwargs.get("end_year", None),
                              month=kwargs.get("end_month", None),
                              day=kwargs.get("end_day", None))
-        
+
         filter_rules += self.query_object_date_rule(start_date, end_date)
 
         query_objects = self.get_user_query_objects(user_id=user_id, 
@@ -143,7 +147,7 @@ class DateQueryHelper:
 
     def get_query_objects_monthly(self, user_id, year, month, order_attr=None, partition_rule=None, return_dict=True):
         year = int(year)
-        month = __MONTHS__.index(month.lower()) + 1 if (isinstance(month, str) and not month.isdigit()) else int(month)
+        month = (__MONTHS__.index(month.lower()) + 1) if (isinstance(month, str) and not month.isdigit()) else int(month)
         return self.get_user_partial_query_objects(user_id=user_id, 
                                                    order_attr=order_attr, 
                                                    partition_rule=partition_rule,

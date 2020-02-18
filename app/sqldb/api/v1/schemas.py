@@ -1,6 +1,6 @@
 from marshmallow import Schema, fields, post_load, pre_load
-from flask_login import current_user
-from app.sqldb.models import User
+from flask_jwt_extended import current_user
+from app.sqldb.models import User, Transaction
 from app import ma, db
 from app.sqldb.models import Transaction
 from flask_login import login_user
@@ -10,6 +10,7 @@ from flask_jwt_extended import (create_access_token,
                                 jwt_refresh_token_required, 
                                 get_jwt_identity, 
                                 get_raw_jwt)
+import datetime
 
 class TransactionSchema(ma.ModelSchema):
     class Meta:
@@ -85,3 +86,20 @@ class PartitionedTransactionSchema(Schema):
     year = fields.String()
     month = fields.String()
     transactions = fields.List(fields.Nested(TransactionSchema()))
+
+class NewTransactionSchema(Schema):
+    date = fields.Str()
+    price = fields.Float()
+    category = fields.Integer()
+    currency = fields.String()
+    incoming = fields.Boolean()
+    comment = fields.String()
+
+    @post_load
+    def format_data(self, data, many, **kwargs):
+        # check username
+        data["date"] = datetime.datetime.strptime(data["date"], '%d/%m/%Y')
+        transaction = Transaction(user_id=current_user.id, **data)
+        db.session.add(transaction)
+        db.session.commit()
+        return transaction

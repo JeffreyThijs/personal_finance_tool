@@ -168,6 +168,20 @@ class SecretResource(Resource):
             'answer': 42
         }
 
+class NewTransaction(Resource):
+    @jwt_required
+    def post(self):
+        data = request.get_json()
+        try:
+            # deserialize and receive username and tokens
+            nts = NewTransactionSchema()
+            transaction = nts.load(data)
+            return {
+                'message': 'Transaction {} has been added'.format(transaction.id)
+            }
+        except:
+            return {'message': 'Something went wrong'}, 500
+
 api.add_resource(UserRegistration, '/registration')
 api.add_resource(UserLogin, '/login')
 api.add_resource(UserUpdate, '/user/update')
@@ -178,3 +192,4 @@ api.add_resource(SecretResource, '/secret')
 api.add_resource(Transactions, '/transactions')
 api.add_resource(YearlyTransactions, '/transactions/<string:year>')
 api.add_resource(MonthlyTransactions, '/transactions/<string:year>/<string:month>')
+api.add_resource(NewTransaction, '/transaction')

@@ -1,4 +1,4 @@
-from marshmallow import Schema, fields, post_load, pre_load
+from marshmallow import Schema, fields, post_load, pre_load, post_dump
 from flask_jwt_extended import current_user
 from app.sqldb.models import User, Transaction
 from app import ma, db
@@ -15,12 +15,17 @@ import datetime
 class TransactionSchema(ma.ModelSchema):
     class Meta:
         model = Transaction
-        fields = ("date", "price", "category", "currency", "incoming", "comment")
+        fields = ("id", "date", "price", "category", "currency", "incoming", "comment")
+
+    @post_dump
+    def format_date(self, data, **kwargs):
+        data["date"] = datetime.datetime.strptime(data["date"], '%Y-%m-%dT%H:%M:%S').strftime('%d/%m/%Y')
+        return data
 
 class UserRegistrationSchema(Schema):
-    username = fields.Str()
-    email = fields.Email()
-    password = fields.Str()
+    username = fields.Str(required=True)
+    email = fields.Email(required=True)
+    password = fields.Str(required=True)
 
     @pre_load
     def check_user(self, data, many, **kwargs):
@@ -88,9 +93,27 @@ class PartitionedTransactionSchema(Schema):
     transactions = fields.List(fields.Nested(TransactionSchema()))
 
 class NewTransactionSchema(Schema):
+    date = fields.Str(required=True)
+    price = fields.Float(required=True)
+    category = fields.Integer(required=True)
+    currency = fields.String(required=True)
+    incoming = fields.Boolean(required=True)
+    comment = fields.String(required=True)
+
+    @post_load
+    def format_data(self, data, many, **kwargs):
+        # check username
+        data["date"] = datetime.datetime.strptime(data["date"], '%d/%m/%Y')
+        transaction = Transaction(user_id=current_user.id, **data)
+        db.session.add(transaction)
+        db.session.commit()
+        return transaction
+
+class EditTransactionSchema(Schema):
+    id = fields.Integer(required=True)
     date = fields.Str()
     price = fields.Float()
-    category = fields.Integer()
+    category = fields.String()
     currency = fields.String()
     incoming = fields.Boolean()
     comment = fields.String()
@@ -99,7 +122,11 @@ class NewTransactionSchema(Schema):
     def format_data(self, data, many, **kwargs):
         # check username
         data["date"] = datetime.datetime.strptime(data["date"], '%d/%m/%Y')
-        transaction = Transaction(user_id=current_user.id, **data)
+        transaction = db.session.query(Transaction).filter(Transaction.id == data["id"]).one_or_none()
+        if not transaction:
+            raise ValueError('transaction no found')
+        for key, value in data.items():
+            setattr(transaction, key, value)
         db.session.add(transaction)
         db.session.commit()
         return transaction

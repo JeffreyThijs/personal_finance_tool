@@ -124,7 +124,11 @@ class Transaction(UserMixin, db.Model):
 
     @category.setter
     def category(self, value):
-        self.type = Transaction.TransactionType.coerce(value)
+        if isinstance(value, str) and not value.isdigit():
+            tmp = value.upper()
+            self.type = getattr(Transaction.TransactionType, tmp, Transaction.TransactionType.UNKOWN).name
+        else:
+            self.type = Transaction.TransactionType.coerce(value)
 
     def __repr__(self):
         return '<Transaction {}>'.format(self.id)

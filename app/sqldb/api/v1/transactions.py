@@ -13,12 +13,12 @@ Transactions = List[Transaction]
 _dqh = DateQueryHelper(query_class=Transaction)
 
 # @cache.memoize(timeout=300)
-def get_user_transactions(user_id, order_attr=None, filter_rules=[]):
+def get_user_transactions(user_id, order_attr=None, filter_rules=None):
     return _dqh.get_user_query_objects(user_id=user_id,  
                                        order_attr=order_attr,
                                        filter_rules=filter_rules)
 
-def get_current_user_transactions(order_rules=None, filter_rules=[]):
+def get_current_user_transactions(order_rules=None, filter_rules=None):
     return get_user_transactions(user_id=current_user.id, 
                                  order_attr=order_rules,
                                  filter_rules=filter_rules)
@@ -28,7 +28,7 @@ def get_user_partial_transactions(user_id, order_attr=None, partition_rule=None,
                                                order_attr=order_attr,
                                                partition_rule=partition_rule,
                                                return_dict=return_dict,
-                                               filter_rules=[],
+                                               filter_rules=None,
                                                **kwargs)
 
 def get_current_user_partial_transactions(order_attr=None, partition_rule=None, return_dict=True, **kwargs):

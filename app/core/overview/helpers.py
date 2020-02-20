@@ -26,7 +26,5 @@ def transition_monthly_overview(value : int):
     qd = QueryDate(year=last_date_viewed.year,
                    month=last_date_viewed.month,
                    day=last_date_viewed.day)
-    print("test")
     qd.month += value
-    print(qd)
     update_last_date_viewed(qd.date, user=current_user)

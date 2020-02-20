@@ -176,6 +176,8 @@ class UserTransaction(Resource):
             # deserialize and receive username and tokens
             nts = NewTransactionSchema()
             transaction = nts.load(data)
+            db.session.commit()
+
             return {
                 'message': 'Transaction has been added',
                 'transaction_id': transaction.id
@@ -186,13 +188,12 @@ class UserTransaction(Resource):
     @jwt_required
     def patch(self):
         data = request.get_json()
-        print(data)
-        ets = EditTransactionSchema()
-        transaction = ets.load(data)
         try:
             # deserialize and receive username and tokens
             ets = EditTransactionSchema()
             transaction = ets.load(data)
+            db.session.commit()
+
             return {
                 'message': 'Transaction has been edited',
                 'transaction_id': transaction.id
@@ -202,7 +203,19 @@ class UserTransaction(Resource):
 
     @jwt_required
     def delete(self):
-        raise NotImplementedError
+        data = request.get_json()
+        try:
+            # deserialize and receive username and tokens
+            dts = DeleteTransactionSchema()
+            transaction = dts.load(data)
+            db.session.commit()
+
+            return {
+                'message': 'Transaction has been deleted',
+                'transaction_id': transaction.id
+            }, 200
+        except:
+            return {'message': 'Something went wrong'}, 500
 
 
 api.add_resource(UserRegistration, '/registration')

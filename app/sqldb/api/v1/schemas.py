@@ -47,7 +47,7 @@ class UserRegistrationSchema(Schema):
         # make new user and add it to db
         user = User(**data)
         db.session.add(user)
-        db.session.commit()
+        db.session.flush()
 
         # create tokens
         access_token = create_access_token(identity = user.username)
@@ -106,7 +106,7 @@ class NewTransactionSchema(Schema):
         data["date"] = datetime.datetime.strptime(data["date"], '%d/%m/%Y')
         transaction = Transaction(user_id=current_user.id, **data)
         db.session.add(transaction)
-        db.session.commit()
+        db.session.flush()
         return transaction
 
 class EditTransactionSchema(Schema):
@@ -128,5 +128,21 @@ class EditTransactionSchema(Schema):
         for key, value in data.items():
             setattr(transaction, key, value)
         db.session.add(transaction)
-        db.session.commit()
+        db.session.flush()
+        return transaction
+
+class DeleteTransactionSchema(Schema):
+    id = fields.Integer(required=True)
+    date = fields.Str()
+    price = fields.Float()
+    category = fields.String()
+    currency = fields.String()
+    incoming = fields.Boolean()
+    comment = fields.String()
+
+    @post_load
+    def delete_transaction(self, data, many, **kwargs):
+        transaction = db.session.query(Transaction).filter(Transaction.id == data["id"]).one_or_none()
+        db.session.delete(transaction)
+        db.session.flush()
         return transaction

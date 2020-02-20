@@ -1,9 +1,10 @@
+import datetime
+from flask_login import current_user
+from app import cache
 from app.tools.dateutils import MONTHS, get_x_prev_months
 from app.sqldb.models import Transaction
-from app import cache
-import datetime
 from app.core.prognosis.helpers import get_prognosis_data
-from app.sqldb.api.v1.transactions import get_current_user_partial_transactions, QueryPartitionRule, get_current_balance, calculate_balance
+from app.sqldb.api.v1.transactions import get_user_partial_transactions, QueryPartitionRule, get_user_balance, calculate_balance
 
 @cache.memoize(timeout=300)
 def get_donut_charts_data():
@@ -13,7 +14,7 @@ def get_donut_charts_data():
     donut_data["incoming"] =  [0] * len(donut_data["labels"])
     donut_data["outgoing"] =  [0] * len(donut_data["labels"])
 
-    transactions = get_current_user_partial_transactions(start_year=1)
+    transactions = get_user_partial_transactions(user_id=current_user.id, start_year=1)
 
     for t in transactions:
         _index = donut_data["labels"].index(Transaction.TransactionType(t.type).name.title())
@@ -36,8 +37,9 @@ def get_bar_charts_data(last_x_months=12):
                 "expected_incoming" :  [0.0] * last_x_months,
                 "expected_outgoing" :  [0.0] * last_x_months}
 
-    ts = get_current_user_partial_transactions(partition_rule=QueryPartitionRule.PER_MONTH,
-                                               start_year=datetime.datetime.now().year - 1)
+    ts = get_user_partial_transactions(user_id=current_user.id, 
+                                       partition_rule=QueryPartitionRule.PER_MONTH,
+                                       start_year=datetime.datetime.now().year - 1)
     last_ordered_x_months, last_ordered_x_months_year = get_x_prev_months(last_x_months)
 
     unique_years = list(set(last_ordered_x_months_year))
@@ -77,9 +79,10 @@ def get_line_charts_data():
                  "monthly_balance" : [],
                  "current_balance" : 0.0}
 
-    line_data["current_balance"] = get_current_balance()
-    ts = get_current_user_partial_transactions(partition_rule=QueryPartitionRule.PER_MONTH,
-                                               start_year=1)
+    line_data["current_balance"] = get_user_balance(current_user.id)
+    ts = get_user_partial_transactions(user_id=current_user.id, 
+                                       partition_rule=QueryPartitionRule.PER_MONTH,
+                                       start_year=1)
 
     _balance = 0.0
     for year in ts:

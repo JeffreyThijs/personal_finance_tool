@@ -80,6 +80,10 @@ def get_current_user_partitioned_transactions(order_attr=None, partition_rule=No
                                                  return_dict=return_dict,
                                                  start_year=1)
 
+def get_user_balance(user_id, precision=2):
+    transactions = get_user_partial_transactions(user_id=user_id, start_year=1)
+    return calculate_balance(transactions, precision=precision)
+
 def get_current_balance(precision=2):
     transactions = get_current_user_partial_transactions(start_year=1)
     return calculate_balance(transactions, precision=precision)
@@ -155,7 +159,8 @@ def remove_transaction(id : int):
      # clear transaction cache on update
     _clear_transaction_cache()
 
-def update_last_date_viewed(last_date_viewed):
-    current_user.last_date_viewed = last_date_viewed
-    db.session.add(current_user)
+def update_last_date_viewed(last_date_viewed, user=None):
+    user = current_user if not user else user
+    user.last_date_viewed = last_date_viewed
+    db.session.add(user)
     db.session.commit()

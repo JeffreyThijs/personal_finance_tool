@@ -3,7 +3,7 @@ from flask_login import current_user
 from app.sqldb.models import Prognosis
 from app.tools.dateutils import get_days_in_month, month_delta, date_delta
 from app.tools.helpers_classes import AttrDict
-from app.sqldb.api.v1.prognoses import get_current_user_partial_prognoses, update_last_prognosis_viewed
+from app.sqldb.api.v1.prognoses import get_user_partial_prognoses, update_last_prognosis_viewed
 from app.sqldb.api.v1.helpers.date_querying_helpers import QueryPartitionRule
 from app.sqldb.api.v1.helpers.date_querying_helpers import __MONTHS__ as MONTHS
 
@@ -78,13 +78,14 @@ def _get_yearly_prognosis_data(year_data, year_prognoses, year):
     return year_data
 
 def get_year_prognosis_data(year):
-    return get_current_user_partial_prognoses(partition_rule=QueryPartitionRule.PER_YEAR, 
-                                              start_year=1, 
-                                              start_month=1, 
-                                              start_day=1,
-                                              end_year=year+1, 
-                                              end_month=1, 
-                                              end_day=1)
+    return get_user_partial_prognoses(user_id=current_user.id,
+                                      partition_rule=QueryPartitionRule.PER_YEAR, 
+                                      start_year=1, 
+                                      start_month=1, 
+                                      start_day=1,
+                                      end_year=year+1, 
+                                      end_month=1, 
+                                      end_day=1)
 
 def _calc_totals(year_data):
     for month in MONTHS:

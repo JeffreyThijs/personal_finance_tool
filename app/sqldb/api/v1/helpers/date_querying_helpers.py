@@ -74,7 +74,7 @@ class QueryDate:
             if value > 12:
                 self._year += int((value-1)/12)
             elif value < 1:
-                self._year += np.ceil((value-1)/ 12).astype(int)
+                self._year += np.floor((value-1)/ 12).astype(int)
             self._month = (((int(value)-1) % 12) + 1)
 
     @property

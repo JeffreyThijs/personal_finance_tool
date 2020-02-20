@@ -18,7 +18,7 @@ class QueryPartitionRule(IntEnum):
     NONE = 6
 
 class QueryPartitionObject:
-    def __init__(self, query_objects=[], **kwargs):
+    def __init__(self, query_objects=None, **kwargs):
         for key, value in kwargs.items():
             if key == "slug":
                 setattr(self, value, query_objects) 

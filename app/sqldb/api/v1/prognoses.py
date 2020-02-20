@@ -9,12 +9,12 @@ from app.tools.dateutils import convert_to_datetime, date_parse
 _dqh = DateQueryHelper(query_class=Prognosis)
 
 # @cache.memoize(timeout=300)
-def get_user_prognoses(user_id, order_attr=None, filter_rules=[]):
+def get_user_prognoses(user_id, order_attr=None, filter_rules=None):
     return _dqh.get_user_query_objects(user_id=user_id,  
                                        order_attr=order_attr,
                                        filter_rules=filter_rules)
 
-def get_current_user_prognoses(order_rules=None, filter_rules=[]):
+def get_current_user_prognoses(order_rules=None, filter_rules=None):
     return get_user_prognoses(user_id=current_user.id, 
                               order_attr=order_rules,
                               filter_rules=filter_rules)

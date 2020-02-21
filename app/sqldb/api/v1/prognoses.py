@@ -5,6 +5,8 @@ from flask_jwt_extended import current_user
 from app.sqldb.models import Prognosis
 from app.sqldb.api.v1.helpers.date_querying_helpers import DateQueryHelper, QueryPartitionRule, __MONTHS__
 from app.tools.dateutils import convert_to_datetime, date_parse
+from app.tools.helpers_classes import AttrDict
+from app.tools.dateutils import get_days_in_month
 
 _dqh = DateQueryHelper(query_class=Prognosis)
 
@@ -99,3 +101,105 @@ def update_last_prognosis_viewed(last_prognosis_viewed):
     current_user.last_prognosis_viewed = last_prognosis_viewed
     db.session.add(current_user)
     db.session.commit()
+
+
+def _get_year_data_base():
+    year_data = AttrDict()
+    rows = __MONTHS__ + ["Totals"]
+    for row in rows:
+        year_data[row] = AttrDict({"incoming" : 0, 
+                                   "outgoing" : 0, 
+                                   "balance" : 0,
+                                   "prognoses" : set()})
+    return year_data
+
+def _get_only_once_prognosis_data(year_data, year_prognoses, year):
+    for syear in year_prognoses:
+        prognoses = list(filter(lambda x: x.type == Prognosis.PrognosisOccuranceType.ONCE, year_prognoses[syear]))
+        for p in prognoses:
+            smonth = __MONTHS__[p.date.month]
+            year_data[smonth].prognoses.add(p)
+            if p.incoming:  
+                year_data[smonth].incoming += p.amount
+            else:
+                year_data[smonth].outgoing += p.amount
+
+    return year_data
+
+def _get_daily_prognosis_data(year_data, year_prognoses, year):
+    for syear in year_prognoses:
+        prognoses = list(filter(lambda x: x.type == Prognosis.PrognosisOccuranceType.DAILY, year_prognoses[syear]))
+        for p in prognoses:
+            month = p.date.month 
+            start_month_idx = month-1 if int(syear) == year else 0
+            for i in range(start_month_idx, len(__MONTHS__)):
+                smonth = __MONTHS__[i]
+                year_data[smonth].prognoses.add(p)
+                days_in_month = (get_days_in_month(i + 1, year) if ((i + 1) != p.date.month)
+                                 else (get_days_in_month(i + 1, year) - p.date.day + 1))
+                if p.incoming:  
+                    year_data[smonth].incoming += (p.amount * days_in_month)
+                else:
+                    year_data[smonth].outgoing += (p.amount * days_in_month)
+
+    return year_data
+
+def _get_monthly_prognosis_data(year_data, year_prognoses, year):
+    for syear in year_prognoses:
+        prognoses = list(filter(lambda x: x.type == Prognosis.PrognosisOccuranceType.MONTHLY, year_prognoses[syear]))
+        for p in prognoses:
+            month = p.date.month 
+            start_month_idx = month-1 if int(syear) == year else 0
+            for i in range(start_month_idx, len(__MONTHS__)):
+                smonth = __MONTHS__[i]
+                year_data[smonth].prognoses.add(p)
+                if p.incoming:  
+                    year_data[smonth].incoming += p.amount
+                else:
+                    year_data[smonth].outgoing += p.amount
+
+    return year_data
+
+def _get_yearly_prognosis_data(year_data, year_prognoses, year):
+    for syear in year_prognoses:
+        prognoses = list(filter(lambda x: x.type == Prognosis.PrognosisOccuranceType.YEARLY, year_prognoses[syear]))
+        for p in prognoses:
+            smonth = __MONTHS__[p.date.month - 1]
+            year_data[smonth].prognoses.add(p)
+            if p.incoming:  
+                year_data[smonth].incoming += p.amount
+            else:
+                 year_data[smonth].outgoing += p.amount
+
+    return year_data
+
+def get_year_prognosis_data(year):
+    return get_user_partial_prognoses(user_id=current_user.id,
+                                      partition_rule=QueryPartitionRule.PER_YEAR, 
+                                      start_year=1, 
+                                      start_month=1, 
+                                      start_day=1,
+                                      end_year=year+1, 
+                                      end_month=1, 
+                                      end_day=1)
+
+def _calc_totals(year_data):
+    for month in __MONTHS__:
+        year_data[month].balance = round(year_data[month].incoming - year_data[month].outgoing, 2)
+
+    year_data.Totals.incoming = round(sum([year_data[str(key)].incoming for key in year_data.keys()]), 2)
+    year_data.Totals.outgoing = round(sum([year_data[str(key)].outgoing for key in year_data.keys()]), 2)
+    year_data.Totals.balance = round(year_data.Totals.incoming - year_data.Totals.outgoing, 2)
+    return year_data
+
+def get_prognosis_data(year):
+    print("getting data from year: {}".format(year))
+    year_prognoses = get_year_prognosis_data(year)
+    year_data = _get_year_data_base()
+    year_data = _get_only_once_prognosis_data(year_data, year_prognoses, year)
+    year_data = _get_monthly_prognosis_data(year_data, year_prognoses, year)
+    year_data = _get_yearly_prognosis_data(year_data, year_prognoses, year)
+    year_data = _get_daily_prognosis_data(year_data, year_prognoses, year)
+    year_data = _calc_totals(year_data)
+
+    return year_data

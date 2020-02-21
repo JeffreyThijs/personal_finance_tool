@@ -2,7 +2,7 @@ from marshmallow import Schema, fields, post_load, pre_load, post_dump
 from flask_jwt_extended import current_user
 from app.sqldb.models import User, Transaction
 from app import ma, db
-from app.sqldb.models import Transaction
+from app.sqldb.models import Transaction, Prognosis
 from flask_login import login_user
 from flask_jwt_extended import (create_access_token, 
                                 create_refresh_token, 
@@ -16,6 +16,16 @@ class TransactionSchema(ma.ModelSchema):
     class Meta:
         model = Transaction
         fields = ("id", "date", "price", "category", "currency", "incoming", "comment")
+
+    @post_dump
+    def format_date(self, data, **kwargs):
+        data["date"] = datetime.datetime.strptime(data["date"], '%Y-%m-%dT%H:%M:%S').strftime('%d/%m/%Y')
+        return data
+
+class PrognosisSchema(ma.ModelSchema):
+    class Meta:
+        model = Prognosis
+        fields = ("id", "date", "amount", "occurance", "currency", "incoming", "comment")
 
     @post_dump
     def format_date(self, data, **kwargs):
@@ -146,3 +156,11 @@ class DeleteTransactionSchema(Schema):
         db.session.delete(transaction)
         db.session.flush()
         return transaction
+
+class PartitionedPrognosesSchema(Schema):
+    year = fields.String()
+    month = fields.String()
+    incoming = fields.Float()
+    outgoing = fields.Float()
+    balance = fields.Float()
+    prognoses = fields.List(fields.Nested(TransactionSchema()))

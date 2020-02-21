@@ -5,10 +5,12 @@ from app.sqldb.api.v1.schemas import *
 from app.sqldb.models import Transaction, User, RevokedTokenModel
 from app.sqldb.api.v1 import _api as api
 from app.sqldb.api.v1 import bp
+from app.sqldb.api.v1.helpers.dict_helpers import unwrap_dict
 from app.sqldb.api.v1.transactions import (get_current_user_transactions, 
                                            get_current_user_monthly_transactions, 
                                            get_current_user_yearly_transactions,
                                            get_current_user_partitioned_transactions)
+from app.sqldb.api.v1.prognoses import get_prognosis_data
 from app.sqldb.api.v1.helpers.date_querying_helpers import QueryPartitionRule, QueryPartitionObject
 from flask_jwt_extended import (create_access_token, 
                                 create_refresh_token, 
@@ -217,6 +219,26 @@ class UserTransaction(Resource):
         except:
             return {'message': 'Something went wrong'}, 500
 
+class UserPrognoses(Resource):
+    @jwt_required
+    def get(self, year : str):
+        try:
+            prognosis_data = get_prognosis_data(int(year))
+
+            all_data = []
+            for month, data in prognosis_data.items():
+                data["year"] = year
+                data["month"] = month
+                all_data.append(data)
+            pps = PartitionedPrognosesSchema(many=True)
+
+            return { 
+                'message': 'Found {} prognosis'.format(len(all_data)),
+                'prognoses': pps.dump(all_data)
+            }
+        except:
+            return {'message': 'Something went wrong'}, 500
+
 
 api.add_resource(UserRegistration, '/registration')
 api.add_resource(UserLogin, '/login')
@@ -229,3 +251,4 @@ api.add_resource(Transactions, '/transactions')
 api.add_resource(YearlyTransactions, '/transactions/<string:year>')
 api.add_resource(MonthlyTransactions, '/transactions/<string:year>/<string:month>')
 api.add_resource(UserTransaction, '/transaction')
+api.add_resource(UserPrognoses, '/prognosis_data/<string:year>')

@@ -163,4 +163,21 @@ class PartitionedPrognosesSchema(Schema):
     incoming = fields.Float()
     outgoing = fields.Float()
     balance = fields.Float()
-    prognoses = fields.List(fields.Nested(TransactionSchema()))
+    prognoses = fields.List(fields.Nested(PrognosisSchema()))
+
+class AddPrognosisSchema(Schema):
+
+    date = fields.Str(required=True)
+    amount = fields.Float(required=True)
+    occurrence = fields.Integer(required=True)
+    incoming = fields.Boolean(required=True)
+    comment = fields.String(required=True)
+
+    @post_load
+    def format_data(self, data, many, **kwargs):
+        data["date"] = datetime.datetime.strptime(data["date"], '%d/%m/%Y')
+        data["occurance"] = data["occurrence"]
+        del data["occurrence"]
+        prognosis = Prognosis(user_id=current_user.id, **data)
+        db.session.add(prognosis)
+        db.session.flush()

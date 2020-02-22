@@ -5,7 +5,6 @@ from app.sqldb.api.v1.schemas import *
 from app.sqldb.models import Transaction, User, RevokedTokenModel
 from app.sqldb.api.v1 import _api as api
 from app.sqldb.api.v1 import bp
-from app.sqldb.api.v1.helpers.dict_helpers import unwrap_dict
 from app.sqldb.api.v1.transactions import (get_current_user_transactions, 
                                            get_current_user_monthly_transactions, 
                                            get_current_user_yearly_transactions,
@@ -239,6 +238,34 @@ class UserPrognoses(Resource):
         except:
             return {'message': 'Something went wrong'}, 500
 
+class UserPrognose(Resource):
+    @jwt_required
+    def get(self):
+        raise NotImplementedError
+
+    @jwt_required
+    def post(self):
+        data = request.get_json()
+        try:
+            aps = AddPrognosisSchema()
+            _ = aps.load(data)
+            db.session.commit()
+
+            return { 
+                'message': 'Added prognosis'
+            }
+        except:
+            return {'message': 'Something went wrong'}, 500
+        
+
+    @jwt_required
+    def patch(self):
+        pass
+
+    @jwt_required
+    def delete(self):
+        pass
+
 
 api.add_resource(UserRegistration, '/registration')
 api.add_resource(UserLogin, '/login')
@@ -252,3 +279,4 @@ api.add_resource(YearlyTransactions, '/transactions/<string:year>')
 api.add_resource(MonthlyTransactions, '/transactions/<string:year>/<string:month>')
 api.add_resource(UserTransaction, '/transaction')
 api.add_resource(UserPrognoses, '/prognosis_data/<string:year>')
+api.add_resource(UserPrognose, '/prognosis')

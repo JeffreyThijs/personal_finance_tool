@@ -169,15 +169,48 @@ class AddPrognosisSchema(Schema):
 
     date = fields.Str(required=True)
     amount = fields.Float(required=True)
-    occurrence = fields.Integer(required=True)
+    occurance = fields.Integer(required=True)
     incoming = fields.Boolean(required=True)
     comment = fields.String(required=True)
 
     @post_load
     def format_data(self, data, many, **kwargs):
         data["date"] = datetime.datetime.strptime(data["date"], '%d/%m/%Y')
-        data["occurance"] = data["occurrence"]
-        del data["occurrence"]
         prognosis = Prognosis(user_id=current_user.id, **data)
         db.session.add(prognosis)
         db.session.flush()
+
+class EditPrognosisSchema(Schema):
+    id = fields.Integer(required=True)
+    date = fields.Str()
+    amount = fields.Float()
+    occurance = fields.String()
+    incoming = fields.Boolean()
+    comment = fields.String()
+
+    @post_load
+    def format_data(self, data, many, **kwargs):
+        data["date"] = datetime.datetime.strptime(data["date"], '%d/%m/%Y')
+        prognosis = db.session.query(Prognosis).filter(Prognosis.id == data["id"]).one_or_none()
+        if not prognosis:
+            raise ValueError('prognosis no found')
+        for key, value in data.items():
+            setattr(prognosis, key, value)
+        db.session.add(prognosis)
+        db.session.flush()
+        return prognosis
+
+class DeletePrognosisSchema(Schema):
+    id = fields.Integer(required=True)
+    date = fields.Str()
+    amount = fields.Float()
+    occurance = fields.String()
+    incoming = fields.Boolean()
+    comment = fields.String()
+
+    @post_load
+    def delete_transaction(self, data, many, **kwargs):
+        prognosis = db.session.query(Prognosis).filter(Prognosis.id == data["id"]).one_or_none()
+        db.session.delete(prognosis)
+        db.session.flush()
+        return prognosis

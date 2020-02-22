@@ -260,11 +260,35 @@ class UserPrognose(Resource):
 
     @jwt_required
     def patch(self):
-        pass
+        data = request.get_json()
+        eps = EditPrognosisSchema()
+        prognosis = eps.load(data)
+        try:
+            # deserialize and receive username and tokens
+            db.session.commit()
+
+            return {
+                'message': 'Prognosis has been edited',
+                'prognosis_id': prognosis.id
+            }, 200
+        except:
+            return {'message': 'Something went wrong'}, 500
 
     @jwt_required
     def delete(self):
-        pass
+        data = request.get_json()
+        try:
+            # deserialize and receive username and tokens
+            dps = DeletePrognosisSchema()
+            prognosis = dps.load(data)
+            db.session.commit()
+
+            return {
+                'message': 'Prognosis has been deleted',
+                'prognosis_id': prognosis.id
+            }, 200
+        except:
+            return {'message': 'Something went wrong'}, 500
 
 
 api.add_resource(UserRegistration, '/registration')

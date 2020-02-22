@@ -125,8 +125,7 @@ class Transaction(UserMixin, db.Model):
     @category.setter
     def category(self, value):
         if isinstance(value, str) and not value.isdigit():
-            tmp = value.upper()
-            self.type = getattr(Transaction.TransactionType, tmp, Transaction.TransactionType.UNKOWN).name
+            self.type = getattr(Transaction.TransactionType, value.upper(), Transaction.TransactionType.UNKOWN).name
         else:
             self.type = Transaction.TransactionType.coerce(value)
 
@@ -174,7 +173,10 @@ class Prognosis(UserMixin, db.Model):
 
     @occurance.setter
     def occurance(self, value):
-        self.type = Prognosis.PrognosisOccuranceType.coerce(value)
+        if isinstance(value, str) and not value.isdigit():
+            self.type = getattr(Prognosis.PrognosisOccuranceType, value.upper(), Prognosis.PrognosisOccuranceType.ONCE).name
+        else:
+            self.type = Prognosis.PrognosisOccuranceType.coerce(value)
 
     @property
     def tag(self):

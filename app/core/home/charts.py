@@ -1,16 +1,20 @@
-from app.tools.dateutils import filter_on_MonthYear, MONTHS, partition_in_MonthYear, filter_on_last_x_months, get_x_prev_months
-from app.sqldb.models import Transaction
-from app import cache
 import datetime
+from flask_login import current_user
+from app import cache
+from app.tools.dateutils import MONTHS, get_x_prev_months
+from app.sqldb.models import Transaction
 from app.core.prognosis.helpers import get_prognosis_data
+from app.sqldb.api.v1.transactions import get_user_partial_transactions, QueryPartitionRule, get_user_balance, calculate_balance
 
 @cache.memoize(timeout=300)
-def get_donut_charts_data(transactions):
+def get_donut_charts_data():
 
     donut_data = {}
     donut_data["labels"] = [c[1] for c in Transaction.TransactionType.choices()]
     donut_data["incoming"] =  [0] * len(donut_data["labels"])
     donut_data["outgoing"] =  [0] * len(donut_data["labels"])
+
+    transactions = get_user_partial_transactions(user_id=current_user.id, start_year=1)
 
     for t in transactions:
         _index = donut_data["labels"].index(Transaction.TransactionType(t.type).name.title())
@@ -25,7 +29,7 @@ def get_donut_charts_data(transactions):
     return donut_data
 
 @cache.memoize(timeout=300)
-def get_bar_charts_data(transactions, last_x_months=12):
+def get_bar_charts_data(last_x_months=12):
 
     bar_data = {"labels" : [0.0] * last_x_months,
                 "incoming" : [0.0] * last_x_months,
@@ -33,8 +37,9 @@ def get_bar_charts_data(transactions, last_x_months=12):
                 "expected_incoming" :  [0.0] * last_x_months,
                 "expected_outgoing" :  [0.0] * last_x_months}
 
-    ts = filter_on_last_x_months(transactions, last_x_months)
-    ts = partition_in_MonthYear(ts)
+    ts = get_user_partial_transactions(user_id=current_user.id, 
+                                       partition_rule=QueryPartitionRule.PER_MONTH,
+                                       start_year=datetime.datetime.now().year - 1)
     last_ordered_x_months, last_ordered_x_months_year = get_x_prev_months(last_x_months)
 
     unique_years = list(set(last_ordered_x_months_year))
@@ -53,15 +58,15 @@ def get_bar_charts_data(transactions, last_x_months=12):
                 else:
                     sum_outgoing += t.price
 
-        bar_data["labels"][i] = month + " " + year
+        bar_data["labels"][i] = "{} {}".format(month, year)
         bar_data["incoming"][i] = round(sum_incoming, 2)
         bar_data["outgoing"][i] = round(sum_outgoing, 2)
 
         sum_incoming, sum_outgoing = 0.0, 0.0
 
-        if (year in prognosis_data) and (month.capitalize() in prognosis_data[year]):
-            sum_incoming += prognosis_data[year][month.capitalize()]["incoming"]
-            sum_outgoing += prognosis_data[year][month.capitalize()]["outgoing"]
+        if (year in prognosis_data) and (month in prognosis_data[year]):
+            sum_incoming += prognosis_data[year][month]["incoming"]
+            sum_outgoing += prognosis_data[year][month]["outgoing"]
 
         bar_data["expected_incoming"][i] = round(sum_incoming, 2)
         bar_data["expected_outgoing"][i] = round(sum_outgoing, 2)
@@ -69,23 +74,21 @@ def get_bar_charts_data(transactions, last_x_months=12):
     return bar_data
 
 @cache.memoize(timeout=300)
-def get_line_charts_data(transactions):
-
+def get_line_charts_data():
     line_data = {"labels" : [],
-                 "monthly_balance" : []}
+                 "monthly_balance" : [],
+                 "current_balance" : 0.0}
 
-    line_data["current_balance"] = (sum([t.price for t in transactions if (t.incoming and (t.date < datetime.datetime.now()))]) -
-                                    sum([t.price for t in transactions if (not t.incoming and (t.date < datetime.datetime.now()))]))
-    line_data["current_balance"] = round(line_data["current_balance"], 2)
-    transactions_monthly = partition_in_MonthYear(transactions)
+    line_data["current_balance"] = get_user_balance(current_user.id)
+    ts = get_user_partial_transactions(user_id=current_user.id, 
+                                       partition_rule=QueryPartitionRule.PER_MONTH,
+                                       start_year=1)
 
-    _balance = 0
-    for year in transactions_monthly:
-        for month in transactions_monthly[year]:
-            _balance += (  sum([t.price for t in transactions_monthly[year][month] if t.incoming]) 
-                         - sum([t.price for t in transactions_monthly[year][month] if not t.incoming]))
+    _balance = 0.0
+    for year in ts:
+        for month in ts[year]:
+            _balance += calculate_balance(ts[year][month])
             line_data["labels"].append("{} {}".format(month, year))
             line_data["monthly_balance"].append(round(_balance, 2))
-
             
     return line_data

@@ -7,6 +7,9 @@ from flask_bootstrap import Bootstrap
 from flask_mail import Mail
 from flask_caching import Cache
 from flask_migrate import Migrate
+from flask_marshmallow import Marshmallow
+from flask_jwt_extended import JWTManager
+from flask_cors import CORS
 
 naming_convention = {
     "ix": 'ix_%(column_0_label)s',
@@ -23,6 +26,9 @@ cache = Cache()
 migrate = Migrate()
 login = LoginManager()
 login.login_view = 'auth.login'
+ma = Marshmallow()
+jwt_manager = JWTManager()
+cors = CORS()
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -34,9 +40,15 @@ def create_app(config_class=Config):
     cache.init_app(app)
     migrate.init_app(app, db=db)
     login.init_app(app)
+    ma.init_app(app)
+    jwt_manager.init_app(app)
+    cors.init_app(app)
 
     from app.auth import bp as auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')
+
+    from app.sqldb.api.v1 import bp as api_bp
+    app.register_blueprint(api_bp, url_prefix='/api/v1')
 
     from app.core.home import bp as home_bp
     app.register_blueprint(home_bp)
@@ -52,4 +64,6 @@ def create_app(config_class=Config):
 
     return app
 
-from app.sqldb import models, transactions, prognoses
+from app.sqldb import models
+from app.sqldb.api.v1 import api as _api
+from app.auth import jwt as _jwt

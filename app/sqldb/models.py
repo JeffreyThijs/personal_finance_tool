@@ -124,7 +124,10 @@ class Transaction(UserMixin, db.Model):
 
     @category.setter
     def category(self, value):
-        self.type = Transaction.TransactionType.coerce(value)
+        if isinstance(value, str) and not value.isdigit():
+            self.type = getattr(Transaction.TransactionType, value.upper(), Transaction.TransactionType.UNKOWN).name
+        else:
+            self.type = Transaction.TransactionType.coerce(value)
 
     def __repr__(self):
         return '<Transaction {}>'.format(self.id)
@@ -170,7 +173,10 @@ class Prognosis(UserMixin, db.Model):
 
     @occurance.setter
     def occurance(self, value):
-        self.type = Prognosis.PrognosisOccuranceType.coerce(value)
+        if isinstance(value, str) and not value.isdigit():
+            self.type = getattr(Prognosis.PrognosisOccuranceType, value.upper(), Prognosis.PrognosisOccuranceType.ONCE).name
+        else:
+            self.type = Prognosis.PrognosisOccuranceType.coerce(value)
 
     @property
     def tag(self):
@@ -192,3 +198,17 @@ class Prognosis(UserMixin, db.Model):
             self.date,
             self.fdate
         )
+
+class RevokedTokenModel(db.Model):
+    __tablename__ = 'revoked_tokens'
+    id = db.Column(db.Integer, primary_key = True)
+    jti = db.Column(db.String(120))
+    
+    def add(self):
+        db.session.add(self)
+        db.session.commit()
+    
+    @classmethod
+    def is_jti_blacklisted(cls, jti):
+        query = cls.query.filter_by(jti = jti).first()
+        return bool(query)

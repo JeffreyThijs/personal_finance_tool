@@ -117,7 +117,7 @@ def _get_only_once_prognosis_data(year_data, year_prognoses, year):
     for syear in year_prognoses:
         prognoses = list(filter(lambda x: x.type == Prognosis.PrognosisOccuranceType.ONCE, year_prognoses[syear]))
         for p in prognoses:
-            smonth = __MONTHS__[p.date.month]
+            smonth = __MONTHS__[p.date.month-1]
             year_data[smonth].prognoses.add(p)
             if p.incoming:  
                 year_data[smonth].incoming += p.amount

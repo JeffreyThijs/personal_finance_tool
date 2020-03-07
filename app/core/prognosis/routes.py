@@ -2,7 +2,8 @@ from flask import render_template, redirect, url_for
 from flask_login import login_required, current_user
 from app.core.prognosis import bp
 from app.core.prognosis.form_handler import FormHandler
-from app.core.prognosis.helpers import get_prognosis_data, transition_yearly_overview
+from app.core.prognosis.helpers import transition_yearly_overview
+from app.sqldb.api.v1.prognoses import get_prognosis_data
 import datetime
 
 @bp.route('/yearly_overview', methods=['GET', 'POST'])
@@ -23,7 +24,7 @@ def yearly_overview():
         return redirect(url_for('prognosis.yearly_overview'))  
 
     # get prognosesprevious_year
-    data = get_prognosis_data(year)
+    data = get_prognosis_data(year, user_id=current_user.id)
     
     return render_template('core/prognosis/yearly_overview.html',
                            table_title=table_title,

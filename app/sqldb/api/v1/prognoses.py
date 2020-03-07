@@ -58,18 +58,20 @@ def add_new_prognosis(amount : float,
                       date : str = None,
                       incoming : bool = False,
                       occurance_type : Prognosis.PrognosisOccuranceType = Prognosis.PrognosisOccuranceType.ONCE,
-                      comment : str = "placeholder"):
+                      comment : str = "placeholder",
+                      **kwargs):
 
     if date:
         day, month, year = date_parse(date)
         date = convert_to_datetime(day, month, year)
 
+    user = kwargs.get("user", current_user)
     prognosis = Prognosis(amount=amount,
                           date=date,
                           incoming=incoming,
                           type=occurance_type,
                           comment=comment,
-                          user_id=current_user.id)
+                          user_id=user.id)
     db.session.add(prognosis)
     db.session.commit()
 
@@ -97,9 +99,10 @@ def edit_prognosis(id : int,
     # clear prognosis cache on update
     # _clear_prognosis_cache()
 
-def update_last_prognosis_viewed(last_prognosis_viewed):
-    current_user.last_prognosis_viewed = last_prognosis_viewed
-    db.session.add(current_user)
+def update_last_prognosis_viewed(last_prognosis_viewed, user=None):
+    user = getattr(current_user, "last_prognosis_viewed", user)
+    user.last_prognosis_viewed = last_prognosis_viewed
+    db.session.add(user)
     db.session.commit()
 
 
@@ -117,6 +120,8 @@ def _get_only_once_prognosis_data(year_data, year_prognoses, year):
     for syear in year_prognoses:
         prognoses = list(filter(lambda x: x.type == Prognosis.PrognosisOccuranceType.ONCE, year_prognoses[syear]))
         for p in prognoses:
+            if p.date.year != year:
+                continue
             smonth = __MONTHS__[p.date.month-1]
             year_data[smonth].prognoses.add(p)
             if p.incoming:  
@@ -173,8 +178,9 @@ def _get_yearly_prognosis_data(year_data, year_prognoses, year):
 
     return year_data
 
-def get_year_prognosis_data(year):
-    return get_user_partial_prognoses(user_id=current_user.id,
+def get_year_prognosis_data(year, **kwargs):
+    user_id = kwargs.get('user_id', getattr(current_user, 'id', None))
+    return get_user_partial_prognoses(user_id=user_id,
                                       partition_rule=QueryPartitionRule.PER_YEAR, 
                                       start_year=1, 
                                       start_month=1, 
@@ -192,9 +198,9 @@ def _calc_totals(year_data):
     year_data.Totals.balance = round(year_data.Totals.incoming - year_data.Totals.outgoing, 2)
     return year_data
 
-def get_prognosis_data(year):
+def get_prognosis_data(year, **kwargs):
     print("getting data from year: {}".format(year))
-    year_prognoses = get_year_prognosis_data(year)
+    year_prognoses = get_year_prognosis_data(year, **kwargs)
     year_data = _get_year_data_base()
     year_data = _get_only_once_prognosis_data(year_data, year_prognoses, year)
     year_data = _get_monthly_prognosis_data(year_data, year_prognoses, year)

@@ -3,7 +3,7 @@ from flask_login import current_user
 from app import cache
 from app.tools.dateutils import MONTHS, get_x_prev_months
 from app.sqldb.models import Transaction
-from app.core.prognosis.helpers import get_prognosis_data
+from app.sqldb.api.v1.prognoses import get_prognosis_data
 from app.sqldb.api.v1.transactions import get_user_partial_transactions, QueryPartitionRule, get_user_balance, calculate_balance
 
 @cache.memoize(timeout=300)
@@ -45,7 +45,7 @@ def get_bar_charts_data(last_x_months=12):
     unique_years = list(set(last_ordered_x_months_year))
     prognosis_data = {}
     for year in unique_years:
-        prognosis_data[year] = get_prognosis_data(int(year))
+        prognosis_data[year] = get_prognosis_data(int(year), user_id=current_user.id)
 
     for i, (month, year) in enumerate(zip(last_ordered_x_months, last_ordered_x_months_year)):
         

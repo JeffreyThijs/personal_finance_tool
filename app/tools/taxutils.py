@@ -33,7 +33,8 @@ def calc_slice_tax(values, slice_bounds, slice_percentages):
 
 def calc_tax(values):
 
-    slice_bounds = [0.00, 12860.00, 19630.00, 40470.00, None]
+    # slice_bounds = [0.00, 12860.00, 19630.00, 40470.00, None]
+    slice_bounds = [0.00, 13050.00, 19920.00, 41070.00, None]
     slice_percentages = [0.2675, 0.428, 0.4815, 0.5350]
     return calc_slice_tax(values, slice_bounds, slice_percentages)
 
@@ -42,8 +43,8 @@ def calc_rsz(value):
 
 # bedrijfvooorheffing
 def calc_payroll_tax(taxable_wage,
-                     flat_rate_professional_expenses=4810.00,
-                     gross_tax_free_sum=7720.00,
+                     flat_rate_professional_expenses=4890.00,
+                     gross_tax_free_sum=7840.00,
                      **tax_reductions):
 
     sum_tax_reductions = 0

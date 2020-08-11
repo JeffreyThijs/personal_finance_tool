@@ -10,6 +10,7 @@ from flask_migrate import Migrate
 from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
+from oauthlib.oauth2 import WebApplicationClient
 
 naming_convention = {
     "ix": 'ix_%(column_0_label)s',
@@ -43,6 +44,8 @@ def create_app(config_class=Config):
     ma.init_app(app)
     jwt_manager.init_app(app)
     cors.init_app(app)
+
+    app.oauth_client = WebApplicationClient(app.config['GOOGLE_CLIENT_ID'])
 
     from app.auth import bp as auth_bp
     app.register_blueprint(auth_bp, url_prefix='/auth')

@@ -30,6 +30,9 @@ class Config(object):
     JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY")
     JWT_BLACKLIST_ENABLED = os.environ.get("JWT_BLACKLIST_ENABLED")
     JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
+    GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", None)
+    GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", None)
+    GOOGLE_DISCOVERY_URL = os.environ.get("GOOGLE_DISCOVERY_URL", None)
 
 class TestConfig(object):
     SECRET_KEY = 'bad_secret_key'

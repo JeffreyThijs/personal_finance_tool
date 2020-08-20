@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, session
 from flask_restplus import Resource, Api
 from app import ma, db
 from app.sqldb.api.v1.schemas import *
@@ -118,6 +118,7 @@ class UserUpdate(Resource):
 
 class UserLogin(Resource):
     def post(self):
+        print(session['ruri'])
         data = request.get_json()
         try:
             # deserialize and receive username and tokens

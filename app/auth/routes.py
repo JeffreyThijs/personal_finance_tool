@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for, request, current_app
+from flask import render_template, flash, redirect, url_for, request, current_app, session
 from flask_login import login_user, logout_user, current_user, login_required
 from app.auth.forms import LoginForm, RegistrationForm, ResetPasswordForm, ResetPasswordRequestForm
 from werkzeug.urls import url_parse
@@ -46,11 +46,13 @@ def login():
     return render_template('auth/login.html', title='Sign In', form=form)
 
 def get_google_provider_cfg():
-    print(current_app.config['GOOGLE_DISCOVERY_URL'])
     return requests.get(current_app.config['GOOGLE_DISCOVERY_URL']).json()
 
 @bp.route("/login/google")
 def login_google():
+
+    session['redirect_url'] = request.args.get('ruri', None)
+
     # Find out what URL to hit for Google login
     google_provider_cfg = get_google_provider_cfg()
     authorization_endpoint = google_provider_cfg["authorization_endpoint"]
@@ -111,7 +113,7 @@ def callback():
 
     # Create a user in our db with the information provided
     # by Google
-    user = User.query.filter_by(username=users_email).first()
+    user = User.query.filter_by(username='jthijs').first()
 
     # Doesn't exist? Add to database
     if not user:
@@ -123,10 +125,11 @@ def callback():
     login_user(user)
 
     # Send user back to homepage
-    next_page = request.args.get('next')
+    next_page = session.get('redirect_url', request.args.get('next'))
 
-    if not next_page or url_parse(next_page).netloc != '':
+    if not next_page:
         next_page = url_for('home.index')
+
     return redirect(next_page)
 
 @bp.route('/logout')

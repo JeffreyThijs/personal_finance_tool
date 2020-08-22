@@ -47,23 +47,8 @@ def create_app(config_class=Config):
 
     app.oauth_client = WebApplicationClient(app.config['GOOGLE_CLIENT_ID'])
 
-    from app.auth import bp as auth_bp
-    app.register_blueprint(auth_bp, url_prefix='/auth')
-
     from app.sqldb.api.v1 import bp as api_bp
     app.register_blueprint(api_bp, url_prefix='/api/v1')
-
-    from app.core.home import bp as home_bp
-    app.register_blueprint(home_bp)
-
-    from app.core.overview import bp as overview_bp
-    app.register_blueprint(overview_bp, url_prefix='/core/overview')
-
-    from app.core.tax import bp as tax_bp
-    app.register_blueprint(tax_bp, url_prefix='/core/tax')
-
-    from app.core.prognosis import bp as prognosis_bp
-    app.register_blueprint(prognosis_bp, url_prefix='/core/prognosis')
 
     return app
 

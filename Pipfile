@@ -8,6 +8,9 @@ starlette = "*"
 fastapi = "*"
 fastapi-jwt-auth = "*"
 pydantic = "*"
+sqlalchemy = "*"
+fastapi-sqlalchemy = "*"
+python-dotenv = "*"
 
 [dev-packages]
 uvicorn = "*"

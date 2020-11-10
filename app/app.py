@@ -2,11 +2,13 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi_jwt_auth import AuthJWT
 from fastapi_jwt_auth.exceptions import AuthJWTException
-from .endpoints import auth
 from pydantic import BaseModel
+from fastapi_sqlalchemy import DBSessionMiddleware 
+
+from .endpoints import auth
 
 app = FastAPI()
-
+# app.add_middleware(DBSessionMiddleware, db_url="sqlite://")
 
 class Settings(BaseModel):
     authjwt_secret_key: str = "secret"

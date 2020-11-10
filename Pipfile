@@ -1,0 +1,17 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+starlette = "*"
+fastapi = "*"
+fastapi-jwt-auth = "*"
+pydantic = "*"
+
+[dev-packages]
+uvicorn = "*"
+autopep8 = "*"
+
+[requires]
+python_version = "3.8"

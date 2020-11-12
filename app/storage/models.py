@@ -9,11 +9,10 @@ from sqlalchemy.orm import relationship
 
 from .monkey_patches import SQLAlchemyUserDatabase
 from .schemas import UserDB
-from ..config import Config
+from ..settings import settings
 
 
-config = Config.from_environ()
-database = Database(config.DATABASE_URL)
+database = Database(settings.DATABASE_URL)
 Base: DeclarativeMeta = declarative_base()
 
 

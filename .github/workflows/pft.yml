@@ -15,8 +15,9 @@ jobs:
         python-version: 3.8
     - name: Install dependencies
       run: |
-        sudo apt install libpq-dev pipenv
+        sudo apt install libpq-dev
         python3 -m pip install --upgrade pip
+        python3 -m pip install pipenv
         pipenv install --system --dev --deploy
     - name: Lint with flake8
       run: |

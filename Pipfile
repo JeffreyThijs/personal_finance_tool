@@ -6,11 +6,15 @@ name = "pypi"
 [packages]
 starlette = "*"
 fastapi = "*"
-fastapi-jwt-auth = "*"
 pydantic = "*"
-sqlalchemy = "*"
-fastapi-sqlalchemy = "*"
+SQLAlchemy = "*"
+FastAPI-SQLAlchemy = "*"
 python-dotenv = "*"
+databases = "*"
+alembic = "*"
+fastapi-users = "*"
+asyncpg = "*"
+psycopg2 = "*"
 
 [dev-packages]
 uvicorn = "*"

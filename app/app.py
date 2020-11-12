@@ -1,30 +1,50 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
-from fastapi_jwt_auth import AuthJWT
-from fastapi_jwt_auth.exceptions import AuthJWTException
-from pydantic import BaseModel
-from fastapi_sqlalchemy import DBSessionMiddleware 
+from fastapi import FastAPI
+from fastapi_sqlalchemy import DBSessionMiddleware
+from fastapi import FastAPI
+from fastapi_users import FastAPIUsers
+from fastapi_users.authentication import JWTAuthentication
 
-from .endpoints import auth
+from .config import Config
+from .storage.models import database, user_db, on_after_register, on_after_forgot_password
+from .storage.schemas import User, UserCreate, UserUpdate, UserDB
+
+jwt_authentication = JWTAuthentication(
+    secret=Config.SECRET, lifetime_seconds=3600, tokenUrl="/auth/jwt/login"
+)
 
 app = FastAPI()
-# app.add_middleware(DBSessionMiddleware, db_url="sqlite://")
+app.add_middleware(DBSessionMiddleware, db_url=Config.DATABASE_URL)
 
-class Settings(BaseModel):
-    authjwt_secret_key: str = "secret"
+fastapi_users = FastAPIUsers(
+    user_db,
+    [jwt_authentication],
+    User,
+    UserCreate,
+    UserUpdate,
+    UserDB,
+)
+app.include_router(
+    fastapi_users.get_auth_router(jwt_authentication), prefix="/auth/jwt", tags=["auth"]
+)
+app.include_router(
+    fastapi_users.get_register_router(on_after_register), prefix="/auth", tags=["auth"]
+)
+app.include_router(
+    fastapi_users.get_reset_password_router(
+        Config.SECRET, after_forgot_password=on_after_forgot_password
+    ),
+    prefix="/auth",
+    tags=["auth"],
+)
+app.include_router(fastapi_users.get_users_router(),
+                   prefix="/users", tags=["users"])
 
 
-@AuthJWT.load_config
-def get_config():
-    return Settings()
+@app.on_event("startup")
+async def startup():
+    await database.connect()
 
 
-@app.exception_handler(AuthJWTException)
-def authjwt_exception_handler(request: Request, exc: AuthJWTException):
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"detail": exc.message}
-    )
-
-
-app.include_router(auth.router, tags=['users'])
+@app.on_event("shutdown")
+async def shutdown():
+    await database.disconnect()

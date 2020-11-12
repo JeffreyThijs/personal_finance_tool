@@ -15,6 +15,8 @@ alembic = "*"
 fastapi-users = "*"
 asyncpg = "*"
 psycopg2 = "*"
+pydantic-sqlalchemy = "*"
+httpx-oauth = "*"
 
 [dev-packages]
 uvicorn = "*"

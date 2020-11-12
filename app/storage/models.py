@@ -18,7 +18,7 @@ Base: DeclarativeMeta = declarative_base()
 
 
 class UserTable(Base, SQLAlchemyBaseUserTable):
-    pass
+    transactions = relationship("Transaction", backref="parent", cascade="all, delete")
 
 
 class OAuthAccount(SQLAlchemyBaseOAuthAccountTable, Base):
@@ -28,3 +28,11 @@ class OAuthAccount(SQLAlchemyBaseOAuthAccountTable, Base):
 users = UserTable.__table__
 oauth_accounts = OAuthAccount.__table__
 user_db = SQLAlchemyUserDatabase(UserDB, database, users, oauth_accounts)
+
+
+class TransactionTable(Base):
+    __tablename__ = "transactions"
+
+    id = Column(Integer, primary_key=True)
+    comment = Column(String, nullable=False)
+    price = Column(Float, nullable=False)

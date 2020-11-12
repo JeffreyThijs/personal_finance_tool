@@ -3,12 +3,13 @@ from fastapi_users.db import (
     SQLAlchemyBaseUserTable,
     SQLAlchemyBaseOAuthAccountTable
 )
+from fastapi_users.db.sqlalchemy import GUID
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
-from sqlalchemy import Column, Float, Integer, String
+from sqlalchemy import Column, Float, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
 
 from .monkey_patches import SQLAlchemyUserDatabase
-from .schemas import UserDB
+from .schemas.users import UserDB
 from ..settings import settings
 
 
@@ -17,7 +18,7 @@ Base: DeclarativeMeta = declarative_base()
 
 
 class UserTable(Base, SQLAlchemyBaseUserTable):
-    transactions = relationship("Transaction", backref="parent", cascade="all, delete")
+    transactions = relationship("TransactionTable", backref="parent", cascade="all, delete")
 
 
 class OAuthAccount(SQLAlchemyBaseOAuthAccountTable, Base):
@@ -35,3 +36,5 @@ class TransactionTable(Base):
     id = Column(Integer, primary_key=True)
     comment = Column(String, nullable=False)
     price = Column(Float, nullable=False)
+    
+    user_id = Column(GUID, ForeignKey('user.id'))

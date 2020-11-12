@@ -1,16 +1,17 @@
 """add transaction table
 
-Revision ID: c5f38a84314c
+Revision ID: d365b9b6a097
 Revises: 86821a36a853
-Create Date: 2020-11-12 22:08:14.340430
+Create Date: 2020-11-12 23:13:35.669600
 
 """
 from alembic import op
 import sqlalchemy as sa
+from fastapi_users.db.sqlalchemy import GUID
 
 
 # revision identifiers, used by Alembic.
-revision = 'c5f38a84314c'
+revision = 'd365b9b6a097'
 down_revision = '86821a36a853'
 branch_labels = None
 depends_on = None
@@ -22,6 +23,8 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('comment', sa.String(), nullable=False),
     sa.Column('price', sa.Float(), nullable=False),
+    sa.Column('user_id', GUID(), nullable=True),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###

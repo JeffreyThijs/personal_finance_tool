@@ -3,7 +3,7 @@ from fastapi_users.authentication import JWTAuthentication
 
 from .settings import settings
 from .storage.models import user_db
-from .storage.schemas import User, UserCreate, UserUpdate, UserDB
+from .storage.schemas.users import User, UserCreate, UserUpdate, UserDB
 
 
 jwt_authentication = JWTAuthentication(

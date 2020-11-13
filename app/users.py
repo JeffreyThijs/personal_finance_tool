@@ -1,6 +1,4 @@
-from fastapi_users import FastAPIUsers
-from fastapi_users.authentication import JWTAuthentication
-
+from .storage.monkey_patches import JWTAuthentication, FastAPIUsers
 from .settings import settings
 from .storage.models import user_db
 from .storage.schemas.users import User, UserCreate, UserUpdate, UserDB

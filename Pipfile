@@ -12,11 +12,12 @@ FastAPI-SQLAlchemy = "*"
 python-dotenv = "*"
 databases = "*"
 alembic = "*"
-fastapi-users = "*"
 asyncpg = "*"
 psycopg2 = "*"
 pydantic-sqlalchemy = "*"
 httpx-oauth = "*"
+setuptools = "==49.0"
+fastapi-users = "*"
 
 [dev-packages]
 uvicorn = "*"

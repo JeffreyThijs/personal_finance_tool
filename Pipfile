@@ -18,6 +18,7 @@ pydantic-sqlalchemy = "*"
 httpx-oauth = "*"
 setuptools = "==49.0"
 fastapi-users = "*"
+fastapi-mail = "*"
 
 [dev-packages]
 uvicorn = "*"

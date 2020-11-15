@@ -3,7 +3,7 @@ from fastapi_sqlalchemy import DBSessionMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 
 from .settings import settings
-from .post_request_methods import on_after_register, on_after_forgot_password
+from .background_tasks import on_after_register, on_after_forgot_password
 from .storage.models import database
 from .endpoints import transactions
 from .users import fastapi_users, jwt_authentication

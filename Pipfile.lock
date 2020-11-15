@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "86847727f39d5fd97f494430ec65d8688fa048f72ca9f48971443460613c72d1"
+            "sha256": "e9312fd055535f11bd818ebccbfb3550147f73e07293218a5195d5a2d8757497"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,6 +16,14 @@
         ]
     },
     "default": {
+        "aiosmtplib": {
+            "hashes": [
+                "sha256:8270d0a06475aa05b9276fc954fbd08a1f6c59d0452b4899413d8bca1db24541",
+                "sha256:93e53edac183f1a608bc34464efeef23902e59e949017b1682014f59ecdcd37d"
+            ],
+            "markers": "python_full_version >= '3.5.2' and python_full_version < '4.0.0'",
+            "version": "==1.1.4"
+        },
         "alembic": {
             "hashes": [
                 "sha256:4e02ed2aa796bd179965041afa092c55b51fb077de19d61835673cc80672c01c",
@@ -146,6 +154,14 @@
             "index": "pypi",
             "version": "==0.61.2"
         },
+        "fastapi-mail": {
+            "hashes": [
+                "sha256:154e357784da47bbb2056c5b385ab9a5c43ddc8f02a040b43d49336e165e531c",
+                "sha256:55fe2b6d97fadb80c7b93a8f3c35c01012501350bd8e2bacdab745d3e9c9399d"
+            ],
+            "index": "pypi",
+            "version": "==0.3.0.1"
+        },
         "fastapi-sqlalchemy": {
             "hashes": [
                 "sha256:7a9d44e46cbc73c3f5ee8c444f7e0bcd3d01370a878740abd4cd4d2e900ce9af",
@@ -200,6 +216,14 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==2.10"
+        },
+        "jinja2": {
+            "hashes": [
+                "sha256:89aab215427ef59c34ad58735269eb58b1a5808103067f7bb9d5836c651b3bb0",
+                "sha256:f0a4641d3cf955324a89c04f3d94663aa4d638abe8f733ecd3582848e1c37035"
+            ],
+            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
+            "version": "==2.11.2"
         },
         "makefun": {
             "hashes": [

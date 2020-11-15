@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 from abc import ABC, abstractmethod
 import pendulum
@@ -29,6 +30,41 @@ class MonthFilter(Filter):
             month=self._month,
             year=self._year
         )
+        
+class DateFilter(Filter):
+    def __init__(self, model: ModelType, column_name: str, start: datetime = None, end: datetime = None):
+        super().__init__(model, filter_in_date_range)
+        self._column_name = column_name
+        self._start = start
+        self._end = end
+
+    def __call__(self):
+        return self._filter_func(
+            model=self._model,
+            column_name=self._column_name,
+            start=self._start,
+            end=self._end
+        )
+
+def filter_in_date_range(model: ModelType, column_name, start: datetime, end: datetime) -> List[BinaryExpression]:
+
+    if start is None and end is None:
+        return []
+    
+    if start is None:
+        start = pendulum.datetime(1900, 1, 1)
+        
+    if end is None:
+        end = pendulum.datetime(3000, 12, 31).end_of("day")
+
+    model_operand = getattr(model, column_name, None)
+    if not model_operand:
+        raise AttributeError()
+
+    return [
+        model_operand >= start,
+        model_operand <= end
+    ]
 
 
 def filter_in_month(model: ModelType, column_name, month: int, year: int) -> List[BinaryExpression]:

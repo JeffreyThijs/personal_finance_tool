@@ -1,5 +1,4 @@
-from typing import List
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends
 from fastapi_sqlalchemy import db
 from app.fastapi_users import fastapi_users
 
@@ -7,12 +6,14 @@ from app.crud import transaction
 from .dependencies import DateFilters
 from ..dependencies import PaginationParams
 from .....storage.schemas.users import UserDB
-from .....storage.schemas.transactions import TransactionOut, TransactionStatistics
+from .....storage.schemas.transactions import TransactionStatistics
 
 router = APIRouter()
 
 
-@router.get('', response_model=TransactionStatistics, summary="Global statistics of the transactions of a user")
+@router.get('', 
+            response_model=TransactionStatistics, 
+            summary="Global statistics of the transactions of a user")
 def get_user_transactions_statistics(
         user: UserDB = Depends(fastapi_users.get_current_active_user),
         pagination_params: PaginationParams = Depends(),

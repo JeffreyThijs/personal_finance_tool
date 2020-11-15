@@ -48,3 +48,16 @@ class DateFilters:
             start_date=self.start_date,
             end_date=self.end_date
         )
+
+
+class TransactionTypeFilters:
+    def __init__(self,
+                 incoming: bool = Query(
+                     None, description="Wether to filter on incoming"),
+                 ):
+        self.incoming = incoming
+
+    def dict(self):
+        return dict(
+            incoming=self.incoming
+        )

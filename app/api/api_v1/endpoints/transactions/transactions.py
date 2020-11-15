@@ -4,7 +4,7 @@ from fastapi_sqlalchemy import db
 from app.fastapi_users import fastapi_users
 
 from .statistics import router as stats_router
-from .dependencies import DateFilters
+from .dependencies import DateFilters, TransactionTypeFilters
 from ..dependencies import PaginationParams
 from .....storage.schemas.users import UserDB
 from .....crud import transaction
@@ -17,13 +17,15 @@ router.include_router(stats_router, prefix="/stats", tags=["statistics"])
 @router.get('', response_model=List[TransactionOut])
 async def get_user_transactions(user: UserDB = Depends(fastapi_users.get_current_active_user),
                                 pagination_params: PaginationParams = Depends(),
-                                date_filters: DateFilters = Depends()):
+                                date_filters: DateFilters = Depends(),
+                                type_filters: TransactionTypeFilters = Depends()):
 
     transactions = transaction.get_multi_by_owner(
         db=db.session,
         user_id=user.id,
         **pagination_params.dict(),
-        **date_filters.dict()
+        **date_filters.dict(),
+        **type_filters.dict()
     )
 
     return transactions

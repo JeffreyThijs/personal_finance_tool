@@ -4,7 +4,6 @@ from app.fastapi_users import fastapi_users
 
 from app.crud import transaction
 from .dependencies import DateFilters
-from ..dependencies import PaginationParams
 from .....storage.schemas.users import UserDB
 from .....storage.schemas.transactions import TransactionStatistics
 
@@ -16,13 +15,13 @@ router = APIRouter()
             summary="Global statistics of the transactions of a user")
 def get_user_transactions_statistics(
         user: UserDB = Depends(fastapi_users.get_current_active_user),
-        pagination_params: PaginationParams = Depends(),
         date_filters: DateFilters = Depends()):
 
     transactions = transaction.get_multi_by_owner(
         db=db.session,
         user_id=user.id,
-        **pagination_params.dict(),
+        skip=None,
+        limit=None,
         **date_filters.dict()
     )
     stats = TransactionStatistics(

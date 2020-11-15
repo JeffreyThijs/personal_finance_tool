@@ -9,7 +9,7 @@ from .....storage.schemas.transactions import TransactionStatistics
 router = APIRouter()
 
 
-@router.get('/', response_model=TransactionStatistics, summary="Global statistics of the transactions of a user")
+@router.get('', response_model=TransactionStatistics, summary="Global statistics of the transactions of a user")
 def get_user_transactions_statistics(
         user: UserDB = Depends(fastapi_users.get_current_active_user),
         year: int = Query(None, title="The year of the month to get the stats from", ge=1900, le=3000), 

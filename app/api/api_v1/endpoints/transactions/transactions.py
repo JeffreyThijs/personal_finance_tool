@@ -12,7 +12,7 @@ from .....storage.schemas.transactions import TransactionOut, TransactionCreate,
 router = APIRouter()
 
 
-@router.get('/', response_model=List[TransactionOut])
+@router.get('', response_model=List[TransactionOut])
 def get_user_transactions(user: UserDB = Depends(fastapi_users.get_current_active_user),
                           skip: int = 0,
                           limit: int = 100,
@@ -41,7 +41,7 @@ def get_user_transaction(id: int,
     return existing_transaction
 
 
-@router.post('/', response_model=TransactionOut)
+@router.post('', response_model=TransactionOut)
 def create_transaction(transaction_in: TransactionCreate,
                        user: UserDB = Depends(fastapi_users.get_current_active_user)):
 

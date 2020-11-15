@@ -1,4 +1,6 @@
+from pydantic import BaseModel, validator
 from pydantic_sqlalchemy import sqlalchemy_to_pydantic
+
 from ..models import TransactionTable as Transaction
 
 _TransactionDB = sqlalchemy_to_pydantic(Transaction)
@@ -23,3 +25,13 @@ class TransactionUpdate(_TransactionUpdate):
 
 class TransactionOut(_TransactionOut):
     pass
+
+
+class TransactionStatistics(BaseModel):
+    incoming: float
+    outgoing: float
+    balance: float = None
+    
+    @validator("balance", always=True)
+    def balance_calc(cls, v, values, **kwargs):
+        return values["incoming"] - values["outgoing"]

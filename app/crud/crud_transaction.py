@@ -1,10 +1,11 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import UUID4 as GUID
 from sqlalchemy.orm import Session
 
 from .base import CRUDBase
+from .filters import MonthFilter
 from ..storage.models import TransactionTable as Transaction
 from ..storage.schemas.transactions import TransactionCreate, TransactionUpdate
 
@@ -21,22 +22,25 @@ class CRUDTransaction(CRUDBase[Transaction, TransactionCreate, TransactionUpdate
         return db_obj
     
     def get_by_owner(
-        self, db: Session, *, id: int, user_id: GUID
+        self, db: Session, *, id: int, user_id: GUID, month: int = None, year: int = None
     ) -> List[Transaction]:
+        filters = MonthFilter(self.model, "date", month, year)()
         return (
             db.query(self.model)
             .filter(Transaction.user_id == user_id,
-                    Transaction.id == id)
+                    Transaction.id == id,
+                    *filters)
             .one_or_none()
         )
         
 
     def get_multi_by_owner(
-        self, db: Session, *, user_id: GUID, skip: int = 0, limit: int = 100
+        self, db: Session, *, user_id: GUID, skip: int = 0, limit: int = 100, month: int = None, year: int = None, 
     ) -> List[Transaction]:
+        filters = MonthFilter(self.model, "date", month, year)()
         return (
             db.query(self.model)
-            .filter(Transaction.user_id == user_id)
+            .filter(Transaction.user_id == user_id, *filters)
             .offset(skip)
             .limit(limit)
             .all()

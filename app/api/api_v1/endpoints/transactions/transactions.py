@@ -1,11 +1,11 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi_sqlalchemy import db
-from ..users import fastapi_users
+from app.fastapi_users import fastapi_users
 
-from ..storage.schemas.users import UserDB
-from ..crud import transaction
-from ..storage.schemas.transactions import TransactionOut, TransactionCreate, TransactionUpdate
+from .....storage.schemas.users import UserDB
+from .....crud import transaction
+from .....storage.schemas.transactions import TransactionOut, TransactionCreate, TransactionUpdate
 
 router = APIRouter()
 

@@ -9,9 +9,9 @@ from sqlalchemy import func, Column, Float, Integer, String, ForeignKey, DateTim
 from sqlalchemy.orm import relationship
 
 from .mixins import TimestampMixin
-from .monkey_patches import SQLAlchemyUserDatabase
 from .schemas.users import UserDB
 from ..settings import settings
+from ..fastapi_users import SQLAlchemyUserDatabase
 
 
 database = Database(settings.DATABASE_URL)

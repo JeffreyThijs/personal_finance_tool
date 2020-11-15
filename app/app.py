@@ -53,7 +53,7 @@ google_oauth_router = fastapi_users.get_oauth_router(
 )
 app.include_router(google_oauth_router, prefix="/auth/google", tags=["auth"])
 
-app.include_router(transactions.router, tags=["transactions"])
+app.include_router(transactions.router, prefix="/transactions", tags=["transactions"])
 
 
 @app.on_event("startup")

@@ -1,6 +1,7 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi_sqlalchemy import db
+from pydantic.main import BaseModel
 from app.fastapi_users import fastapi_users
 
 from .statistics import router as stats_router
@@ -13,22 +14,30 @@ from .....storage.schemas.transactions import TransactionOut, TransactionCreate,
 router = APIRouter()
 router.include_router(stats_router, prefix="/stats", tags=["statistics"])
 
+class PaginatedTransaction(BaseModel):
+    transactions: List[TransactionOut]
+    total_transactions: int
+    
 
-@router.get('', response_model=List[TransactionOut])
+@router.get('', response_model=PaginatedTransaction)
 async def get_user_transactions(user: UserDB = Depends(fastapi_users.get_current_active_user),
                                 pagination_params: PaginationParams = Depends(),
                                 date_filters: DateFilters = Depends(),
                                 type_filters: TransactionTypeFilters = Depends()):
 
-    transactions = transaction.get_multi_by_owner(
+    transactions, total_transactions = transaction.get_multi_by_owner(
         db=db.session,
         user_id=user.id,
         **pagination_params.dict(),
         **date_filters.dict(),
-        **type_filters.dict()
+        **type_filters.dict(),
+        get_total=True
     )
 
-    return transactions
+    return PaginatedTransaction(
+        transactions=transactions,
+        total_transactions=total_transactions
+    )
 
 
 @router.get("/{id}", response_model=TransactionOut)

@@ -74,7 +74,8 @@ class CRUDTransaction(CRUDBase[Transaction, TransactionCreate, TransactionUpdate
         end_date: datetime = None,
         incoming: bool = None,
         order_attribute: str = None,
-        desc_order: bool = False
+        desc_order: bool = False,
+        get_total: bool = False
     ) -> List[Transaction]:
 
         filters = [
@@ -91,6 +92,8 @@ class CRUDTransaction(CRUDBase[Transaction, TransactionCreate, TransactionUpdate
         transaction_q = db.query(self.model)\
                           .filter(Transaction.user_id == user_id, *filters)
 
+        transaction_count_q = transaction_q
+
         if skip is not None:
             transaction_q = transaction_q.offset(skip)
         if limit is not None:
@@ -103,7 +106,11 @@ class CRUDTransaction(CRUDBase[Transaction, TransactionCreate, TransactionUpdate
                     sort_obj = desc(sort_obj)
                 transaction_q = transaction_q.order_by(sort_obj)
             
-        return transaction_q.all()
+        found_transactions = transaction_q.all()
+            
+        if get_total:
+            return (found_transactions, transaction_count_q.count())
+        return found_transactions
 
 
 transaction = CRUDTransaction(Transaction)

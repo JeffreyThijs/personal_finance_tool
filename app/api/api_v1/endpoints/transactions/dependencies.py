@@ -38,16 +38,13 @@ def group_by_month_func(model) -> Callable:
     return group_by_func(model, ['date.year', 'date.month'])
 
 
+
 class PartitionFunction(str, Enum):
-    by_month = 'group_by_month_func'
+    by_month = 'by_month'
 
     @property
     def func(self):
-        return locals()[self.value]
-
-    @property
-    def func(self):
-        return globals()[self.value]
+        return FUNC_MAPPING[self]
 
     @property
     def order_attribute(self) -> str:
@@ -56,6 +53,9 @@ class PartitionFunction(str, Enum):
         else:
             raise NotImplementedError()
 
+FUNC_MAPPING = {
+    PartitionFunction.by_month: group_by_month_func
+}
 
 class DateFilters:
     def __init__(self,

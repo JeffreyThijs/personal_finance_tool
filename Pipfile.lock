@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "99ff92fef15f392887da30042e64dbad08b38680b2db267e86422fa8750deee8"
+            "sha256": "3ba38ebe91e3130aa23647af284465a1657bce26e90544a3a4fa8714013cf46b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -125,11 +125,11 @@
         },
         "databases": {
             "hashes": [
-                "sha256:8aac48977c3827a7c9bc4d94a0b138ac7fa60679facd3d4b15e4533f463e48fa",
-                "sha256:f8a2f48f17f39803d7b74e810be0ad4add030f392f178fc1ded374d80c9645a9"
+                "sha256:799febb8fc0ad1e9ac47b5510b91e971d35be205aa99b9a00b3811b4cb5e5254",
+                "sha256:853c7fa9a0d9b8af8d58cfa15aae00ec0a4fa73b31df4331192308e00c5b6345"
             ],
             "index": "pypi",
-            "version": "==0.4.0"
+            "version": "==0.4.1"
         },
         "dnspython": {
             "hashes": [
@@ -156,11 +156,11 @@
         },
         "fastapi-mail": {
             "hashes": [
-                "sha256:154e357784da47bbb2056c5b385ab9a5c43ddc8f02a040b43d49336e165e531c",
-                "sha256:55fe2b6d97fadb80c7b93a8f3c35c01012501350bd8e2bacdab745d3e9c9399d"
+                "sha256:6e463f718b065b8f17b8f43553a0b15c3a9e91a5262067955de6e5ad228dad55",
+                "sha256:fde2ada950010a865d81cb00e84cc6a779992f0172a1af6d0fe0f1ef41a98375"
             ],
             "index": "pypi",
-            "version": "==0.3.0.1"
+            "version": "==0.3.0.4"
         },
         "fastapi-sqlalchemy": {
             "hashes": [
@@ -172,11 +172,11 @@
         },
         "fastapi-users": {
             "hashes": [
-                "sha256:1f36d32f86a7dfe2f5f889183585e1a6c63843c6be4cf5a3b0ab6b65cf7b47c0",
-                "sha256:8f0d5a1aaffd350ae649f2785c653ea929d38107ee8d2e21a3767ac7c10c61b0"
+                "sha256:2b67258dc90661e15285d0c0b0d46578a38806847dc31f0f9b9e95e4134bfee8",
+                "sha256:6654f3b9d1f3ac5a0c16a1e0257da7d4a23da93c9932059a6d7a0142c2a55cb5"
             ],
             "index": "pypi",
-            "version": "==3.0.6"
+            "version": "==3.0.7"
         },
         "h11": {
             "hashes": [

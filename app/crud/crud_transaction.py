@@ -1,7 +1,8 @@
+from app.api.api_v1.endpoints.transactions.dependencies import PartitionFunction
 import operator
+from itertools import groupby
 from datetime import datetime
-import operator
-from typing import List, Optional
+from typing import Any, Callable, Iterable, List, Optional, Tuple, Union
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import UUID4 as GUID
@@ -13,6 +14,7 @@ from .filters import ConditionFilter, DateFilter, MonthFilter
 from ..storage.models import TransactionTable as Transaction
 from ..storage.schemas.transactions import TransactionCreate, TransactionUpdate
 
+TXS = List[Transaction]
 
 class CRUDTransaction(CRUDBase[Transaction, TransactionCreate, TransactionUpdate]):
     def create_with_owner(
@@ -40,13 +42,13 @@ class CRUDTransaction(CRUDBase[Transaction, TransactionCreate, TransactionUpdate
         incoming: bool = None,
         order_attribute: str = None,
         desc_order: bool = False
-    ) -> List[Transaction]:
+    ) -> TXS:
 
         filters = [
             *MonthFilter(self.model, "date", month, year)(),
             *DateFilter(self.model, "date", start, end)()
         ]
-        
+
         if incoming is not None:
             op = operator.ge if incoming else operator.lt
             filters.extend(
@@ -75,14 +77,15 @@ class CRUDTransaction(CRUDBase[Transaction, TransactionCreate, TransactionUpdate
         incoming: bool = None,
         order_attribute: str = None,
         desc_order: bool = False,
-        get_total: bool = False
-    ) -> List[Transaction]:
+        get_total: bool = False,
+        partition_func: PartitionFunction = None
+    ) -> Union[TXS, Tuple[TXS, int], Iterable[Tuple[Any, Iterable[TXS]]], Tuple[Iterable[Tuple[Any, Iterable[TXS]]], int]]:
 
         filters = [
             *MonthFilter(self.model, "date", month, year)(),
             *DateFilter(self.model, "date", start_date, end_date)()
         ]
-        
+
         if incoming is not None:
             op = operator.ge if incoming else operator.lt
             filters.extend(
@@ -98,18 +101,21 @@ class CRUDTransaction(CRUDBase[Transaction, TransactionCreate, TransactionUpdate
             transaction_q = transaction_q.offset(skip)
         if limit is not None:
             transaction_q = transaction_q.limit(limit)
-            
-            
+
         if order_attribute is not None:
             if sort_obj := getattr(self.model, order_attribute, None):
                 if desc_order:
                     sort_obj = desc(sort_obj)
                 transaction_q = transaction_q.order_by(sort_obj)
-            
+
         found_transactions = transaction_q.all()
+        
+        if partition_func is not None:
+            found_transactions = groupby(found_transactions, partition_func)
             
         if get_total:
             return (found_transactions, transaction_count_q.count())
+        
         return found_transactions
 
 

@@ -33,15 +33,17 @@ def get_user_transactions_statistics(
             outgoing=-sum([t.price for t in transactions if t.price < 0.0])
         )
     else:
-        print(date_filters.partition_func)
         if date_filters.partition_func == PartitionFunction.by_month:
             stats = []
             for (year, month), txs in transactions:
+                incoming, outgoing = [], []
+                for t in txs:
+                    (incoming, outgoing)[t.price < 0].append(t.price)
                 stat = TransactionStatisticsByMonth(
                     year=year,
                     month=month,
-                    incoming=sum(t.price for t in txs if t.price >= 0),
-                    outgoing=sum(t.price for t in txs if t.price < 0)
+                    incoming=sum(incoming),
+                    outgoing=-sum(outgoing)
                 )
                 stats.append(stat)
         else:

@@ -1,4 +1,4 @@
-from databases import Database
+
 from fastapi_users.db import (
     SQLAlchemyBaseUserTable,
     SQLAlchemyBaseOAuthAccountTable
@@ -9,12 +9,8 @@ from sqlalchemy import func, Column, Float, Integer, String, ForeignKey, DateTim
 from sqlalchemy.orm import relationship
 
 from .mixins import TimestampMixin
-from .schemas.users import UserDB
-from ..settings import settings
-from ..fastapi_users import SQLAlchemyUserDatabase
 
 
-database = Database(settings.DATABASE_URL)
 Base: DeclarativeMeta = declarative_base()
 
 
@@ -26,11 +22,6 @@ class OAuthAccount(SQLAlchemyBaseOAuthAccountTable, Base):
     pass
 
 
-users = UserTable.__table__
-oauth_accounts = OAuthAccount.__table__
-user_db = SQLAlchemyUserDatabase(UserDB, database, users, oauth_accounts)
-
-
 class TransactionTable(Base, TimestampMixin):
     __tablename__ = "transactions"
 
@@ -38,5 +29,5 @@ class TransactionTable(Base, TimestampMixin):
     comment = Column(String, nullable=False)
     price = Column(Float, nullable=False)
     date = Column(DateTime, nullable=False, default=func.now())
-    
+
     user_id = Column(GUID, ForeignKey('user.id'))

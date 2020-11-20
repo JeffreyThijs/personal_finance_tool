@@ -1,1 +1,1 @@
-web: alembic upgrade head; gunicorn -w 4 -k uvicorn.workers.UvicornWorker app.app:app
+web: alembic upgrade head; gunicorn app.app:app

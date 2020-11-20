@@ -19,7 +19,7 @@ def index():
     all_data: List[Transaction] = db.session.query(Transaction).filter(Transaction.user_id == current_user.id).all()
     all_data = [dict(date=x.date, 
                      user_email=x.user.email,
-                     price=x.pice,
+                     price=x.price,
                      comment=x.comment,
                      incoming=x.incoming) for x in all_data]
 

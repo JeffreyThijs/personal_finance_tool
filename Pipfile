@@ -23,6 +23,7 @@ pendulum = "*"
 uvicorn = "*"
 gunicorn = "*"
 uvloop = "*"
+httptools = "*"
 
 [dev-packages]
 autopep8 = "*"

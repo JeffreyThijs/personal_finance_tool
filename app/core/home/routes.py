@@ -1,3 +1,4 @@
+from typing import List
 from flask import render_template, current_app
 from flask_login import current_user, login_required
 from app.core.home import bp
@@ -15,7 +16,12 @@ def index():
     from app import db
     from app.sqldb.models import Transaction
     
-    all_data = db.session.query(Transaction).filter(Transaction.user_id == current_user.id).all()
+    all_data: List[Transaction] = db.session.query(Transaction).filter(Transaction.user_id == current_user.id).all()
+    all_data = [dict(date=x.date, 
+                     user_email=x.user.email,
+                     price=x.pice,
+                     comment=x.comment,
+                     incoming=x.incoming) for x in all_data]
 
     return render_template('/core/home/index.html',
                             all_data=all_data,

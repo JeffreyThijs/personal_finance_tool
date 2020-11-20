@@ -1,4 +1,5 @@
 from typing import List
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi_sqlalchemy import db
 from pydantic.main import BaseModel
@@ -14,10 +15,18 @@ from .....storage.schemas.transactions import TransactionOut, TransactionCreate,
 router = APIRouter()
 router.include_router(stats_router, prefix="/stats", tags=["statistics"])
 
+
 class PaginatedTransaction(BaseModel):
     transactions: List[TransactionOut]
     total_transactions: int
-    
+
+
+class LegacyTransaction(BaseModel):
+    date: datetime
+    price: float
+    comment: str
+    incoming: bool
+
 
 @router.get('', response_model=PaginatedTransaction)
 async def get_user_transactions(user: UserDB = Depends(fastapi_users.get_current_active_user),
@@ -91,3 +100,24 @@ async def delete_transaction(id: int,
         raise HTTPException(status_code=404, detail="Transaction not found")
     removed_transaction = transaction.remove(db=db.session, id=id)
     return removed_transaction
+
+
+@router.post('/import/legacy', response_model=List[TransactionOut])
+async def import_data(transactions_in: List[LegacyTransaction],
+                      user: UserDB = Depends(fastapi_users.get_current_active_user)):
+
+    new_transactions = []
+    for tx in transactions_in:
+        price = tx.price if tx.incoming else -tx.price
+        new_transaction = transaction.create_with_owner(
+            db=db.session,
+            obj_in=TransactionCreate(
+                price=price,
+                date=tx.date,
+                comment=tx.comment
+            ),
+            user_id=user.id
+        )
+        new_transactions.append(new_transaction)
+
+    return new_transactions

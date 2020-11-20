@@ -20,9 +20,9 @@ setuptools = "*"
 fastapi-users = "*"
 fastapi-mail = "*"
 pendulum = "*"
+uvicorn = "*"
 
 [dev-packages]
-uvicorn = "*"
 autopep8 = "*"
 
 [requires]

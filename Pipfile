@@ -21,6 +21,7 @@ fastapi-users = "*"
 fastapi-mail = "*"
 pendulum = "*"
 uvicorn = "*"
+gunicorn = "*"
 
 [dev-packages]
 autopep8 = "*"

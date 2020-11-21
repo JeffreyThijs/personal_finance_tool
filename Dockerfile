@@ -1,9 +1,17 @@
-FROM ubuntu:latest
-MAINTAINER Thijs Jeffrey "jeffrey.thijs@hotmail.com"
-RUN apt-get update -y
-RUN apt-get install -y python3-pip python3-dev build-essential sqlite3 libsqlite3-dev
-COPY . /app
-WORKDIR /app
-RUN pip3 install -r requirements.txt
-ENTRYPOINT ["python3"]
-CMD ["pft.py"]
+# Pull base image
+FROM python:3.8
+
+# Set environment varibles
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+WORKDIR /code/
+
+# Install dependencies
+RUN pip install pipenv
+COPY Pipfile Pipfile.lock /code/
+RUN pipenv install --system --dev
+
+COPY . /code/
+
+EXPOSE 8000

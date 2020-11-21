@@ -1,0 +1,33 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+starlette = "*"
+fastapi = "*"
+pydantic = "*"
+SQLAlchemy = "*"
+FastAPI-SQLAlchemy = "*"
+python-dotenv = "*"
+databases = "*"
+alembic = "*"
+asyncpg = "*"
+psycopg2 = "*"
+pydantic-sqlalchemy = "*"
+httpx-oauth = "*"
+setuptools = "*"
+fastapi-users = "*"
+fastapi-mail = "*"
+pendulum = "*"
+uvicorn = "*"
+gunicorn = "*"
+uvloop = "*"
+httptools = "*"
+aiofiles = "*"
+
+[dev-packages]
+autopep8 = "*"
+
+[requires]
+python_version = "3.8"

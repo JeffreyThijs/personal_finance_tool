@@ -1,1 +1,1 @@
-web: flask db upgrade; gunicorn pft:app
+web: alembic upgrade head; gunicorn -k uvicorn.workers.UvicornWorker app.app:app

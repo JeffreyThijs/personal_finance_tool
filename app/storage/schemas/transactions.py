@@ -30,13 +30,13 @@ class TransactionOut(_TransactionOut):
 
 
 class TransactionStatistics(BaseModel):
-    incoming: float
-    outgoing: float
+    incoming: float = 0
+    outgoing: float = 0
     balance: float = None
 
     @validator("balance", always=True)
     def balance_calc(cls, v, values, **kwargs):
-        return values["incoming"] - values["outgoing"]
+        return values.get("incoming", 0) - values.get("outgoing", 0)
 
 
 class TransactionStatisticsByMonth(TransactionStatistics):

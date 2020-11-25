@@ -1,9 +1,9 @@
 from typing import List, Union
 from app.storage.models import TransactionTable
 from fastapi import APIRouter, Depends
-from fastapi_sqlalchemy import db
 from app.fastapi_users import fastapi_users
 
+from app.storage.db import Session, get_db
 from app.crud import transaction
 from .dependencies import DateFilters, PartitionFunction, PartitionaleDateFilters
 from .....storage.schemas.users import UserDB
@@ -17,10 +17,11 @@ router = APIRouter()
             summary="Global statistics of the transactions of a user")
 def get_user_transactions_statistics(
         user: UserDB = Depends(fastapi_users.get_current_active_user),
-        date_filters: PartitionaleDateFilters = Depends()):
+        date_filters: PartitionaleDateFilters = Depends(),
+        db: Session = Depends(get_db)):
     
     transactions = transaction.get_multi_by_owner(
-        db=db.session,
+        db=db,
         user_id=user.id,
         skip=None,
         limit=None,

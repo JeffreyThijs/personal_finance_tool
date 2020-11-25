@@ -1,14 +1,11 @@
 from fastapi import FastAPI
-from fastapi_sqlalchemy import DBSessionMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 
 from .api.api_v1.api import api_router
 from .api.common.api import api_router as common_api_router
-from .settings import settings
-from .storage.user_db import database
+from .storage.db import database
 
 app = FastAPI()
-app.add_middleware(DBSessionMiddleware, db_url=settings.DATABASE_URL)
 
 origins = [
     "http://localhost.tiangolo.com",

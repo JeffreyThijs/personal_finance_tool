@@ -83,11 +83,14 @@ class TransactionSortBy:
 
     TransactionAttributes = _generate_enum(TransactionTable)
 
-    def __init__(self, sort_by: Optional[TransactionAttributes] = Query(None, description="sort by")) -> None:
+    def __init__(self, sort_by: Optional[TransactionAttributes] = Query(None, description="sort by"),
+                       descending_order: Optional[bool] = Query(None, description="descending order")) -> None:
         self.sort_by = sort_by
+        self.descending_order = descending_order if descending_order is not None else False
 
     def dict(self):
-        return dict(order_attribute=getattr(self.sort_by, 'value', None))
+        return dict(order_attribute=getattr(self.sort_by, 'value', None),
+                    desc_order=self.descending_order)
 
 
 # class TransactionSortBy:

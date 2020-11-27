@@ -87,7 +87,7 @@ class TransactionSortBy:
         self.sort_by = sort_by
 
     def dict(self):
-        return dict(order_attribute=self.sort_by.value)
+        return dict(order_attribute=getattr(self.sort_by, 'value', None))
 
 
 # class TransactionSortBy:

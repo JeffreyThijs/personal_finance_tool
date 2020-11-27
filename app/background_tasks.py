@@ -22,5 +22,25 @@ async def on_after_register(user: UserDB, request: Request):
     await fm.send_message(message)
 
 
-def on_after_forgot_password(user: UserDB, token: str, request: Request):
-    print(f"User {user.id} has forgot their password. Reset token: {token}")
+async def on_after_forgot_password(user: UserDB, token: str, request: Request):
+    
+    origin = request.headers.get("Origin", None)
+    if not origin:
+        return
+    
+    reset_url = f"{origin}/reset-password?token={token}"
+    
+    html = f"""
+    <p>Hi, reset your password <a href="{reset_url}">here</a>.</p> 
+    """
+    
+    message = MessageSchema(
+        subject="Password reset",
+        recipients=[user.email],
+        body=html,
+        subtype="html"
+    )
+    
+    fm = FastMail(mail_settings)
+    
+    await fm.send_message(message)

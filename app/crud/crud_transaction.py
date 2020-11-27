@@ -97,16 +97,16 @@ class CRUDTransaction(CRUDBase[Transaction, TransactionCreate, TransactionUpdate
 
         transaction_count_q = transaction_q
 
-        if skip is not None:
-            transaction_q = transaction_q.offset(skip)
-        if limit is not None:
-            transaction_q = transaction_q.limit(limit)
-
         if order_attribute is not None:
             if sort_obj := getattr(self.model, order_attribute, None):
                 if desc_order:
                     sort_obj = desc(sort_obj)
                 transaction_q = transaction_q.order_by(sort_obj)
+                
+        if skip is not None:
+            transaction_q = transaction_q.offset(skip)
+        if limit is not None:
+            transaction_q = transaction_q.limit(limit)
 
         found_transactions = transaction_q.all()
         

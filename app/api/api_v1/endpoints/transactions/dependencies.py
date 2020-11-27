@@ -1,34 +1,11 @@
-from app.crud.filters import DateFilter
+from app.storage.models import TransactionTable
+from app.crud.base import ModelType
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, List, Optional, Tuple, Union
-from databases.core import Transaction
+from typing import Any, Callable, List, Optional, Tuple, Type, TypeVar
 from fastapi import Query
-from pydantic import BaseModel
 from app.utils import rgetattr
 
-
-# class DateFilters(BaseModel):
-#     year: Optional[int] = Query(
-#         None,
-#         description="The year of the month to get the stats from",
-#         ge=1900,
-#         le=3000
-#     )
-#     month: Optional[int] = Query(
-#         None,
-#         description="The month numerically to get the stats from",
-#         ge=1,
-#         le=12
-#     )
-#     start_date: Optional[datetime] = Query(
-#         None,
-#         description="Start Date"
-#     )
-#     end_date: Optional[datetime] = Query(
-#         None,
-#         description="End date"
-#     )
 
 def group_by_func(model, attrs: List[str]) -> Tuple[Any, ...]:
     return tuple([rgetattr(model, attr) for attr in attrs])
@@ -36,7 +13,6 @@ def group_by_func(model, attrs: List[str]) -> Tuple[Any, ...]:
 
 def group_by_month_func(model) -> Callable:
     return group_by_func(model, ['date.year', 'date.month'])
-
 
 
 class PartitionFunction(str, Enum):
@@ -53,9 +29,11 @@ class PartitionFunction(str, Enum):
         else:
             raise NotImplementedError()
 
+
 FUNC_MAPPING = {
     PartitionFunction.by_month: group_by_month_func
 }
+
 
 class DateFilters:
     def __init__(self,
@@ -91,6 +69,38 @@ class TransactionTypeFilters:
         return dict(
             incoming=self.incoming
         )
+
+
+EnumType = TypeVar("EnumType", bound=Enum)
+
+
+def _generate_enum(model: Type[ModelType]) -> Type[EnumType]:
+    _enum_content = {key: key for key in model.__table__.columns.keys()}
+    return Enum(f"{model.__class__.__name__}Enum", _enum_content)
+
+
+class TransactionSortBy:
+
+    TransactionAttributes = _generate_enum(TransactionTable)
+
+    def __init__(self, sort_by: Optional[TransactionAttributes] = Query(None, description="sort by")) -> None:
+        self.sort_by = sort_by
+
+    def dict(self):
+        return dict(order_attribute=self.sort_by.value)
+
+
+# class TransactionSortBy:
+
+#     _enum_content = {key: key for key in TransactionTable.__table__.columns.keys()}
+#     TransactionAttribute = Enum(f"{TransactionTable.__class__.__name__}Enum", _enum_content)
+
+#     def __init__(self,
+#                  sort_by: Optional[TransactionAttribute] = Query(None, description="sort by")):
+#         self.sort_by = sort_by
+
+#     def dict(self):
+#         return dict(order_attribute=self.sort_by)
 
 
 class PartitionalDateFilters(DateFilters):

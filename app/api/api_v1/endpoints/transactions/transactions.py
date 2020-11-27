@@ -6,7 +6,7 @@ from app.fastapi_users import fastapi_users
 
 from app.storage.db import Session, get_db
 from .statistics import router as stats_router
-from .dependencies import DateFilters, TransactionTypeFilters
+from .dependencies import DateFilters, TransactionSortBy, TransactionTypeFilters
 from ..dependencies import PaginationParams
 from .....storage.schemas.users import UserDB
 from .....crud import transaction
@@ -33,6 +33,7 @@ async def get_user_transactions(user: UserDB = Depends(fastapi_users.get_current
                                 pagination_params: PaginationParams = Depends(),
                                 date_filters: DateFilters = Depends(),
                                 type_filters: TransactionTypeFilters = Depends(),
+                                sort_by: TransactionSortBy = Depends(),
                                 db: Session = Depends(get_db)):
 
     transactions, total_transactions = transaction.get_multi_by_owner(
@@ -41,6 +42,7 @@ async def get_user_transactions(user: UserDB = Depends(fastapi_users.get_current
         **pagination_params.dict(),
         **date_filters.dict(),
         **type_filters.dict(),
+        **sort_by.dict(),
         get_total=True
     )
 

@@ -93,7 +93,7 @@ class TransactionTypeFilters:
         )
 
 
-class PartitionaleDateFilters(DateFilters):
+class PartitionalDateFilters(DateFilters):
 
     def __init__(self,
                  year: Optional[int] = Query(

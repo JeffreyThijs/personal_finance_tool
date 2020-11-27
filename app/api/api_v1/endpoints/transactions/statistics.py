@@ -5,7 +5,7 @@ from app.fastapi_users import fastapi_users
 
 from app.storage.db import Session, get_db
 from app.crud import transaction
-from .dependencies import DateFilters, PartitionFunction, PartitionaleDateFilters
+from .dependencies import DateFilters, PartitionFunction, PartitionalDateFilters
 from .....storage.schemas.users import UserDB
 from .....storage.schemas.transactions import TransactionStatistics, TransactionStatisticsByMonth
 
@@ -17,7 +17,7 @@ router = APIRouter()
             summary="Global statistics of the transactions of a user")
 def get_user_transactions_statistics(
         user: UserDB = Depends(fastapi_users.get_current_active_user),
-        date_filters: PartitionaleDateFilters = Depends(),
+        date_filters: PartitionalDateFilters = Depends(),
         db: Session = Depends(get_db)):
     
     transactions = transaction.get_multi_by_owner(

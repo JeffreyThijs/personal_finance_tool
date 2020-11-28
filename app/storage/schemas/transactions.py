@@ -1,3 +1,4 @@
+from typing import List, Set
 from pydantic import BaseModel, validator
 from pydantic.types import conint
 from pydantic_sqlalchemy import sqlalchemy_to_pydantic
@@ -18,15 +19,15 @@ class TransactionDB(_TransactionDB):
 
 
 class TransactionCreate(_TransactionCreate):
-    pass
+    tags: Set[str]
 
 
 class TransactionUpdate(_TransactionUpdate):
-    pass
+    tags: Set[str]
 
 
 class TransactionOut(_TransactionOut):
-    pass
+    tags: Set[str]
 
 
 class TransactionStatistics(BaseModel):

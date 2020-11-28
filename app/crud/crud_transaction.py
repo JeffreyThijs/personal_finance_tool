@@ -1,8 +1,9 @@
-from app.api.api_v1.endpoints.transactions.dependencies import PartitionFunction
 import operator
+from sqlalchemy import and_, or_
+from app.api.api_v1.endpoints.transactions.dependencies import PartitionFunction, TagCondition
 from itertools import groupby
 from datetime import datetime
-from typing import Any, Callable, Iterable, List, Optional, Tuple, Union
+from typing import Any, Iterable, List, Tuple, Union
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import UUID4 as GUID
@@ -15,6 +16,7 @@ from ..storage.models import TransactionTable as Transaction
 from ..storage.schemas.transactions import TransactionCreate, TransactionUpdate
 
 TXS = List[Transaction]
+
 
 class CRUDTransaction(CRUDBase[Transaction, TransactionCreate, TransactionUpdate]):
     def create_with_owner(
@@ -78,7 +80,9 @@ class CRUDTransaction(CRUDBase[Transaction, TransactionCreate, TransactionUpdate
         order_attribute: str = None,
         desc_order: bool = False,
         get_total: bool = False,
-        partition_func: PartitionFunction = None
+        partition_func: PartitionFunction = None,
+        tags: List[str] = None,
+        tag_condition: TagCondition = None
     ) -> Union[TXS, Tuple[TXS, int], Iterable[Tuple[Any, Iterable[TXS]]], Tuple[Iterable[Tuple[Any, Iterable[TXS]]], int]]:
 
         filters = [
@@ -95,27 +99,39 @@ class CRUDTransaction(CRUDBase[Transaction, TransactionCreate, TransactionUpdate
         transaction_q = db.query(self.model)\
                           .filter(Transaction.user_id == user_id, *filters)
 
-        transaction_count_q = transaction_q
+        if tags is not None and tag_condition is not None:
+            if tag_condition is TagCondition.any:
+                tag_filters = [Transaction.tags.any(tag) for tag in tags]
+                tag_filters = or_(*tag_filters)
+            elif tag_condition is TagCondition.all:
+                tag_filters = [Transaction.tags.any(tag) for tag in tags]
+                tag_filters = and_(*tag_filters)
+            else:
+                raise NotImplementedError("unknown condition")
+
+            transaction_q = transaction_q.filter(tag_filters)
 
         if order_attribute is not None:
             if sort_obj := getattr(self.model, order_attribute, None):
                 if desc_order:
                     sort_obj = desc(sort_obj)
                 transaction_q = transaction_q.order_by(sort_obj)
-                
+
+        transaction_count_q = transaction_q
+
         if skip is not None:
             transaction_q = transaction_q.offset(skip)
         if limit is not None:
             transaction_q = transaction_q.limit(limit)
 
         found_transactions = transaction_q.all()
-        
+
         if partition_func is not None:
             found_transactions = groupby(found_transactions, partition_func)
-            
+
         if get_total:
             return (found_transactions, transaction_count_q.count())
-        
+
         return found_transactions
 
 

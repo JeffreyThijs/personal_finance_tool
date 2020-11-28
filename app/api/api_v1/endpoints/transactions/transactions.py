@@ -6,8 +6,7 @@ from app.fastapi_users import fastapi_users
 
 from app.storage.db import Session, get_db
 from .statistics import router as stats_router
-from .dependencies import DateFilters, TransactionSortBy, TransactionTypeFilters
-from ..dependencies import PaginationParams
+from .dependencies import TransactionFilterOptions
 from .....storage.schemas.users import UserDB
 from .....crud import transaction
 from .....storage.schemas.transactions import TransactionOut, TransactionCreate, TransactionUpdate
@@ -30,19 +29,13 @@ class LegacyTransaction(BaseModel):
 
 @router.get('', response_model=PaginatedTransaction)
 async def get_user_transactions(user: UserDB = Depends(fastapi_users.get_current_active_user),
-                                pagination_params: PaginationParams = Depends(),
-                                date_filters: DateFilters = Depends(),
-                                type_filters: TransactionTypeFilters = Depends(),
-                                sort_by: TransactionSortBy = Depends(),
+                                filter_options: TransactionFilterOptions = Depends(),
                                 db: Session = Depends(get_db)):
 
     transactions, total_transactions = transaction.get_multi_by_owner(
         db=db,
         user_id=user.id,
-        **pagination_params.dict(),
-        **date_filters.dict(),
-        **type_filters.dict(),
-        **sort_by.dict(),
+        **filter_options.dict(),
         get_total=True
     )
 

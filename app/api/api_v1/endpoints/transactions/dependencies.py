@@ -1,11 +1,10 @@
-from app.storage.models import TransactionTable
-from app.crud.base import ModelType
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, List, Optional, Tuple, Type, TypeVar
-from fastapi import Query
+from typing import Any, Callable, List, Optional, Tuple
+from fastapi import Query, Depends
 from app.utils import rgetattr
-from ..dependencies import SortBy, model_enum
+from app.storage.models import TransactionTable
+from ..dependencies import SortBy, model_enum, PaginationParams
 
 
 def group_by_func(model, attrs: List[str]) -> Tuple[Any, ...]:
@@ -61,14 +60,33 @@ class DateFilters:
 
 class TransactionTypeFilters:
     def __init__(self,
-                 incoming: bool = Query(
-                     None, description="Wether to filter on incoming"),
+                 incoming: bool = Query(None, description="Whether to filter on incoming"),
                  ):
         self.incoming = incoming
 
     def dict(self):
         return dict(
             incoming=self.incoming
+        )
+
+
+class TagCondition(str, Enum):
+    all = 'all'
+    any = 'any'
+
+
+class TransactionTagFilters:
+    def __init__(self,
+                 tags: List[str] = Query([], description="Transaction contains of the following tags (depends on condition)"),
+                 tag_condition: TagCondition = Query(TagCondition.any, description="needs to have one of the tags / all of the tags"),
+                 ):
+        self._tags = tags
+        self._tag_condition = tag_condition
+
+    def dict(self):
+        return dict(
+            tags=self._tags,
+            tag_condition=self._tag_condition
         )
 
 
@@ -104,3 +122,28 @@ class PartitionalDateFilters(DateFilters):
             order_attribute=self.order_attribute,
             partition_func=getattr(self.partition_func, 'func', None)
         )
+
+
+class TransactionFilterOptions:
+
+    def __init__(self,
+                 pagination_params: PaginationParams = Depends(),
+                 date_filters: DateFilters = Depends(),
+                 type_filters: TransactionTypeFilters = Depends(),
+                 sort_by: TransactionSortBy = Depends(),
+                 tagged_by: TransactionTagFilters = Depends(),
+                 ) -> None:
+        self._pagination_params = pagination_params
+        self._date_filters = date_filters
+        self._type_filters = type_filters
+        self._sort_by = sort_by
+        self._tagged_by = tagged_by
+
+    def dict(self):
+        return {
+            **self._pagination_params.dict(),
+            **self._date_filters.dict(),
+            **self._type_filters.dict(),
+            **self._sort_by.dict(),
+            **self._tagged_by.dict()
+        }

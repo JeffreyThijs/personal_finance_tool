@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     MAIL_PORT: int = 587
     MAIL_TLS: bool = True
     MAIL_SSL: bool = False
+    DEBUG_MODE: bool = False
 
     class Config:
         case_sensitive = True
@@ -39,7 +40,9 @@ class Settings(BaseSettings):
     
     @property
     def ASYNC_DATABASE_URL(self):
-        return self.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+        if self.DEBUG_MODE:
+            return self.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+        return self.DATABASE_URL
 
 
 settings = Settings()

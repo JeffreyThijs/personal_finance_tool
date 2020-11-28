@@ -586,6 +586,7 @@
             "version": "==1.2.0"
         },
         "sqlalchemy": {
+            "extras": [],
             "hashes": [
                 "sha256:0f598fda22895cae04588fba211271d5eeae33ca7db8fa8611fcb68d3289d918",
                 "sha256:125fa3cf8212d803624f7d5eef1c8e7028170aba4bc21a622e81012050da8826",

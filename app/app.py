@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .api.api_v1.api import api_router
 from .api.common.api import api_router as common_api_router
-from .storage.db import database
+from .storage.user_db import database
 
 app = FastAPI(docs_url="/")
 

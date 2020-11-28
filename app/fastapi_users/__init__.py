@@ -256,7 +256,7 @@ def get_oauth_router(
 FastAPIUsers.get_oauth_router = get_oauth_router
 
 from ..settings import settings
-from ..storage.db import user_db
+from ..storage.user_db import user_db
 from ..storage.schemas.users import User, UserCreate, UserUpdate, UserDB
 
 jwt_authentication = JWTAuthentication(

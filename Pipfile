@@ -7,7 +7,7 @@ name = "pypi"
 starlette = "*"
 fastapi = "*"
 pydantic = "*"
-SQLAlchemy = "*"
+SQLAlchemy = "==1.4.0b1"
 python-dotenv = "*"
 databases = "*"
 alembic = "*"
@@ -31,3 +31,6 @@ autopep8 = "*"
 
 [requires]
 python_version = "3.8"
+
+[pipenv]
+allow_prereleases = true

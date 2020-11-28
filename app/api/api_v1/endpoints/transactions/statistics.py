@@ -1,11 +1,12 @@
 from typing import List, Union
-from app.storage.models import TransactionTable
 from fastapi import APIRouter, Depends
-from app.fastapi_users import fastapi_users
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.storage.db import Session, get_db
-from app.crud import transaction
-from .dependencies import DateFilters, PartitionFunction, PartitionalDateFilters
+from app.fastapi_users import fastapi_users
+from app.storage.db import get_db
+from app import crud
+
+from .dependencies import PartitionFunction, PartitionalDateFilters
 from .....storage.schemas.users import UserDB
 from .....storage.schemas.transactions import TransactionStatistics, TransactionStatisticsByMonth
 
@@ -15,12 +16,12 @@ router = APIRouter()
 @router.get('', 
             response_model=Union[TransactionStatistics, List[TransactionStatisticsByMonth]], 
             summary="Global statistics of the transactions of a user")
-def get_user_transactions_statistics(
+async def get_user_transactions_statistics(
         user: UserDB = Depends(fastapi_users.get_current_active_user),
         date_filters: PartitionalDateFilters = Depends(),
-        db: Session = Depends(get_db)):
+        db: AsyncSession = Depends(get_db)):
     
-    transactions = transaction.get_multi_by_owner(
+    transactions = await crud.transaction.get_multi_by_owner(
         db=db,
         user_id=user.id,
         skip=None,

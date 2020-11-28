@@ -1,4 +1,4 @@
-from typing import List, Set
+from typing import List, Optional, Set
 from pydantic import BaseModel, validator
 from pydantic.types import conint
 from pydantic_sqlalchemy import sqlalchemy_to_pydantic
@@ -27,7 +27,14 @@ class TransactionUpdate(_TransactionUpdate):
 
 
 class TransactionOut(_TransactionOut):
-    tags: Set[str]
+    tags: Optional[Set[str]] = None
+
+    @validator("tags", always=True)
+    def tags(cls, v):
+        if isinstance(v, list):
+            return [val for val in v if val is not None]
+        else:
+            return v
 
 
 class TransactionStatistics(BaseModel):

@@ -5,10 +5,9 @@ from itertools import groupby
 from datetime import datetime
 from typing import Any, Iterable, List, Tuple, Union
 
-from fastapi.encoders import jsonable_encoder
 from pydantic import UUID4 as GUID
-from sqlalchemy import desc
-from sqlalchemy.orm import Session
+from sqlalchemy import desc, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from .base import CRUDBase
 from .filters import ConditionFilter, DateFilter, MonthFilter
@@ -19,21 +18,20 @@ TXS = List[Transaction]
 
 
 class CRUDTransaction(CRUDBase[Transaction, TransactionCreate, TransactionUpdate]):
-    def create_with_owner(
-        self, db: Session, *, obj_in: TransactionCreate, user_id: GUID
+    async def create_with_owner(
+        self, db: AsyncSession, *, obj_in: TransactionCreate, user_id: GUID
     ) -> Transaction:
-
-        obj_in_data = jsonable_encoder(obj_in)
+        obj_in_data = self._encode(obj_in)
         db_obj = self.model(**obj_in_data, user_id=user_id)
         db.add(db_obj)
-        db.commit()
-        db.refresh(db_obj)
+        await db.commit()
+        await db.refresh(db_obj)
 
         return db_obj
 
-    def get_by_owner(
+    async def get_by_owner(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         id: int,
         user_id: GUID,
@@ -57,17 +55,18 @@ class CRUDTransaction(CRUDBase[Transaction, TransactionCreate, TransactionUpdate
                 ConditionFilter(self.model, "price", op, 0.0)()
             )
 
-        return (
-            db.query(self.model)
-            .filter(Transaction.user_id == user_id,
-                    Transaction.id == id,
-                    *filters)
-            .one_or_none()
+        stmt = select(self.model).filter(
+            Transaction.user_id == user_id,
+            Transaction.id == id,
+            *filters
         )
 
-    def get_multi_by_owner(
+        db_execute = await db.execute(stmt)
+        return db_execute.scalars().one_or_none()
+
+    async def get_multi_by_owner(
         self,
-        db: Session,
+        db: AsyncSession,
         *,
         user_id: GUID,
         skip: int = 0,
@@ -96,8 +95,10 @@ class CRUDTransaction(CRUDBase[Transaction, TransactionCreate, TransactionUpdate
                 ConditionFilter(self.model, "price", op, 0.0)()
             )
 
-        transaction_q = db.query(self.model)\
-                          .filter(Transaction.user_id == user_id, *filters)
+        stmt = select(self.model).filter(
+            Transaction.user_id == user_id, 
+            *filters
+        )
 
         if tags is not None and tag_condition is not None:
             if tag_condition is TagCondition.any:
@@ -109,28 +110,30 @@ class CRUDTransaction(CRUDBase[Transaction, TransactionCreate, TransactionUpdate
             else:
                 raise NotImplementedError("unknown condition")
 
-            transaction_q = transaction_q.filter(tag_filters)
+            stmt = stmt.filter(tag_filters)
 
         if order_attribute is not None:
             if sort_obj := getattr(self.model, order_attribute, None):
                 if desc_order:
                     sort_obj = desc(sort_obj)
-                transaction_q = transaction_q.order_by(sort_obj)
+                stmt = stmt.order_by(sort_obj)
 
-        transaction_count_q = transaction_q
+        count_stmt = stmt
 
         if skip is not None:
-            transaction_q = transaction_q.offset(skip)
+            stmt = stmt.offset(skip)
         if limit is not None:
-            transaction_q = transaction_q.limit(limit)
+            stmt = stmt.limit(limit)
 
-        found_transactions = transaction_q.all()
+        db_execute = await db.execute(stmt)
+        found_transactions = db_execute.scalars().all()
 
         if partition_func is not None:
             found_transactions = groupby(found_transactions, partition_func)
 
         if get_total:
-            return (found_transactions, transaction_count_q.count())
+            db_execute = await db.execute(count_stmt)
+            return (found_transactions, len(db_execute.scalars().all()))
 
         return found_transactions
 

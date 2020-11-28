@@ -37,12 +37,10 @@ class Settings(BaseSettings):
         if 'MIN_DB_SESSIONS' in values and v < values['MIN_DB_SESSIONS']:
             raise ValueError("MAX_DB_SESSIONS can't be lower than MIN_DB_SESSIONS")
         return v
-    
+
     @property
     def ASYNC_DATABASE_URL(self):
-        if self.DEBUG_MODE:
-            return self.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
-        return self.DATABASE_URL
+        return self.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
 
 
 settings = Settings()

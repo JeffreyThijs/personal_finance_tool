@@ -4,6 +4,7 @@ from fastapi_users.db import (
     SQLAlchemyBaseOAuthAccountTable
 )
 from fastapi_users.db.sqlalchemy import GUID
+from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from sqlalchemy import func, Column, Float, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
@@ -31,3 +32,5 @@ class TransactionTable(Base, TimestampMixin):
     date = Column(DateTime, nullable=False, default=func.now())
 
     user_id = Column(GUID, ForeignKey('user.id'))
+    
+    tags = Column(ARRAY(String))

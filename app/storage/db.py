@@ -6,7 +6,6 @@ from ..settings import settings
 
 logger = logging.getLogger(__name__)
 
-print(settings.ASYNC_DATABASE_URL)
 try:
     engine = create_async_engine(
         settings.ASYNC_DATABASE_URL

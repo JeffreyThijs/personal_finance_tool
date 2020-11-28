@@ -19,11 +19,11 @@ class TransactionDB(_TransactionDB):
 
 
 class TransactionCreate(_TransactionCreate):
-    tags: Set[str]
+    tags: Optional[Set[str]] = None
 
 
 class TransactionUpdate(_TransactionUpdate):
-    tags: Set[str]
+    tags: Optional[Set[str]] = None
 
 
 class TransactionOut(_TransactionOut):

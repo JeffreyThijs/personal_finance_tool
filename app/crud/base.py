@@ -30,7 +30,6 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         
         def convert(x: Dict[str, Any]) -> Dict[str, Any]:
             y = {}
-            print(x)
             for k, v in x.items():
                 if isinstance(v, dict):
                     v = convert(v)
@@ -82,14 +81,14 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         for field in obj_data:
             if field in update_data:
                 setattr(db_obj, field, update_data[field])
-        print(db_obj)
         db.add(db_obj)
         await db.commit()
         await db.refresh(db_obj)
         return db_obj
 
     async def remove(self, db: AsyncSession, *, id: int) -> ModelType:
-        obj = await db.get(self.model, id)
-        await db.delete(obj)
+        db_execute =  await db.execute(select(self.model).filter(self.model.id == id))
+        obj = db_execute.scalars().one_or_none()
+        db.delete(obj)
         await db.commit()
         return obj

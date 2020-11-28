@@ -48,6 +48,7 @@ class DateFilter(Filter):
             end=self._end
         )
 
+
 class ConditionFilter(Filter):
     def __init__(self, model: ModelType, column_name: str, operator: Any, value: Any):
         super().__init__(model, filter_on_condition)
@@ -62,6 +63,7 @@ class ConditionFilter(Filter):
             operator=self._operator,
             value=self._value
         )
+
 
 def filter_in_date_range(model: ModelType, column_name, start: datetime, end: datetime) -> List[BinaryExpression]:
 
@@ -78,6 +80,10 @@ def filter_in_date_range(model: ModelType, column_name, start: datetime, end: da
     if not model_operand:
         raise AttributeError()
 
+    # FIXME: hack as asyncpg can't use datetime with timezones
+    start = start.replace(tzinfo=None)
+    end = end.replace(tzinfo=None)
+
     return [
         model_operand >= start,
         model_operand <= end
@@ -90,11 +96,11 @@ def filter_in_month(model: ModelType, column_name, month: int, year: int) -> Lis
         return []
 
     if month is None:
-        begin = pendulum.datetime(year, 1, 1)
-        end = begin.last_of("year").end_of("day")
+        begin = pendulum.datetime(year, 1, 1).replace(tzinfo=None)
+        end = begin.last_of("year").end_of("day").replace(tzinfo=None)
     else:
-        begin = pendulum.datetime(year, month, 1)
-        end = begin.last_of("month").end_of("day")
+        begin = pendulum.datetime(year, month, 1).replace(tzinfo=None)
+        end = begin.last_of("month").end_of("day").replace(tzinfo=None)
 
     model_operand = getattr(model, column_name, None)
     if not model_operand:
@@ -106,9 +112,9 @@ def filter_in_month(model: ModelType, column_name, month: int, year: int) -> Lis
     ]
 
 
-def filter_on_condition(model: ModelType, 
-                        column_name, operator: Any, 
-                        value: Any, 
+def filter_on_condition(model: ModelType,
+                        column_name, operator: Any,
+                        value: Any,
                         skip_non_value: bool = False) -> List[BinaryExpression]:
 
     if not skip_non_value and value is None:

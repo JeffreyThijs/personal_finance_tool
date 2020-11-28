@@ -5,7 +5,7 @@ from .api.api_v1.api import api_router
 from .api.common.api import api_router as common_api_router
 from .storage.db import database
 
-app = FastAPI()
+app = FastAPI(docs_url="/")
 
 origins = [
     "http://localhost.tiangolo.com",

@@ -5,6 +5,7 @@ from enum import Enum
 from typing import Any, Callable, List, Optional, Tuple, Type, TypeVar
 from fastapi import Query
 from app.utils import rgetattr
+from ..dependencies import SortBy, model_enum
 
 
 def group_by_func(model, attrs: List[str]) -> Tuple[Any, ...]:
@@ -71,39 +72,12 @@ class TransactionTypeFilters:
         )
 
 
-EnumType = TypeVar("EnumType", bound=Enum)
+class TransactionSortBy(SortBy):
 
-
-def _generate_enum(model: Type[ModelType]) -> Type[EnumType]:
-    _enum_content = {key: key for key in model.__table__.columns.keys()}
-    return Enum(f"{model.__class__.__name__}Enum", _enum_content)
-
-
-class TransactionSortBy:
-
-    TransactionAttributes = _generate_enum(TransactionTable)
-
-    def __init__(self, sort_by: Optional[TransactionAttributes] = Query(None, description="sort by"),
-                       descending_order: Optional[bool] = Query(None, description="descending order")) -> None:
-        self.sort_by = sort_by
-        self.descending_order = descending_order if descending_order is not None else False
-
-    def dict(self):
-        return dict(order_attribute=getattr(self.sort_by, 'value', None),
-                    desc_order=self.descending_order)
-
-
-# class TransactionSortBy:
-
-#     _enum_content = {key: key for key in TransactionTable.__table__.columns.keys()}
-#     TransactionAttribute = Enum(f"{TransactionTable.__class__.__name__}Enum", _enum_content)
-
-#     def __init__(self,
-#                  sort_by: Optional[TransactionAttribute] = Query(None, description="sort by")):
-#         self.sort_by = sort_by
-
-#     def dict(self):
-#         return dict(order_attribute=self.sort_by)
+    def __init__(self,
+                 sort_by: Optional[model_enum(TransactionTable)] = Query(None, description="sort by"),
+                 descending_order: Optional[bool] = Query(None, description="descending order")) -> None:
+        super().__init__(sort_by, descending_order)
 
 
 class PartitionalDateFilters(DateFilters):

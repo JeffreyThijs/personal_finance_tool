@@ -24,10 +24,10 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         * `schema`: A Pydantic model (schema) class
         """
         self.model = model
-        
+
     @staticmethod
     def _encode(obj_in: Union[ModelType, CreateSchemaType, UpdateSchemaType, Dict[str, Any]]) -> Dict[str, Any]:
-        
+
         def convert(x: Dict[str, Any]) -> Dict[str, Any]:
             y = {}
             for k, v in x.items():
@@ -35,15 +35,15 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
                     v = convert(v)
                 elif isinstance(v, str):
                     try:
-                        v = pendulum.parse(v).replace(tzinfo=None) 
+                        v = pendulum.parse(v).replace(tzinfo=None)
                     except Exception as e:
                         pass
-                    
+
                 elif isinstance(v, datetime):
-                       v = v.replace(tzinfo=None) 
+                    v = v.replace(tzinfo=None)
                 y[k] = v
             return y
-        
+
         # FIXME: hack until fixed in sqlalchemy
         obj_in_data = jsonable_encoder(obj_in)
         return convert(obj_in_data)
@@ -87,7 +87,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return db_obj
 
     async def remove(self, db: AsyncSession, *, id: int) -> ModelType:
-        db_execute =  await db.execute(select(self.model).filter(self.model.id == id))
+        db_execute = await db.execute(select(self.model).filter(self.model.id == id))
         obj = db_execute.scalars().one_or_none()
         db.delete(obj)
         await db.commit()

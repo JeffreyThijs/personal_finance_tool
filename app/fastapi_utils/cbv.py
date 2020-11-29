@@ -74,7 +74,8 @@ def _init_cbv(cls: Type[Any]) -> None:
         return  # Already initialized
     old_init: Callable[..., Any] = cls.__init__
     old_signature = inspect.signature(old_init)
-    old_parameters = list(old_signature.parameters.values())[1:]  # drop `self` parameter
+    old_parameters = list(old_signature.parameters.values())[
+        1:]  # drop `self` parameter
     new_parameters = [
         x for x in old_parameters if x.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
     ]
@@ -85,7 +86,8 @@ def _init_cbv(cls: Type[Any]) -> None:
         parameter_kwargs = {"default": getattr(cls, name, Ellipsis)}
         dependency_names.append(name)
         new_parameters.append(
-            inspect.Parameter(name=name, kind=inspect.Parameter.KEYWORD_ONLY, annotation=hint, **parameter_kwargs)
+            inspect.Parameter(
+                name=name, kind=inspect.Parameter.KEYWORD_ONLY, annotation=hint, **parameter_kwargs)
         )
     new_signature = old_signature.replace(parameters=new_parameters)
 
@@ -106,7 +108,8 @@ def _update_cbv_route_endpoint_signature(cls: Type[Any], route: Union[Route, Web
     """
     old_endpoint = route.endpoint
     old_signature = inspect.signature(old_endpoint)
-    old_parameters: List[inspect.Parameter] = list(old_signature.parameters.values())
+    old_parameters: List[inspect.Parameter] = list(
+        old_signature.parameters.values())
     old_first_parameter = old_parameters[0]
     new_first_parameter = old_first_parameter.replace(default=Depends(cls))
     new_parameters = [new_first_parameter] + [

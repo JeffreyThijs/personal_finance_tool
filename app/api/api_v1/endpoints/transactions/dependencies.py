@@ -41,8 +41,10 @@ class DateFilters:
                      None, description="The year of the month you want to filter on", ge=1900, le=3000),
                  month: Optional[int] = Query(
                      None, description="The month numerically to filter on", ge=1, le=12),
-                 start_date: Optional[datetime] = Query(None, description="Start date to filter on"),
-                 end_date: Optional[datetime] = Query(None, description="End date to filter on")
+                 start_date: Optional[datetime] = Query(
+                     None, description="Start date to filter on"),
+                 end_date: Optional[datetime] = Query(
+                     None, description="End date to filter on")
                  ):
         self.year = year
         self.month = month
@@ -60,7 +62,8 @@ class DateFilters:
 
 class TransactionTypeFilters:
     def __init__(self,
-                 incoming: bool = Query(None, description="Whether to filter on incoming"),
+                 incoming: bool = Query(
+                     None, description="Whether to filter on incoming"),
                  ):
         self.incoming = incoming
 
@@ -77,8 +80,10 @@ class TagCondition(str, Enum):
 
 class TransactionTagFilters:
     def __init__(self,
-                 tags: List[str] = Query([], description="Transaction contains of the following tags (depends on condition)"),
-                 tag_condition: TagCondition = Query(TagCondition.any, description="needs to have one of the tags / all of the tags"),
+                 tags: List[str] = Query(
+                     [], description="Transaction contains of the following tags (depends on condition)"),
+                 tag_condition: TagCondition = Query(
+                     TagCondition.any, description="needs to have one of the tags / all of the tags"),
                  ):
         self._tags = tags
         self._tag_condition = tag_condition
@@ -93,7 +98,8 @@ class TransactionTagFilters:
 class TransactionSortBy(SortBy):
 
     def __init__(self,
-                 sort_by: Optional[model_enum(TransactionTable)] = Query(None, description="sort by"),
+                 sort_by: Optional[model_enum(TransactionTable)] = Query(
+                     None, description="sort by"),
                  descending_order: Optional[bool] = Query(None, description="descending order")) -> None:
         super().__init__(sort_by, descending_order)
 
@@ -105,9 +111,12 @@ class PartitionalDateFilters(DateFilters):
                      None, description="The year of the month you want to filter on", ge=1900, le=3000),
                  month: Optional[int] = Query(
                      None, description="The month numerically to filter on", ge=1, le=12),
-                 start_date: Optional[datetime] = Query(None, description="Start date to filter on"),
-                 end_date: Optional[datetime] = Query(None, description="End date to filter on"),
-                 partition_by: Optional[PartitionFunction] = Query(None, description="partition the results by")
+                 start_date: Optional[datetime] = Query(
+                     None, description="Start date to filter on"),
+                 end_date: Optional[datetime] = Query(
+                     None, description="End date to filter on"),
+                 partition_by: Optional[PartitionFunction] = Query(
+                     None, description="partition the results by")
                  ) -> None:
         super().__init__(year=year, month=month, start_date=start_date, end_date=end_date)
         self.order_attribute = getattr(partition_by, 'order_attribute', None)

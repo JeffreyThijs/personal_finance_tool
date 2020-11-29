@@ -57,7 +57,8 @@ class TransactionCBV:
 
         existing_transaction = await crud.transaction.get_by_owner(db=self.db, id=id, user_id=self.user.id)
         if not existing_transaction:
-            raise HTTPException(status_code=404, detail="Transaction not found")
+            raise HTTPException(
+                status_code=404, detail="Transaction not found")
 
         return existing_transaction
 
@@ -79,7 +80,8 @@ class TransactionCBV:
 
         existing_transaction = await crud.transaction.get_by_owner(db=self.db, id=id, user_id=self.user.id)
         if not existing_transaction:
-            raise HTTPException(status_code=404, detail="Transaction not found")
+            raise HTTPException(
+                status_code=404, detail="Transaction not found")
 
         updated_transaction = await crud.transaction.update(
             db=self.db,
@@ -94,7 +96,8 @@ class TransactionCBV:
 
         existing_transaction = await crud.transaction.get_by_owner(db=self.db, id=id, user_id=self.user.id)
         if not existing_transaction:
-            raise HTTPException(status_code=404, detail="Transaction not found")
+            raise HTTPException(
+                status_code=404, detail="Transaction not found")
         removed_transaction = await crud.transaction.remove(db=self.db, id=id)
         return removed_transaction
 

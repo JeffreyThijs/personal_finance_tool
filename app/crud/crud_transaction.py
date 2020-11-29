@@ -96,7 +96,7 @@ class CRUDTransaction(CRUDBase[Transaction, TransactionCreate, TransactionUpdate
             )
 
         stmt = select(self.model).filter(
-            Transaction.user_id == user_id, 
+            Transaction.user_id == user_id,
             *filters
         )
 

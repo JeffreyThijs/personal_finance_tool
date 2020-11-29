@@ -21,7 +21,8 @@ Base = declarative_base()
 
 
 class UserTable(Base, SQLAlchemyBaseUserTable):
-    transactions = relationship("TransactionTable", backref="parent", cascade="all, delete")
+    transactions = relationship(
+        "TransactionTable", backref="parent", cascade="all, delete")
 
 
 class OAuthAccount(SQLAlchemyBaseOAuthAccountTable, Base):

@@ -12,9 +12,10 @@ try:
     )
 except Exception as e:
     from sqlalchemy import create_engine
-    logger.critical("could not load async engine, trying again with non async engine...")
+    logger.critical(
+        "could not load async engine, trying again with non async engine...")
     engine = create_engine(settings.DATABASE_URL)
-    
+
 
 async def get_db() -> AsyncSession:
     """ FastAPI dependency that provides a sqlalchemy session """

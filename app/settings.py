@@ -31,15 +31,17 @@ class Settings(BaseSettings):
     @validator('MIN_DB_SESSIONS', always=True)
     def min_db_session_check(cls, v, values, **kwargs):
         if 'MAX_DB_SESSIONS' in values and v > values['MAX_DB_SESSIONS']:
-            raise ValueError("MIN_DB_SESSIONS can't be higher than MAX_DB_SESSIONS")
+            raise ValueError(
+                "MIN_DB_SESSIONS can't be higher than MAX_DB_SESSIONS")
         return v
 
     @validator('MAX_DB_SESSIONS', always=True)
     def max_db_session_check(cls, v, values, **kwargs):
         if 'MIN_DB_SESSIONS' in values and v < values['MIN_DB_SESSIONS']:
-            raise ValueError("MAX_DB_SESSIONS can't be lower than MIN_DB_SESSIONS")
+            raise ValueError(
+                "MAX_DB_SESSIONS can't be lower than MIN_DB_SESSIONS")
         return v
-    
+
     @validator('DATABASE_URL', always=True)
     def replace_driver(cls, v, values, **kwargs):
         return v.replace('postgres://', "postgresql://") if v.startswith('postgres://') else v

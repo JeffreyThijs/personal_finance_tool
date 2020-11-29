@@ -20,7 +20,8 @@ def model_enum(model: Type[ModelType]) -> Type[EnumType]:
 class SortBy:
 
     def __init__(self,
-                 sort_by: Optional[EnumType] = Query(None, description="sort by"),
+                 sort_by: Optional[EnumType] = Query(
+                     None, description="sort by"),
                  descending_order: Optional[bool] = Query(None, description="descending order")) -> None:
         self.sort_by = sort_by
         self.descending_order = descending_order if descending_order is not None else False
@@ -32,8 +33,10 @@ class SortBy:
 
 class PaginationParams:
     def __init__(self,
-                 skip: int = Query(0, description="Skip the first x results", ge=0),
-                 limit: int = Query(100, description="Skip the first x results", ge=1)
+                 skip: int = Query(
+                     0, description="Skip the first x results", ge=0),
+                 limit: int = Query(
+                     100, description="Skip the first x results", ge=1)
                  ):
         self.skip = skip
         self.limit = limit

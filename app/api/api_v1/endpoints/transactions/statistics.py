@@ -37,7 +37,8 @@ class TransactionCBV:
 
         if isinstance(transactions, list):
             stats = TransactionStatistics(
-                incoming=sum([t.price for t in transactions if t.price >= 0.0]),
+                incoming=sum(
+                    [t.price for t in transactions if t.price >= 0.0]),
                 outgoing=-sum([t.price for t in transactions if t.price < 0.0])
             )
         else:

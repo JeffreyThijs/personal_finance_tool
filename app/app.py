@@ -13,28 +13,18 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(docs_url="/")
 
-origins = [
-    "http://localhost.tiangolo.com",
-    "https://localhost.tiangolo.com",
-    "http://localhost",
-    "http://localhost:8080",
-    "http://127.0.0.1:8080",
-    "http://127.0.0.1",
-    "http://localhost:8080",
-    "https://pft-webapp.herokuapp.com",
-]
-
 app.add_middleware(
-CORSMiddleware,
-    allow_origins=origins, # Allows all origins
+    CORSMiddleware,
+    allow_origins=settings.ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"], # Allows all methods
-    allow_headers=["*"], # Allows all headers
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
 )
 add_timing_middleware(app, record=logger.info, prefix="app")
 
 app.include_router(common_api_router)
 app.include_router(api_router)
+
 
 @app.on_event("startup")
 async def startup():

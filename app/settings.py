@@ -1,4 +1,5 @@
-from pydantic import BaseSettings, PostgresDsn, EmailStr, validator
+from typing import List, Set
+from pydantic import BaseSettings, PostgresDsn, AnyUrl, validator
 from fastapi_mail import ConnectionConfig
 
 
@@ -20,6 +21,7 @@ class Settings(BaseSettings):
     MAIL_TLS: bool = True
     MAIL_SSL: bool = False
     DEBUG_MODE: bool = False
+    ORIGINS: List[AnyUrl] = []
 
     class Config:
         case_sensitive = True

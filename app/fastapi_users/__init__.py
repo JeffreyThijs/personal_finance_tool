@@ -1,6 +1,3 @@
-from ..storage.schemas.users import User, UserCreate, UserUpdate, UserDB
-from ..storage.user_db import user_db
-from ..settings import settings
 import jwt
 import urllib.parse as urlparse
 from urllib.parse import urlencode
@@ -11,8 +8,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response,
 from httpx_oauth.integrations.fastapi import OAuth2AuthorizeCallback
 from httpx_oauth.oauth2 import BaseOAuth2
 
-from fastapi_users.models import UD, BaseUserDB
-from fastapi_users.db import SQLAlchemyUserDatabase
+from fastapi_users.models import BaseUserDB
 from fastapi_users import FastAPIUsers
 from fastapi_users.router.oauth import generate_state_token, decode_state_token
 from fastapi_users import models
@@ -23,24 +19,10 @@ from fastapi_users.router.common import ErrorCode, run_handler
 from fastapi_users.authentication.cookie import CookieAuthentication
 from fastapi_users.authentication.jwt import JWTAuthentication
 
+from ..storage.schemas.users import User, UserCreate, UserUpdate, UserDB
+from ..storage.user_db import user_db
+from ..settings import settings
 
-async def _make_user(self, user: Mapping) -> UD:
-    user_dict = {**user}
-
-    if self.oauth_accounts is not None:
-        query = self.oauth_accounts.select().where(
-            self.oauth_accounts.c.user_id == user["id"]
-        )
-        oauth_accounts = await self.database.fetch_all(query)
-        # PATCHING THIS DUE PENDATIC VALIDATION ERROR
-        # user_dict["oauth_accounts"] = oauth_accounts
-        user_dict["oauth_accounts"] = [{**account}
-                                       for account in oauth_accounts]
-
-    return self.user_db_model(**user_dict)
-
-
-SQLAlchemyUserDatabase._make_user = _make_user
 
 
 async def get_login_redirected_response(self, user: BaseUserDB, response: Response, redirect_uri: str) -> Any:

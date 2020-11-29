@@ -1,6 +1,7 @@
 from typing import Iterator
 import pytest
 import tempfile
+from fastapi.testclient import TestClient
 
 from pytest_postgresql import factories
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
@@ -28,3 +29,10 @@ async def db_session(postgresql_my) -> Iterator[AsyncSession]:
         yield session
     finally:
         await session.close()
+
+@pytest.fixture(scope='module')
+def client() -> TestClient:
+    """Session for SQLAlchemy."""
+    from app.app import app
+
+    return TestClient(app)

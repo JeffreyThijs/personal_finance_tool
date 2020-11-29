@@ -34,6 +34,7 @@ pytest-postgresql = "*"
 pytest-asyncio = "*"
 faker = "*"
 pytest-cov = "*"
+requests = "*"
 
 [requires]
 python_version = "3.8"

@@ -37,6 +37,10 @@ class Settings(BaseSettings):
         if 'MIN_DB_SESSIONS' in values and v < values['MIN_DB_SESSIONS']:
             raise ValueError("MAX_DB_SESSIONS can't be lower than MIN_DB_SESSIONS")
         return v
+    
+    @validator('DATABASE_URL', always=True)
+    def replace_driver(cls, v, values, **kwargs):
+        return v.replace('postgres://', "postgresql://") if v.startswith('postgres://') else v
 
     @property
     def ASYNC_DATABASE_URL(self):

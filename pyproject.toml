@@ -1,0 +1,43 @@
+[tool.poetry]
+name = "personal_finance_tool"
+version = "0.1.0"
+description = "A simple web application to track your personal finances."
+authors = ["JeffreyThijs <jeffrey.thijs@hotmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+starlette = "*"
+fastapi = "*"
+pydantic = "*"
+SQLAlchemy = "==1.4.0b1"
+python-dotenv = "*"
+databases = "*"
+alembic = "*"
+asyncpg = "*"
+psycopg2 = "*"
+pydantic-sqlalchemy = "*"
+httpx-oauth = "*"
+setuptools = "*"
+fastapi-users = "*"
+fastapi-mail = "*"
+pendulum = "*"
+uvicorn = "*"
+gunicorn = "*"
+uvloop = "*"
+httptools = "*"
+aiofiles = "*"
+fastapi-utils = "*"
+pytest-asyncio = "*"
+
+[tool.poetry.dev-dependencies]
+autopep8 = "*"
+pytest = "*"
+pytest-postgresql = "*"
+pytest-asyncio = "*"
+faker = "*"
+pytest-cov = "*"
+requests = "*"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

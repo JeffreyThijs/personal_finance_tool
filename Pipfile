@@ -25,9 +25,14 @@ uvloop = "*"
 httptools = "*"
 aiofiles = "*"
 fastapi-utils = "*"
+pytest-asyncio = "*"
 
 [dev-packages]
 autopep8 = "*"
+pytest = "*"
+pytest-postgresql = "*"
+pytest-asyncio = "*"
+faker = "*"
 
 [requires]
 python_version = "3.8"

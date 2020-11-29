@@ -7,5 +7,6 @@ dist/
 
 .env
 .heroku.env
+.pytest_cache/
 
 import_data.py

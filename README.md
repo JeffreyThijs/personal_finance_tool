@@ -2,6 +2,9 @@
 
 A simple web application to track your personal finances.
 
+![master](https://github.com/actions/JeffreyThijs/personal-finance-tool/workflows/PersonalFinanceTool/badge.svg?branch=master)
+[![codecov](https://codecov.io/gh/JeffreyThijs/personal_finance_tool/branch/master/graph/badge.svg?token=1QBMYLET49)](https://codecov.io/gh/JeffreyThijs/personal_finance_tool)
+
 # Deploy
 
 This application can be deployed easily on Heroku, hereby specify the following parameters in your `.env` file:

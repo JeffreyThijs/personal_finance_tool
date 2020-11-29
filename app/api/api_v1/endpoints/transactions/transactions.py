@@ -30,12 +30,13 @@ class LegacyTransaction(BaseModel):
     comment: str
     incoming: bool
 
+
 @cbv(router, prefix="/transactions", tags=["transactions"])
 class TransactionCBV:
 
     user: UserDB = Depends(fastapi_users.get_current_active_user)
     db: AsyncSession = Depends(get_db)
-    
+
     @router.get('')
     async def get_user_transactions(self, filter_options: TransactionFilterOptions = Depends()) -> PaginatedTransaction:
 
@@ -51,7 +52,6 @@ class TransactionCBV:
             total_transactions=total_transactions
         )
 
-
     @router.get("/{id}")
     async def get_user_transaction(self, id: int) -> TransactionOut:
 
@@ -60,7 +60,6 @@ class TransactionCBV:
             raise HTTPException(status_code=404, detail="Transaction not found")
 
         return existing_transaction
-
 
     @router.post('')
     async def create_transaction(self, transaction_in: TransactionCreate) -> TransactionOut:
@@ -72,7 +71,6 @@ class TransactionCBV:
         )
 
         return new_transaction
-
 
     @router.put("/{id}")
     async def update_transaction(self,
@@ -91,7 +89,6 @@ class TransactionCBV:
 
         return updated_transaction
 
-
     @router.delete("/{id}")
     async def delete_transaction(self, id: int) -> TransactionOut:
 
@@ -100,7 +97,6 @@ class TransactionCBV:
             raise HTTPException(status_code=404, detail="Transaction not found")
         removed_transaction = await crud.transaction.remove(db=self.db, id=id)
         return removed_transaction
-
 
     @router.post('/import/legacy')
     async def import_data(self, transactions_in: List[LegacyTransaction]) -> List[TransactionOut]:
@@ -120,5 +116,3 @@ class TransactionCBV:
             new_transactions.append(new_transaction)
 
         return new_transactions
-
-print(router.routes)

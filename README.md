@@ -2,7 +2,7 @@
 
 A simple web application to track your personal finances.
 
-![master](https://github.com/JeffreyThijs/personal-finance-tool/workflows/.github/workflows/pft.yml/badge.svg)
+![master](https://github.com/JeffreyThijs/personal_finance_tool/workflows/.github/workflows/pft.yml/badge.svg)
 [![codecov](https://codecov.io/gh/JeffreyThijs/personal_finance_tool/branch/master/graph/badge.svg?token=1QBMYLET49)](https://codecov.io/gh/JeffreyThijs/personal_finance_tool)
 
 # Deploy

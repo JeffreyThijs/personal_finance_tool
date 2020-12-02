@@ -46,5 +46,5 @@ class Settings(ConnectionConfig):
 
 
 @lru_cache()
-def get_settings() -> Settings:
-    return Settings()
+def get_settings(*args, **kwargs) -> Settings:
+    return Settings(*args, **kwargs)

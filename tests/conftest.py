@@ -1,7 +1,9 @@
+from app.settings import Settings
 from typing import Iterator
 import pytest
 import tempfile
 from fastapi.testclient import TestClient
+from mock import patch
 
 from pytest_postgresql import factories
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
@@ -29,8 +31,14 @@ async def db_session(postgresql_my) -> Iterator[AsyncSession]:
         yield session
     finally:
         await session.close()
+        
+from app.settings import Settings
+        
+def get_settings():
+    return Settings(_env_file='.test.env')
 
 @pytest.fixture(scope='module')
+@patch('app.settings.get_settings', new=get_settings)
 def client() -> TestClient:
     """Session for SQLAlchemy."""
     from app.app import app

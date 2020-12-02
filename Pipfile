@@ -35,6 +35,7 @@ pytest-asyncio = "*"
 faker = "*"
 pytest-cov = "*"
 requests = "*"
+mock = "*"
 
 [requires]
 python_version = "3.8"

@@ -1,11 +1,13 @@
+from app.settings import get_settings
 from fastapi import APIRouter
 from httpx_oauth.clients.google import GoogleOAuth2
 from fastapi_utils.inferring_router import InferringRouter
 
-from ...settings import settings
+from ...settings import get_settings
 from ...background_tasks import on_after_register, on_after_forgot_password
 from ...fastapi_users import fastapi_users, jwt_authentication
 
+settings = get_settings()
 google_oauth_client = GoogleOAuth2(
     settings.GOOGLE_OAUTH_CLIENT_ID,
     settings.GOOGLE_OAUTH_CLIENT_SECRET

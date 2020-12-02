@@ -1,16 +1,10 @@
-from typing import List, Set
-from pydantic import BaseSettings, PostgresDsn, AnyUrl, validator
+from typing import List
+from functools import lru_cache
 from fastapi_mail import ConnectionConfig
+from pydantic import PostgresDsn, AnyUrl, validator
 
 
-class MailSettings(ConnectionConfig):
-    class Config:
-        case_sensitive = True
-        env_file = '.env'
-        env_file_encoding = 'utf-8'
-
-
-class Settings(BaseSettings):
+class Settings(ConnectionConfig):
     SECRET: str
     DATABASE_URL: PostgresDsn
     GOOGLE_OAUTH_CLIENT_ID: str
@@ -51,5 +45,6 @@ class Settings(BaseSettings):
         return self.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
 
 
-settings = Settings()
-mail_settings = MailSettings()
+@lru_cache()
+def get_settings() -> Settings:
+    return Settings()

@@ -1,15 +1,17 @@
 from fastapi import Request
+from fastapi_mail import FastMail, MessageSchema
 
 from .storage.schemas.users import UserDB
-from .settings import mail_settings
-from fastapi_mail import FastMail, MessageSchema, ConnectionConfig
+from .settings import get_settings
 
 
-async def on_after_register(user: UserDB, request: Request):
+async def on_after_register(user: UserDB, 
+                            request: Request):
 
     html = """
     <p>Hi, thanks for registering your account at PersonalFinanceTool!</p>
     """
+
 
     message = MessageSchema(
         subject="Welcome to PersonalFinanceTool!",
@@ -18,11 +20,14 @@ async def on_after_register(user: UserDB, request: Request):
         subtype="html"
     )
 
-    fm = FastMail(mail_settings)
+    settings = get_settings()
+    fm = FastMail(settings)
     await fm.send_message(message)
 
 
-async def on_after_forgot_password(user: UserDB, token: str, request: Request):
+async def on_after_forgot_password(user: UserDB, 
+                                   token: str, 
+                                   request: Request):
 
     origin = request.headers.get("Origin", None)
     if not origin:
@@ -41,6 +46,7 @@ async def on_after_forgot_password(user: UserDB, token: str, request: Request):
         subtype="html"
     )
 
-    fm = FastMail(mail_settings)
+    settings = get_settings()
+    fm = FastMail(settings)
 
     await fm.send_message(message)

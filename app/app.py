@@ -6,7 +6,7 @@ from fastapi_utils.timing import add_timing_middleware
 from .api.api_v1.api import api_router
 from .api.common.api import api_router as common_api_router
 from .storage.user_db import database
-from .settings import settings
+from .settings import get_settings
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -15,7 +15,7 @@ app = FastAPI(docs_url="/")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ORIGINS,
+    allow_origins=get_settings().ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],  # Allows all methods
     allow_headers=["*"],  # Allows all headers

@@ -21,7 +21,7 @@ from fastapi_users.authentication.jwt import JWTAuthentication
 
 from ..storage.schemas.users import User, UserCreate, UserUpdate, UserDB
 from ..storage.user_db import user_db
-from ..settings import settings
+from ..settings import get_settings
 
 
 
@@ -242,7 +242,7 @@ FastAPIUsers.get_oauth_router = get_oauth_router
 
 
 jwt_authentication = JWTAuthentication(
-    secret=settings.SECRET,
+    secret=get_settings().SECRET,
     lifetime_seconds=3600,
     tokenUrl="/auth/jwt/login"
 )

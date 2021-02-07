@@ -1,5 +1,6 @@
 import logging
 from typing import Union
+from functools import lru_cache
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,6 +11,7 @@ from ..settings import get_settings
 logger = logging.getLogger(__name__)
 
 
+@lru_cache(maxsize=2)
 def get_engine() -> Union[AsyncEngine, Engine]:
     settings = get_settings()
     try:

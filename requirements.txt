@@ -6,7 +6,7 @@ async-timeout==3.0.1
 asyncpg==0.21.0
 autopep8==1.5.4
 bcrypt==3.2.0
-certifi==2020.11.8
+certifi==2022.12.7
 cffi==1.14.4
 click==7.1.2
 databases==0.4.1
